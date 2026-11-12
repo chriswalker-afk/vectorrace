@@ -239,23 +239,23 @@ function frame(now) {
 
 const tour = [
   {
-    title:'Your skimmer has momentum',
-    text:'This is a vector race. Each move adds an acceleration to your current velocity — you cannot turn instantly.',
+    title:'Keep your momentum',
+    text:'Your velocity carries over. Choose an acceleration rather than a destination.',
     next:'SHOW ME'
   },
   {
     title:'Choose an acceleration',
-    text:'Tap any arrow in the 3 × 3 pad. You may change each velocity component by −1, 0 or +1.',
+    text:'Tap an arrow. Each velocity component changes by −1, 0 or +1.',
     next:'NEXT'
   },
   {
     title:'Commit your glide',
-    text:'Press GLIDE to move by your new velocity. In Guided mode, all nine possible landing points are visible.',
+    text:'Press GLIDE. Your new velocity determines your next position.',
     next:'NEXT'
   },
   {
     title:'Plan before the corners',
-    text:'Your velocity carries over. To turn, start reducing sideways speed early. Pass East, South and West gates, then cross the finish!',
+    text:'Brake before corners. Pass East, South and West gates, then finish.',
     next:'GOT IT'
   }
 ];
