@@ -12,6 +12,8 @@ on:
       - 'tests/race-coach.test.mjs'
       - 'tests/race-records.test.mjs'
       - 'scripts/viewport-smoke-v5.mjs'
+      - 'scripts/solve-lap.mjs'
+      - 'tests/lap-solver.test.mjs'
       - '.github/workflows/gameplay-v5.yml'
   push:
     branches: [main]
