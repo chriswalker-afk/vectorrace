@@ -41,7 +41,7 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
 }
 
 export function stoppingDisplacement(v) {
-  const component = n => n === 0 ? 0 : Math.sign(n) * Math.abs(n) * (Math.abs(n) - 1) / 2;
+  const component = n => Math.abs(n) <= 1 ? 0 : Math.sign(n) * Math.abs(n) * (Math.abs(n) - 1) / 2;
   return { x: component(v.x), y: component(v.y) };
 }
 
