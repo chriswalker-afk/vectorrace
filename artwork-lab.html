@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowshift · Art Library 03</title>
+<style>
+:root{--night:#081e30;--frost:#b9eaf0;--lime:#d4fc77;--orange:#ff7557;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% 5%,#3c968e4a,transparent 40%),linear-gradient(150deg,#081928,#12334a);color:#eff8fb;font-family:system-ui,Segoe UI,sans-serif;min-height:100vh}
+main{width:min(1350px,100%);margin:auto;padding:30px 22px 55px}
+header{border-bottom:1px solid #9dc8d66e;display:flex;justify-content:space-between;align-items:end;gap:12px;padding-bottom:20px;margin-bottom:25px}
+.kicker{font-size:11px;color:var(--lime);font-weight:900;letter-spacing:.19em}
+h1{font-size:clamp(38px,7vw,76px);font-style:italic;letter-spacing:-.055em;line-height:1;margin:5px 0}h1 span{color:var(--orange)}
+p{color:#b6cdd7;line-height:1.55}
+header a,.return{color:var(--lime);text-decoration:none;font-size:13px;font-weight:800;border:1px solid #9ed1da88;border-radius:6px;padding:13px 16px;white-space:nowrap}
+h2{font-size:clamp(21px,3vw,30px);letter-spacing:-.025em;margin:26px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tile{border:1px solid #a3ccd46b;border-radius:9px;overflow:hidden;background:#0d2a3f;box-shadow:0 12px 28px #03132175}
+.media{display:grid;place-items:center;height:230px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 62%,#4c92a0,#1b5069 44%,#11354b 85%)}
+.media.snow{background:linear-gradient(160deg,#e3f1f4,#9cc3d0)}
+.media.texture{background:#122d40}
+.media img{max-width:86%;max-height:85%;object-fit:contain;filter:drop-shadow(0 7px 10px #00223850)}
+.media .large{max-width:98%;max-height:96%}
+.media.repeat{background-repeat:repeat;background-size:256px 256px}
+.media.repeat img{display:none}
+.meta{padding:14px 17px;border-top:1px solid #7cafbc54}
+.meta strong{font-size:15px;display:block}
+.meta small{font-size:11px;color:#a4c6d2;display:block;margin-top:5px}
+.wide{grid-column:span 2}
+.palette{display:flex;gap:4px;margin:12px 0}
+.swatch{width:100%;height:50px;border-radius:4px}
+footer{margin-top:30px;border-top:1px solid #8baeba66;padding-top:20px;color:#a0bfcb;font-size:11px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:570px){main{padding:16px 10px}header{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.wide{grid-column:span 1}.media{height:205px}}
+</style>
+</head>
+<body><main>
+<header><div><div class="kicker">SNOWSHIFT / POLAR SERIES / ART PASS 03</div><h1>ART<span>LIBRARY</span></h1><p>Original overhead sprites and repeatable surfaces for the Northern Loop.</p></div><a href="race-v3.html">PLAY THE ART BUILD ↗</a></header>
+<section>
+<h2>Hero asset / racing skimmer</h2>
+<div class="grid">
+<article class="tile wide"><div class="media"><img class="large" src="./assets/art/ice-skimmer-flare.svg" alt="Flare orange original top-down ice-skimmer racing craft with a glass canopy, streamlined hull and twin ice runners"></div><div class="meta"><strong>01 · FLARE // single-seat ice-skimmer</strong><small>Master SVG · heading right · transparency preserved · rotation at runtime</small></div></article>
+<article class="tile"><div class="media snow"><img src="./assets/art/pine-canopy.svg" alt="Snow-laden evergreen crown, overhead view"></div><div class="meta"><strong>02 · Frostpine</strong><small>Overhead conifer, scattered and rescaled in scenery</small></div></article>
+<article class="tile"><div class="media snow"><img src="./assets/art/granite-outcrop.svg" alt="Snow-covered blue granite rock formation"></div><div class="meta"><strong>03 · Blue granite</strong><small>Reusable cliff and rock outcrop</small></div></article>
+<article class="tile"><div class="media snow"><img src="./assets/art/alpine-cabin.svg" alt="Snow-roofed timber cabin with warm illuminated windows"></div><div class="meta"><strong>04 · Alpine cabin</strong><small>Warm architectural focal point for central snow island</small></div></article>
+<article class="tile"><div class="media snow"><img src="./assets/art/race-flag.svg" alt="Orange snowflake flag and white pole"></div><div class="meta"><strong>05 · Rally flag</strong><small>Trackside checkpoint flag</small></div></article>
+<article class="tile"><div class="media snow"><img src="./assets/art/lantern.svg" alt="Small warm glowing amber lantern"></div><div class="meta"><strong>06 · Polar lantern</strong><small>Soft ambient lighting</small></div></article>
+</div>
+<h2>Material library / repeating textures</h2>
+<div class="grid">
+<article class="tile"><div class="media repeat texture" style="background-image:url('./assets/art/ice-surface.svg')"><img src="./assets/art/ice-surface.svg" alt="Blue crystalline ice tile"></div><div class="meta"><strong>07 · Deep ice</strong><small>SVG surface texture repeated inside exact road polygons</small></div></article>
+<article class="tile"><div class="media repeat texture" style="background-image:url('./assets/art/snowfield.svg')"><img src="./assets/art/snowfield.svg" alt="Powder snow tile"></div><div class="meta"><strong>08 · Powder snow</strong><small>SVG landscape texture, low-contrast frost and drift marks</small></div></article>
+<article class="tile"><div class="media texture"><div style="width:86%"><div class="palette"><div class="swatch" style="background:#0a192b"></div><div class="swatch" style="background:#164b65"></div><div class="swatch" style="background:#b9eaf0"></div><div class="swatch" style="background:#ff7557"></div><div class="swatch" style="background:#d4fc77"></div></div><p style="font-size:11px">Polar night / deep ice / frost / flare / aurora</p></div></div><div class="meta"><strong>Colour discipline</strong><small>Bold game readability without changing vector rules</small></div></article>
+</div>
+</section>
+<footer>Game mechanics remain in src/engine.mjs · Artwork sprites are standalone SVG files · <a class="return" href="race-v3.html">PLAY NORTHERN LOOP ↗</a></footer>
+</main></body></html>
