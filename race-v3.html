@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0a192b">
+  <title>SNOWSHIFT — Northern Loop · Artwork Build 03</title>
+  <link rel="stylesheet" href="./styles/race-v3.css">
+  <script type="module" src="./src/race-v3.mjs"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="eyebrow brand-kicker">POLAR RACING SERIES <span>//</span> ARTWORK BUILD 03</div>
+        <h1>SNOW<span>SHIFT</span><small>03</small></h1>
+        <p>Think ahead. Slide faster.</p>
+      </div>
+      <div class="top-status">
+        <span class="live-dot" aria-hidden="true"></span>
+        <div><strong>01 / NORTHERN LOOP</strong><small>1-LAP CIRCUIT CHALLENGE</small></div>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <section class="game-board" aria-label="Northern Loop racing course">
+        <canvas id="course" width="960" height="700" aria-label="Top-down Northern Loop circuit, an ice-skimmer and nine possible vector destinations. Use the acceleration controls to race."></canvas>
+        <div class="board-label">
+          <span class="tag">NIGHTFALL / FROZEN LAKE</span>
+          <strong>THE NORTHERN LOOP</strong>
+          <small>GLACIER CUP · ARCTIC SERIES</small>
+        </div>
+        <div class="board-scores" aria-label="Race statistics">
+          <div><small>MOVES</small><strong id="moves">00</strong></div>
+          <div><small>CRASHES</small><strong id="crashes">00</strong></div>
+          <div><small>SCORE</small><strong id="score">00</strong></div>
+        </div>
+        <div class="board-bottom"><span id="message" role="status" aria-live="polite">PILOT / CHOOSE ACCELERATION</span><span id="lap">LAP 0 / 1</span></div>
+        <div id="finishPanel" class="finish-panel" hidden>
+          <div class="finish-card">
+            <div class="eyebrow">ARCTIC SERIES / CIRCUIT COMPLETE</div>
+            <h2>FINISH!</h2>
+            <p>One complete lap. Three checkpoints. Every vector counts.</p>
+            <div class="finish-numbers"><span>FINAL SCORE</span><strong id="finalScore">0</strong></div>
+            <button id="raceAgain" class="primary">RACE AGAIN ↗</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="race-panel" aria-label="Race controls and vector telemetry">
+        <div class="panel-title"><span class="eyebrow">RACE TELEMETRY / 01</span><h2>Plan your glide</h2></div>
+        <div class="readout-grid">
+          <div><small>VELOCITY</small><strong id="currentVelocity">( 0, 0 )</strong></div>
+          <div><small>ACCELERATION</small><strong id="selectedAcceleration">( +1, 0 )</strong></div>
+          <div class="wide"><small>NEXT VELOCITY</small><strong id="nextVelocity" class="lime">( +1, 0 )</strong></div>
+        </div>
+
+        <div class="controls-section">
+          <div class="control-caption"><strong>CHOOSE ACCELERATION</strong><small>Each component: −1, 0, +1</small></div>
+          <div id="accelerationPad" class="acceleration-pad" role="group" aria-label="Choose a change in velocity"></div>
+          <p class="assist-label" id="nextMoveLabel">Choose a direction, then commit the vector.</p>
+          <button id="commit" class="primary">COMMIT VECTOR <span aria-hidden="true">↗</span></button>
+        </div>
+
+        <div class="checkpoint-section">
+          <div class="control-caption"><strong>RACE PROGRESS</strong><small>Cross each gate in order</small></div>
+          <ol class="checkpoint-list">
+            <li data-checkpoint="0"><span class="checkpoint-icon">01</span><span>East Gate</span></li>
+            <li data-checkpoint="1"><span class="checkpoint-icon">02</span><span>South Gate</span></li>
+            <li data-checkpoint="2"><span class="checkpoint-icon">03</span><span>West Gate</span></li>
+            <li data-checkpoint="3"><span class="checkpoint-icon">★</span><span>Finish Line</span></li>
+          </ol>
+        </div>
+        <div class="options">
+          <label><input type="checkbox" id="showOptions" checked> Show nine possibilities</label>
+          <label><input type="checkbox" id="showGrid" checked> Show coordinate grid</label>
+        </div>
+        <button id="reset" class="secondary">↺ RESET RACE</button>
+        <p class="helper">Choose with the 3 × 3 pad (or number keys 1–9). Press <kbd>Enter</kbd> or <kbd>Space</kbd> to glide; press <kbd>R</kbd> to reset. Tap a preview dot on the track to select it.</p>
+        <p class="warning"><strong>Race rule:</strong> Touching a track edge is allowed. Crossing snow or the central island is a crash: your velocity resets to zero, and your score incurs an extra three-point penalty.</p>
+      </aside>
+    </main>
+    <footer><span>PR #3 · PRODUCTION ART DIRECTION</span><span>NEW REUSABLE VEHICLE · TERRAIN · TRACK ASSETS</span></footer>
+  </div>
+</body>
+</html>
