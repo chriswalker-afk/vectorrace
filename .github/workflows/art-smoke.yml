@@ -57,6 +57,11 @@ jobs:
             --screenshot="$PWD/snowshift-race-v3-mobile.png" \
             http://127.0.0.1:8765/race-v3.html
           test -s snowshift-race-v3-mobile.png
+          "$CHROME" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars \
+            --window-size=1600,1050 --virtual-time-budget=5000 \
+            --screenshot="$PWD/snowshift-artwork-library.png" \
+            http://127.0.0.1:8765/artwork-lab.html
+          test -s snowshift-artwork-library.png
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -64,4 +69,5 @@ jobs:
           path: |
             snowshift-race-v3.png
             snowshift-race-v3-mobile.png
+            snowshift-artwork-library.png
           if-no-files-found: warn
