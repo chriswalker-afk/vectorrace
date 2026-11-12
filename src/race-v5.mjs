@@ -436,7 +436,7 @@ const tour = [
   },
   {
     title:'Plan before the corners',
-    text:'Brake before corners. Pass East, South and West gates, then finish.',
+    text:'The amber S shows where full braking stops you. Brake early and clear the gates.',
     next:'GOT IT'
   }
 ];
