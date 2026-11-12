@@ -85,6 +85,31 @@ function paintGates() {
     ctx.restore();
   }
 
+  // Gate callouts sit off-road so they cannot mask legal landing positions.
+  const callouts = [
+    { x: 31.7, y: 14.8, text: 'CP1' },
+    { x: 17.4, y: 1.5, text: 'CP2' },
+    { x: .8, y: 15, text: 'CP3' }
+  ];
+  for (const [i, label] of callouts.entries()) {
+    const p = world(label);
+    const active = state.checkpoint === i && !state.finished;
+    ctx.save();
+    ctx.fillStyle = active ? '#d4fc77' : '#09293fda';
+    ctx.strokeStyle = '#c5eaf1';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(p.x - 23, p.y - 12, 46, 24, 5);
+    ctx.fill();
+    ctx.stroke();
+    ctx.font = '900 12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = active ? '#102b3a' : '#eff9fb';
+    ctx.fillText(label.text, p.x, p.y);
+    ctx.restore();
+  }
+
   // Checkered start/finish ribbon, derived from the actual finish gate.
   const a = world(circuit.finish.a), b = world(circuit.finish.b);
   const segments = 12;
