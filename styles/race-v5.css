@@ -1,0 +1,32 @@
+@import url('./race-v4.css');
+
+/* The physical circuit and every core control retain the single-screen PR4 layout. */
+.record-badge{color:#d4fc77;font-weight:1000;letter-spacing:.06em}
+.ghost-toggle{color:#bceaf1;border-color:#7dd6ed}
+.ghost-toggle[aria-pressed="true"]{color:#d4fc77;border-color:#d4fc77}
+.panel-footer:has(.ghost-toggle:not([hidden])) .micro-hint{display:none}
+.record-result{display:block;font-size:11px;letter-spacing:.04em;color:#d4fc77;
+  font-weight:800;margin:2px 0 10px;min-height:12px}
+.event-toast{position:absolute;z-index:4;pointer-events:none;
+  top:24%;left:50%;transform:translateX(-50%);
+  max-width:min(72%,420px);min-width:min(180px,60%);
+  padding:clamp(8px,1.4vw,18px) clamp(12px,2vw,24px);
+  background:linear-gradient(140deg,#092c43f0,#0a182fe8);
+  color:#eaffff;border:2px solid #d4fc77;border-radius:9px;
+  box-shadow:0 10px 30px #071d2edb,0 0 22px #d4fc7750;
+  text-align:center;letter-spacing:.09em;text-transform:uppercase;
+  font-size:clamp(12px,1.55vw,23px);font-weight:1000;line-height:1.2}
+.event-toast[data-tone="crash"]{border-color:#ff7557;color:#ffd7c4;box-shadow:0 10px 30px #071d2edb,0 0 22px #ff755757}
+.event-toast[data-tone="record"]{border-color:#c5fa76;color:#d4fc77}
+@media(max-width:920px) and (orientation:portrait) {
+ .record-result{font-size:10px;line-height:1.2;margin:1px 0 6px}
+ .event-toast{top:25%;font-size:12px;padding:8px 10px;max-width:78%}
+}
+@media(max-width:760px) and (orientation:landscape), (max-height:450px) and (orientation:landscape){
+ .event-toast{top:28%;max-width:65%;font-size:13px;padding:6px 9px}
+ .record-result{font-size:10px;margin:1px 0 5px}
+}
+@media(max-width:365px) and (orientation:portrait){
+ .record-result{font-size:9px}
+ .event-toast{top:26%;font-size:10px;padding:5px 7px;border-width:1px}
+}
