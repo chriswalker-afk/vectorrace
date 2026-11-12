@@ -61,12 +61,18 @@ function imgReady(img) {
 export function createSnowshiftArtwork(requestRender = () => {}) {
   const images = new Map();
   const patterns = new Map();
+  let staticScene = null;
+  let sceneDirty = true;
   for (const [key, relativePath] of Object.entries(ASSETS)) {
     const img = new Image();
     images.set(key, img);
-    img.addEventListener('load', () => requestRender());
+    img.addEventListener('load', () => {
+      sceneDirty = true;
+      requestRender();
+    });
     img.addEventListener('error', () => {
       console.warn('Snowshift art asset unavailable:', relativePath);
+      sceneDirty = true;
       requestRender();
     });
     img.src = new URL(relativePath, import.meta.url).href;
@@ -297,8 +303,32 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.restore();
   }
 
+  function paintScene(ctx, width, height, world, circuit) {
+    const density = 2;
+    if (!staticScene || staticScene.width !== width * density ||
+        staticScene.height !== height * density) {
+      staticScene = document.createElement('canvas');
+      staticScene.width = width * density;
+      staticScene.height = height * density;
+      sceneDirty = true;
+    }
+    if (sceneDirty) {
+      const background = staticScene.getContext('2d');
+      background.setTransform(density, 0, 0, density, 0, 0);
+      background.clearRect(0, 0, width, height);
+      snowfield(background, width, height);
+      drawOutdoorScenery(background, world, circuit, width, height);
+      drawTrackSurface(background, circuit, world, width, height);
+      drawIsland(background, circuit, world);
+      drawGateFlags(background, circuit, world);
+      sceneDirty = false;
+    }
+    ctx.drawImage(staticScene, 0, 0, width, height);
+  }
+
   return {
     assets: ASSETS,
+    paintScene,
     snowfield,
     drawOutdoorScenery,
     drawTrackSurface,
