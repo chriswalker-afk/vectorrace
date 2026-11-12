@@ -1,0 +1,60 @@
+name: Snowshift artwork smoke
+
+on:
+  pull_request:
+    paths:
+      - 'assets/art/**'
+      - 'src/race-art.mjs'
+      - 'src/race-v3.mjs'
+      - 'race-v3.html'
+      - 'artwork-lab.html'
+      - 'styles/race-v3.css'
+      - '.github/workflows/art-smoke.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assets-and-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every artwork SVG as XML
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          paths = sorted(Path('assets/art').glob('*.svg'))
+          assert len(paths) >= 8, f'Expected 8 original SVG assets, found {len(paths)}'
+          for path in paths:
+              root = ET.parse(path).getroot()
+              assert root.tag == '{http://www.w3.org/2000/svg}svg', path
+              assert root.get('viewBox'), f'{path} has no viewBox'
+              print('SVG OK:', path)
+          PY
+      - name: Capture integrated browser scene
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-http.log 2>&1 &
+          sleep 2
+          curl -fsS http://127.0.0.1:8765/race-v3.html -o /dev/null
+          curl -fsS http://127.0.0.1:8765/assets/art/ice-skimmer-flare.svg -o /dev/null
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME" ]; then
+            echo "::warning::No headless Chromium installed: screenshot not available"
+            exit 0
+          fi
+          "$CHROME" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars \
+            --window-size=1600,1050 --virtual-time-budget=5000 \
+            --screenshot="$PWD/snowshift-race-v3.png" \
+            http://127.0.0.1:8765/race-v3.html
+          test -s snowshift-race-v3.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-v3-browser-preview
+          path: snowshift-race-v3.png
+          if-no-files-found: warn
