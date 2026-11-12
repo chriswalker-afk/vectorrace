@@ -138,7 +138,7 @@ button:disabled{opacity:.45;cursor:default}
  .game-layout{grid-template-columns:minmax(0,1fr) clamp(285px,31vw,323px)}
  .circuit-heading{display:none}
 }
-@media(max-width:760px) and (orientation:portrait){
+@media(max-width:920px) and (orientation:portrait){
  :root{--pad-cell:clamp(30px,6dvh,62px);--gap:6px}
  .app-shell{grid-template-rows:42px minmax(0,1fr);padding:5px;gap:5px}
  .brand strong{font-size:30px}
@@ -233,3 +233,7 @@ button:disabled{opacity:.45;cursor:default}
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* Tutorial highlights only indicate the next action; they never block input. */
+.acceleration-pad.tour-focus{outline:3px solid #d4fc77;outline-offset:3px;border-radius:5px}
+.primary.tour-focus{box-shadow:0 0 0 3px #ff7557,0 0 18px #d4fc7773}
