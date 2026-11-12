@@ -237,3 +237,12 @@ button:disabled{opacity:.45;cursor:default}
 /* Tutorial highlights only indicate the next action; they never block input. */
 .acceleration-pad.tour-focus{outline:3px solid #d4fc77;outline-offset:3px;border-radius:5px}
 .primary.tour-focus{box-shadow:0 0 0 3px #ff7557,0 0 18px #d4fc7773}
+
+/* Preserve both header actions on narrow and zoomed-in screens. */
+@media(max-width:560px) {
+  .brand small{display:none}
+  .topbar{gap:6px}
+  .top-controls{gap:5px}
+  .brand strong{font-size:clamp(24px,6.3vw,31px)}
+  .top-button{min-width:30px;padding:4px 7px}
+}
