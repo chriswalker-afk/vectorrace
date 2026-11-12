@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a192b">
+<title>SNOWSHIFT · Vector Racing · Single Screen</title>
+<link rel="stylesheet" href="./styles/race-v4.css">
+<script type="module" src="./src/race-v4.mjs"></script>
+<script type="module" src="./src/ux-smoke.mjs"></script>
+</head>
+<body>
+<div class="app-shell" id="app">
+  <header class="topbar">
+    <div class="brand" aria-label="Snowshift vector racing">
+      <strong>SNOW<span>SHIFT</span></strong>
+      <small>VECTOR RACING <span class="build-tag">04</span></small>
+    </div>
+    <div class="top-controls">
+      <span class="circuit-heading">01 <span aria-hidden="true">/</span> NORTHERN LOOP</span>
+      <button id="help" class="top-button" title="Start the interactive tutorial" aria-label="How to play">? <span>HOW TO PLAY</span></button>
+      <button id="reset" class="top-button" title="Restart race" aria-label="Reset race">↻ <span>RESET</span></button>
+    </div>
+  </header>
+  <main class="game-layout">
+    <section class="game-board" aria-label="Northern Loop race circuit">
+      <canvas id="course" width="960" height="700" aria-label="Race track with position, skimmer, track boundaries, checkpoint gates and preview destinations"></canvas>
+      <div class="board-label" aria-hidden="true"><strong>GLACIER CUP</strong><span>FROZEN LAKE · LAP 01</span></div>
+      <div class="board-scores" aria-label="Race scoreboard">
+        <div><small>TURNS</small><strong id="moves">00</strong></div>
+        <div><small>CRASH</small><strong id="crashes">00</strong></div>
+        <div><small>SCORE</small><strong id="score">00</strong></div>
+      </div>
+      <div class="board-bottom">
+        <span id="message" role="status" aria-live="polite">READY TO RACE</span>
+        <span id="lap">LAP 1 / 1</span>
+      </div>
+      <section id="tutorial" class="tutorial" aria-label="How to play Snowshift" hidden>
+        <div class="tutorial-head"><span id="tourIndex">1 / 4</span><button id="closeTutorial" aria-label="Close tutorial">✕</button></div>
+        <h2 id="tourTitle">Vector racing</h2>
+        <p id="tourText">Your velocity carries over every turn. Choose a change in velocity to steer your racer.</p>
+        <div class="tutorial-foot"><button id="tourSkip" type="button">SKIP</button><button id="tourNext" type="button">NEXT ↗</button></div>
+      </section>
+      <div id="finishPanel" class="finish-panel" hidden>
+        <div class="finish-card">
+          <small>THE ARCTIC SERIES</small>
+          <h2>FINISH!</h2>
+          <p>Beautiful racing. Every vector counted.</p>
+          <div class="finish-score"><span>FINAL SCORE</span><strong id="finalScore">0</strong></div>
+          <button id="raceAgain" class="primary" type="button">RACE AGAIN ↗</button>
+        </div>
+      </div>
+    </section>
+    <aside class="race-panel" aria-label="Single-screen race controls">
+      <div class="mode-strip">
+        <span class="section-label">ASSIST</span>
+        <div id="modeOptions" class="mode-options" role="group" aria-label="Mathematical assistance">
+          <button type="button" data-mode="guided" aria-pressed="true">GUIDED</button>
+          <button type="button" data-mode="standard" aria-pressed="false">STANDARD</button>
+          <button type="button" data-mode="expert" aria-pressed="false">EXPERT</button>
+        </div>
+      </div>
+      <div class="readout-grid" aria-label="Vector telemetry">
+        <div><small>VELOCITY <i>v</i></small><strong id="currentVelocity">( 0, 0 )</strong></div>
+        <div><small>ACCEL. <i>a</i></small><strong id="selectedAcceleration">( +1, 0 )</strong></div>
+        <div><small>NEXT <i>v</i></small><strong id="nextVelocity" class="lime">( +1, 0 )</strong></div>
+      </div>
+      <section class="controls-section">
+        <div class="drive-title"><span class="section-label">CHOOSE ACCELERATION</span><small>−1, 0 or +1 each axis</small></div>
+        <div class="drive-row">
+          <div id="accelerationPad" class="acceleration-pad" role="group" aria-label="Choose a change in velocity"></div>
+          <div class="drive-action">
+            <div id="nextMoveLabel" class="move-status" role="status" aria-live="polite">SELECT AN ARROW TO PLAN YOUR GLIDE</div>
+            <button id="commit" class="primary" type="button">GLIDE <span aria-hidden="true">➜</span></button>
+          </div>
+        </div>
+      </section>
+      <div class="checkpoint-section">
+        <span class="section-label">RACE PROGRESS</span>
+        <ol class="checkpoint-list" aria-label="Checkpoint gates in order">
+          <li data-checkpoint="0"><span class="checkpoint-icon">01</span><span>EAST</span></li>
+          <li data-checkpoint="1"><span class="checkpoint-icon">02</span><span>SOUTH</span></li>
+          <li data-checkpoint="2"><span class="checkpoint-icon">03</span><span>WEST</span></li>
+          <li data-checkpoint="3"><span class="checkpoint-icon">★</span><span>FINISH</span></li>
+        </ol>
+      </div>
+      <div class="panel-footer">
+        <button id="showGrid" class="grid-toggle" type="button" aria-pressed="true" title="Toggle coordinate grid">▦ <span>GRID ON</span></button>
+        <p id="microHint" class="micro-hint">NUMBERS 1–9 · ENTER TO GLIDE · ARROWS TO ADJUST</p>
+      </div>
+    </aside>
+  </main>
+</div>
+</body>
+</html>

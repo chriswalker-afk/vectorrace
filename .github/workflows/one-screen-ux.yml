@@ -1,0 +1,43 @@
+name: Single-screen UI and interactions
+
+on:
+  pull_request:
+    paths:
+      - 'race-v4.html'
+      - 'src/race-v4.mjs'
+      - 'src/ux-smoke.mjs'
+      - 'src/assistance.mjs'
+      - 'styles/race-v4.css'
+      - 'tests/assistance.test.mjs'
+      - 'scripts/viewport-smoke.mjs'
+      - '.github/workflows/one-screen-ux.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  viewport-and-control-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - run: npm run check
+      - name: Exact Chrome phone, tablet and desktop viewport tests
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-http.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr4-viewport-review
+          path: screenshots/*.png
+          if-no-files-found: warn

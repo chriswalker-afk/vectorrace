@@ -22,8 +22,10 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v2.html` — PR #2 single-lap Northern Loop with vector physics, continuous track checks, checkpoints and scoring.
 - `docs/PR2_ENGINE.md` — game rules, architecture and test instructions.
 - `race-v3.html` — original Arctic environment/vehicle artwork integrated into the same racing engine.
+- `race-v4.html` — one-screen race experience with Guided / Standard / Expert modes, tutorial and responsive cockpit.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
+- `docs/PR4_UX.md` — strict one-screen design goals, interaction rules and automated viewport checks.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -33,6 +35,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v2.html`.
+Open `http://localhost:8000/race-v4.html` for the latest UX build.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
