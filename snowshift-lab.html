@@ -56,7 +56,7 @@ strong{color:var(--snow)}.danger{color:var(--flare)}.good{color:var(--lime)}
 <script>
 (()=>{
 const c=document.getElementById('map'),ctx=c.getContext('2d');let W=960,H=700,step=27;
-let pos={x:13,y:10},v={x:0,y:0},a={x:1,y:0},count=0;
+let pos={x:13,y:14},v={x:0,y:0},a={x:1,y:0},count=0;
 const byId=id=>document.getElementById(id);const P={night:'#0a192b',ice:'#164b65',frost:'#b9eaf0',snow:'#eff8fb',flare:'#ff7557',lime:'#d4fc77'};
 const pad=byId('pad');const dirs=[[-1,1],[0,1],[1,1],[-1,0],[0,0],[1,0],[-1,-1],[0,-1],[1,-1]],sym=['↖','↑','↗','←','•','→','↙','↓','↘'];
 dirs.forEach(([x,y],i)=>{const b=document.createElement('button');b.textContent=sym[i];b.setAttribute('aria-label','Acceleration '+x+', '+y);b.addEventListener('click',()=>{a={x,y};update();});pad.appendChild(b)});
@@ -81,7 +81,7 @@ ctx.font='600 12px system-ui';ctx.fillStyle='#7196a4';ctx.fillText('A R C T I C 
 }
 function world(x,y){return{x:80+x*step,y:500-y*step}}
 byId('go').addEventListener('click',()=>{const nx=pos.x+v.x+a.x,ny=pos.y+v.y+a.y;if(nx<0||nx>29||ny<0||ny>23){byId('status').textContent='OUT OF GRID — RESET';return;}v={x:v.x+a.x,y:v.y+a.y};pos={x:nx,y:ny};count++;byId('status').textContent='GLIDE '+String(count).padStart(2,'0');update()});
-byId('reset').addEventListener('click',()=>{pos={x:13,y:10};v={x:0,y:0};a={x:1,y:0};count=0;byId('status').textContent='CHOOSE A VECTOR';update()});
+byId('reset').addEventListener('click',()=>{pos={x:13,y:14};v={x:0,y:0};a={x:1,y:0};count=0;byId('status').textContent='CHOOSE A VECTOR';update()});
 window.addEventListener('keydown',e=>{const map={Numpad1:[-1,-1],Numpad2:[0,-1],Numpad3:[1,-1],Numpad4:[-1,0],Numpad5:[0,0],Numpad6:[1,0],Numpad7:[-1,1],Numpad8:[0,1],Numpad9:[1,1]};if(map[e.code]){a={x:map[e.code][0],y:map[e.code][1]};update()}else if(e.code==='Enter')byId('go').click()});
 new ResizeObserver(resize).observe(c);update();
 })();
