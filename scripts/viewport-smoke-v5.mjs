@@ -11,6 +11,8 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { findLegalLap } from './solve-lap.mjs';
+import { RECORD_KEY } from '../src/race-records.mjs';
 
 const cases = [
   [1440,900], [1280,720], [1024,768],
@@ -77,6 +79,64 @@ async function waitFor(send,predicate,timeout=10000){
   }
   throw new Error('Timed out waiting for browser readiness');
 }
+
+function playLegalLapInBrowser(actions, recordKey) {
+  const gateMessages = [];
+  for(const a of actions) {
+    const button=document.querySelector('#accelerationPad [data-x="'+a.x+'"][data-y="'+a.y+'"]');
+    if(!button) throw new Error('Missing acceleration button');
+    button.click();
+    document.getElementById('commit').click();
+    const message=document.getElementById('message').textContent;
+    if(message.includes('GATE CLEARED'))gateMessages.push(message);
+  }
+  let record=null;
+  try{record=JSON.parse(localStorage.getItem(recordKey));}catch{}
+  return {
+    turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    commitDisabled:document.getElementById('commit').disabled,
+    record,gateMessages,
+    score:document.getElementById('score').textContent,
+    badge:document.getElementById('recordBadge').textContent,
+    ghostHidden:document.getElementById('ghostToggle').hidden
+  };
+}
+function restartGhostBrowser() {
+  const finish=document.getElementById('finishPanel');
+  const text=document.getElementById('bestResult').textContent;
+  const visible=!finish.hidden;
+  document.getElementById('raceAgain').click();
+  const toggle=document.getElementById('ghostToggle');
+  const canSee=!toggle.hidden;
+  const before=document.getElementById('score').textContent;
+  toggle.click();
+  const toggledOff=toggle.getAttribute('aria-pressed')==='false';
+  toggle.click();
+  const toggledOn=toggle.getAttribute('aria-pressed')==='true';
+  document.querySelector('[data-mode="expert"]').click();
+  const expertHides=toggle.hidden;
+  document.querySelector('[data-mode="guided"]').click();
+  return {visible,text,canSee,before,toggledOff,toggledOn,expertHides};
+}
+function moveNorthOnceBrowser() {
+  document.querySelector('#accelerationPad [data-x="0"][data-y="1"]').click();
+  document.getElementById('commit').click();
+  return document.getElementById('moves').textContent;
+}
+function crashThreeNorthBrowser() {
+  document.getElementById('reset').click();
+  const up=document.querySelector('#accelerationPad [data-x="0"][data-y="1"]');
+  for(let i=0;i<3;i++){up.click();document.getElementById('commit').click();}
+  return {
+    turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    score:document.getElementById('score').textContent,
+    velocity:document.getElementById('currentVelocity').textContent,
+    toast:document.getElementById('eventToast').textContent
+  };
+}
+
 async function main(){
   if(typeof WebSocket!=='function')throw new Error('Node 22 WebSocket is required');
   let port=null;
@@ -135,6 +195,78 @@ async function main(){
       await fetch('http://127.0.0.1:'+port+'/json/close/'+target.id).catch(()=>{});
     }
   }
+
+  // Full-lap browser integration: real UI buttons, no physics API shortcuts.
+  // Reduced motion removes gliding delays without changing the deterministic engine.
+  const actions=findLegalLap();
+  const response=await fetch('http://127.0.0.1:'+port+'/json/new?about:blank',{method:'PUT'});
+  if(!response.ok)throw new Error('Could not create full-lap browser page');
+  const target=await response.json();
+  const ws=await openSocket(target.webSocketDebuggerUrl);
+  const send=protocol(ws);
+  try {
+    await send('Page.enable');
+    await send('Runtime.enable');
+    await send('Emulation.setDeviceMetricsOverride',{
+      width:1280,height:720,deviceScaleFactor:1,mobile:false,
+      screenWidth:1280,screenHeight:720
+    });
+    await send('Emulation.setEmulatedMedia',{
+      features:[{name:'prefers-reduced-motion',value:'reduce'}]
+    });
+    await send('Page.navigate',{url:origin+'/race-v5.html'});
+    await waitFor(send,async()=>{
+      const ready=await evaluation(send,
+        'document.readyState==="complete" && document.querySelectorAll("#accelerationPad button").length===9');
+      return ready?true:null;
+    });
+    const script='('+playLegalLapInBrowser.toString()+')('+
+      JSON.stringify(actions)+','+JSON.stringify(RECORD_KEY)+')';
+    const lap=await evaluation(send,script);
+    if(!lap.record || lap.record.moves!==actions.length ||
+       lap.record.frames?.length!==actions.length+1 ||
+       lap.record.score!==actions.length ||
+       !lap.commitDisabled || lap.crashes!=='00' ||
+       lap.gateMessages.length!==3 || lap.ghostHidden){
+      console.error('FAIL full-lap browser integration',lap,'expected moves',actions.length);
+      failed++;
+    }else{
+      console.log('PASS full lap',actions.length,'moves / 3 checkpoints / local best persisted');
+    }
+    await waitFor(send,async()=>{
+      const visible=await evaluation(send,'!document.getElementById("finishPanel").hidden');
+      return visible?true:null;
+    },10000);
+    const restart=await evaluation(send,'('+restartGhostBrowser.toString()+')()');
+    if(!restart.visible || !restart.canSee || restart.before!=='00' ||
+       !restart.toggledOff || !restart.toggledOn || !restart.expertHides ||
+       !/NEW LOCAL BEST/.test(restart.text)){
+      console.error('FAIL ghost / personal-best / restart',restart);
+      failed++;
+    }else{
+      console.log('PASS finish, Race Again and local ghost toggle; Expert hides ghost');
+    }
+    await evaluation(send,'('+moveNorthOnceBrowser.toString()+')()');
+    await delay(350);
+    const ghostPng=await send('Page.captureScreenshot',{
+      format:'png',captureBeyondViewport:false,fromSurface:true
+    });
+    writeFileSync('screenshots/snowshift-v5-personal-ghost.png',
+      Buffer.from(ghostPng.data,'base64'));
+    const crash=await evaluation(send,'('+crashThreeNorthBrowser.toString()+')()');
+    if(crash.turns!=='03' || crash.crashes!=='01' ||
+       crash.score!=='06' || !/0, 0/.test(crash.velocity) ||
+       !/SNOWBANK/.test(crash.toast)){
+      console.error('FAIL crash and penalty recovery',crash);
+      failed++;
+    }else{
+      console.log('PASS crash recovery, +3 score penalty and collision notification');
+    }
+  }finally{
+    ws.close();
+    await fetch('http://127.0.0.1:'+port+'/json/close/'+target.id).catch(()=>{});
+  }
+
   if(failed)throw new Error(failed+' actual viewport check(s) failed');
 }
 try{await main();}catch(error){console.error(error);process.exitCode=1;}finally{quit();}
