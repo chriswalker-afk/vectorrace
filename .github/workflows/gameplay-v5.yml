@@ -1,0 +1,47 @@
+name: Gameplay refinement and single-screen verification
+
+on:
+  pull_request:
+    paths:
+      - 'race-v5.html'
+      - 'src/race-v5.mjs'
+      - 'src/race-coach.mjs'
+      - 'src/race-records.mjs'
+      - 'src/ux-smoke-v5.mjs'
+      - 'styles/race-v5.css'
+      - 'tests/race-coach.test.mjs'
+      - 'tests/race-records.test.mjs'
+      - 'scripts/viewport-smoke-v5.mjs'
+      - '.github/workflows/gameplay-v5.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  game-loop-and-viewport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Deterministic engine, braking and local record tests
+        run: npm test
+      - name: JS syntax
+        run: npm run check
+      - name: Nine exact viewport and interaction tests
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-v5-http.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v5.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr5-gameplay-previews
+          path: screenshots/*.png
+          if-no-files-found: warn
