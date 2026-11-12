@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="368" height="304" viewBox="0 0 368 304">
+<defs>
+<linearGradient id="roof" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff"/><stop offset=".6" stop-color="#d4eaf1"/><stop offset="1" stop-color="#769eae"/></linearGradient>
+<linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#916343"/><stop offset="1" stop-color="#3d302c"/></linearGradient>
+<radialGradient id="glow"><stop stop-color="#ffd788" stop-opacity=".65"/><stop offset="1" stop-color="#ffe4a1" stop-opacity="0"/></radialGradient>
+<filter id="sh"><feGaussianBlur stdDeviation="8"/></filter>
+</defs>
+<ellipse cx="183" cy="188" rx="142" ry="67" fill="#113348" opacity=".25" filter="url(#sh)"/>
+<ellipse cx="191" cy="170" rx="117" ry="97" fill="url(#glow)"/>
+<path d="M65 90 L284 82 L313 125 L299 228 L83 234 L52 185Z" fill="url(#wood)" stroke="#31272a" stroke-width="6"/>
+<g stroke="#b58759" stroke-width="3" opacity=".8"><path d="M83 139 L298 138 M83 159 L298 160 M83 181 L298 182 M83 205 L298 207 M83 224 L298 225"/></g>
+<path d="M51 78 L160 30 L281 60 L327 138 L210 156 L95 142Z" fill="#38596a" stroke="#254356" stroke-width="7"/>
+<path d="M49 78 L159 27 L279 56 L330 139 L277 116 L244 88 L168 68 L95 105 L69 117Z" fill="url(#roof)" stroke="#accedb" stroke-width="4"/>
+<path d="M95 105 L168 68 L244 88 L277 116 L210 141 L95 132Z" fill="#8cb4c3" opacity=".82"/>
+<path d="M70 94 L158 43 L259 65 M213 138 L318 130" stroke="#fff" stroke-width="8" opacity=".75" fill="none" stroke-linecap="round"/>
+<path d="M186 47 L187 19 L226 24 L233 67 L210 74Z" fill="#654335" stroke="#dccbb7" stroke-width="4"/>
+<path d="M185 20 L212 8 L241 23 L229 31Z" fill="#fff" stroke="#bdd9e3" stroke-width="3"/>
+<g fill="#ffcb7c" stroke="#55382e" stroke-width="5"><rect x="99" y="170" width="42" height="41" rx="2"/><rect x="164" y="174" width="47" height="39" rx="2"/><rect x="246" y="158" width="40" height="43" rx="2"/></g>
+<g stroke="#70503a" stroke-width="3"><path d="M120 171 V210 M100 191 H140 M187 176 V213 M165 192 H210 M266 158 V201 M247 179 H286"/></g>
+<path d="M64 231 H303" stroke="#f4fdff" stroke-width="10" stroke-linecap="round"/>
+</svg>
