@@ -54,7 +54,7 @@ python3 -m http.server 8000
 # http://localhost:8000/race-v5.html
 ```
 
-The `gameplay-v5.yml` workflow checks exact engine/braking math and local record handling, plus nine **real CSS viewport sizes** via Chrome DevTools emulation. It validates the complete on-screen cockpit, three assistance modes, tutorial/finish overlays and first movement. Desktop, portrait mobile and landscape mobile screenshots are retained as workflow artifacts.
+The `gameplay-v5.yml` workflow checks exact engine/braking math and local record handling, plus nine **real CSS viewport sizes** via Chrome DevTools emulation. It validates the complete on-screen cockpit, three assistance modes, tutorial/finish overlays and first movement. It also reconstructs a **20-turn legal lap** and clicks each move in the actual browser, checking all three ordered gates, the persisted personal best, the ghost toggle, Expert's ghost restriction and a separate crash with the correct +3 penalty. Once the ghost control is present, its fit is checked again at portrait and landscape phone sizes. Desktop, portrait mobile, landscape mobile and post-record ghost screenshots are retained as workflow artifacts.
 
 ## Review checklist
 
