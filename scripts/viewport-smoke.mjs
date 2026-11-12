@@ -107,8 +107,8 @@ async function main(){
       });
       await send('Page.navigate',{url:origin+'/race-v4.html?qa=1'});
       const result=await waitFor(send,async()=>{
-        const value=await evaluation(send,JSON.stringify('ignored')+
-          ' && ({ qa:document.documentElement.dataset.qa||null, report:document.getElementById("qa-report")?.textContent||null, width:innerWidth,height:innerHeight })');
+        const value=await evaluation(send,
+          '({ qa:document.documentElement?.dataset?.qa||null, report:document.getElementById("qa-report")?.textContent||null, width:innerWidth,height:innerHeight })');
         return value?.qa?value:null;
       });
       if(result.width!==width||result.height!==height){
