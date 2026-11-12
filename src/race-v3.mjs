@@ -172,12 +172,8 @@ function paintPreview() {
 
 function draw(now = performance.now()) {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  artwork.snowfield(ctx, WIDTH, HEIGHT);
-  artwork.drawOutdoorScenery(ctx, world, circuit, WIDTH, HEIGHT);
-  artwork.drawTrackSurface(ctx, circuit, world, WIDTH, HEIGHT);
-  artwork.drawIsland(ctx, circuit, world);
+  artwork.paintScene(ctx, WIDTH, HEIGHT, world, circuit);
   paintGrid();
-  artwork.drawGateFlags(ctx, circuit, world);
   paintGates();
   paintTrail(now);
   if (!animation) paintPreview();
@@ -307,7 +303,7 @@ canvas.addEventListener('click', event => {
   const rect = canvas.getBoundingClientRect();
   const x = (event.clientX - rect.left) * WIDTH / rect.width;
   const y = (event.clientY - rect.top) * HEIGHT / rect.height;
-  let best = null, nearest = 24 * 24;
+  let best = null, nearest = (rect.width < 500 ? 52 : 28) ** 2;
   for (const candidate of possibleMoves(state, circuit)) {
     const pos = world(candidate.to);
     const distance = (pos.x - x) ** 2 + (pos.y - y) ** 2;
