@@ -87,7 +87,8 @@ body {
   .brand h1 {font-size:39px}
   .brand p {font-size:9px}
   .brand-kicker {font-size:8px;letter-spacing:.14em}
-  .top-status {padding:6px 8px}
+  /* Circuit name already appears on the board; hide duplicate badge on phones. */
+  .top-status {display:none}
   .game-board {border-width:1px}
   .race-panel {padding:15px}
   .board-label {border-left-width:3px}
