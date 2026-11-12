@@ -25,16 +25,17 @@ export function findLegalLap(circuit = NORTHERN_LOOP) {
         checkpoint: progress.checkpoint,
         laps: progress.laps
       };
+      // Completion must be checked BEFORE visited-key deduplication: after the
+      // finish the checkpoint counter wraps to zero and can match an older state.
+      if(progress.finished) {
+        const reverse=[{...acceleration}];
+        for(let at=head;at>0;at=nodes[at].parent)reverse.push(nodes[at].acceleration);
+        return reverse.reverse();
+      }
       const k=key(next);
       if(visited.has(k)) continue;
       visited.add(k);
-      const index=nodes.length;
       nodes.push({state:next,parent:head,acceleration:{...acceleration},depth:node.depth+1});
-      if(progress.finished) {
-        const reverse=[];
-        for(let at=index;at>0;at=nodes[at].parent)reverse.push(nodes[at].acceleration);
-        return reverse.reverse();
-      }
     }
   }
   throw new Error('No crash-free lap found after '+visited.size+' states');
