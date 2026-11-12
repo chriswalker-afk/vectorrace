@@ -200,8 +200,8 @@ function paintGates() {
   const segments = 12;
   ctx.save();
   for (let i = 0; i < segments; i++) {
-    const y = a.y + (b.y - a.y) * i / segments;
-    const h = Math.abs((b.y - a.y) / segments) + 1;
+    const h = Math.abs((b.y - a.y) / segments);
+    const y = Math.min(a.y, b.y) + i * h;
     for (let j = 0; j < 2; j++) {
       ctx.fillStyle = (i + j) % 2 === 0 ? '#eef9f8' : '#16374a';
       ctx.fillRect(a.x - 8 + 8 * j, y, 8, h);
