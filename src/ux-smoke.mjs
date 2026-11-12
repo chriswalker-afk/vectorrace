@@ -55,29 +55,48 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       document.getElementById('help').click();
       const coach=document.getElementById('tutorial');
       if(coach.hidden) errors.push('How-to-play coach did not open');
-      const coachRect=coach.getBoundingClientRect();
-      const coachNext=document.getElementById('tourNext').getBoundingClientRect();
-      const coachText=document.getElementById('tourText').getBoundingClientRect();
-      if(coachRect.left < -1 || coachRect.right > width+1 ||
-         coachRect.top < -1 || coachRect.bottom > height+1)
-        errors.push('Tutorial overlay leaves viewport');
-      if(coachNext.bottom > coachRect.bottom+1 || coachNext.top < coachRect.top-1 ||
-         coachText.bottom > coachRect.bottom+1)
-        errors.push('Tutorial content or Next button clipped by overlay');
+      function checkCoachFit(step) {
+        const rect=coach.getBoundingClientRect();
+        if(rect.left < -1 || rect.right > width+1 ||
+           rect.top < -1 || rect.bottom > height+1)
+          errors.push('Tutorial overlay leaves viewport at step '+step);
+        for(const selector of ['#tourTitle','#tourText','#tourNext','#tourSkip']){
+          const item=document.querySelector(selector).getBoundingClientRect();
+          if(item.bottom > rect.bottom+1 || item.top < rect.top-1)
+            errors.push('Tutorial '+selector+' is clipped at step '+step);
+        }
+      }
+      checkCoachFit(1);
       document.getElementById('tourNext').click();
       if(document.getElementById('tourIndex').textContent!=='2 / 4')
         errors.push('Tutorial did not advance to step 2');
+      checkCoachFit(2);
       const east=document.querySelector('#accelerationPad [data-x="1"][data-y="0"]');
       east.click();
       if(document.getElementById('tourIndex').textContent!=='3 / 4')
         errors.push('Tutorial did not react to choosing an acceleration');
+      checkCoachFit(3);
       document.getElementById('commit').click();
       if(document.getElementById('moves').textContent!=='01')
         errors.push('Committing first glide did not advance race');
       if(document.getElementById('tourIndex').textContent!=='4 / 4')
         errors.push('Tutorial did not react to glide');
+      checkCoachFit(4);
       document.getElementById('tourNext').click();
       if(!coach.hidden) errors.push('Tutorial did not close after final step');
+
+      // A completed race must also offer a visible, unscrollable restart button.
+      const finish=document.getElementById('finishPanel');
+      finish.hidden=false;
+      const finishCard=finish.querySelector('.finish-card');
+      const finishRect=finishCard.getBoundingClientRect();
+      const restartRect=document.getElementById('raceAgain').getBoundingClientRect();
+      if(finishRect.top < -1 || finishRect.bottom > height+1 ||
+         restartRect.top < finishRect.top-1 || restartRect.bottom > finishRect.bottom+1)
+        errors.push('Finish card or Race Again leaves the viewport');
+      if(finishCard.scrollHeight > finishCard.clientHeight+1)
+        errors.push('Finish card requires internal scrolling');
+      finish.hidden=true;
 
       const pass=errors.length===0;
       document.documentElement.dataset.qa=pass?'PASS':'FAIL';
