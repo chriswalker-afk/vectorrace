@@ -1,0 +1,70 @@
+name: Single-screen UI and interactions
+
+on:
+  pull_request:
+    paths:
+      - 'race-v4.html'
+      - 'src/race-v4.mjs'
+      - 'src/ux-smoke.mjs'
+      - 'src/assistance.mjs'
+      - 'styles/race-v4.css'
+      - 'tests/assistance.test.mjs'
+      - '.github/workflows/one-screen-ux.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  viewport-and-control-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - run: npm run check
+      - name: Check actual browser viewport sizes without scrolling
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-http.log 2>&1 &
+          sleep 2
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p screenshots
+          for SIZE in 1440x900 1280x720 1024x768 820x1180 390x844 360x640 320x568 844x390 667x375; do
+            W="${SIZE%x*}"
+            H="${SIZE#*x}"
+            echo "Checking Snowshift at ${W}x${H}"
+            "$CHROME" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu               --hide-scrollbars --force-device-scale-factor=1 --window-size="$W,$H"               --virtual-time-budget=3500 --dump-dom               "http://127.0.0.1:8765/race-v4.html?qa=1" >"/tmp/snowshift-${SIZE}.html" 2>/tmp/chromium-qa.log
+            python3 - "$SIZE" <<'PY'
+          import sys
+          size=sys.argv[1]
+          text=open('/tmp/snowshift-'+size+'.html',encoding='utf8').read()
+          if 'data-qa="PASS"' not in text:
+              import re,html
+              result=re.search(r'<pre id="qa-report"[^>]*>(.*?)</pre>',text,re.S)
+              print('FAIL',size,html.unescape(result.group(1)) if result else 'QA did not run')
+              sys.exit(1)
+          print('PASS',size)
+          PY
+          done
+      - name: Capture desktop, mobile portrait and landscape
+        if: always()
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME" ]; then exit 0; fi
+          mkdir -p screenshots
+          for SIZE in 1440x900 390x844 844x390; do
+            W="${SIZE%x*}"; H="${SIZE#*x}"
+            "$CHROME" --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --hide-scrollbars               --force-device-scale-factor=1 --window-size="$W,$H" --virtual-time-budget=3500               --screenshot="$PWD/screenshots/snowshift-${SIZE}.png"               "http://127.0.0.1:8765/race-v4.html"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr4-viewport-review
+          path: screenshots/*.png
+          if-no-files-found: warn
