@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="216" viewBox="0 0 384 216">
+<defs>
+ <linearGradient id="runner" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#f7ffff"/><stop offset=".42" stop-color="#d8f3fa"/><stop offset=".75" stop-color="#79b2cb"/><stop offset="1" stop-color="#315a78"/></linearGradient>
+ <linearGradient id="hull" x1="0" x2=".85" y1="1" y2="0"><stop stop-color="#9d2d24"/><stop offset=".32" stop-color="#f2512f"/><stop offset=".66" stop-color="#ff8d4d"/><stop offset="1" stop-color="#ffe09f"/></linearGradient>
+ <linearGradient id="nose" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffcf86"/><stop offset=".48" stop-color="#ff7846"/><stop offset="1" stop-color="#aa2e27"/></linearGradient>
+ <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d8faff"/><stop offset=".28" stop-color="#4fb7d3"/><stop offset=".65" stop-color="#164664"/><stop offset="1" stop-color="#071e34"/></linearGradient>
+ <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f8ffff"/><stop offset=".5" stop-color="#bed7e6"/><stop offset="1" stop-color="#43748b"/></linearGradient>
+ <filter id="sh"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<!-- Vehicle heading is right (positive x); transparent canvas and ample padding for rotation. -->
+<ellipse cx="178" cy="125" rx="140" ry="48" fill="#001426" opacity=".32" filter="url(#sh)"/>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- two long titanium runners -->
+<path d="M32 56 C70 46 203 43 289 57 L299 64 C225 56 92 61 40 69Z" fill="url(#runner)" stroke="#194559" stroke-width="4"/>
+<path d="M32 157 C70 167 203 170 289 155 L299 148 C225 156 92 151 40 144Z" fill="url(#runner)" stroke="#194559" stroke-width="4"/>
+<path d="M42 58 L287 61" fill="none" stroke="#fff" opacity=".88" stroke-width="3"/>
+<path d="M42 154 L287 151" fill="none" stroke="#fff" opacity=".88" stroke-width="3"/>
+<path d="M61 64 L92 90 L92 126 L61 150" fill="none" stroke="#17445b" stroke-width="12"/>
+<path d="M237 62 L219 89 M237 154 L219 128" fill="none" stroke="#143950" stroke-width="11"/>
+<!-- rear jet engine pods -->
+<path d="M48 76 Q43 62 63 60 L114 65 L133 84 L119 100 L56 99Z" fill="#e7f7f5" stroke="#194458" stroke-width="3"/>
+<path d="M48 140 Q43 154 63 156 L114 151 L133 132 L119 116 L56 117Z" fill="#e7f7f5" stroke="#194458" stroke-width="3"/>
+<path d="M45 75 L78 74 L83 91 L45 91Z M45 125 L83 125 L78 142 L45 141Z" fill="#112c40" stroke="#17394b" stroke-width="3"/>
+<path d="M48 80 L74 80 M48 136 L74 136" stroke="#a8ecfa" stroke-width="6"/>
+<!-- rear wings -->
+<path d="M87 101 L118 40 L165 46 L187 88 L177 107Z" fill="url(#wing)" stroke="#22516a" stroke-width="4"/>
+<path d="M87 115 L118 176 L165 170 L187 128 L177 109Z" fill="url(#wing)" stroke="#22516a" stroke-width="4"/>
+<path d="M120 49 L161 60 L169 86" fill="none" stroke="#fff" stroke-width="5" opacity=".85"/>
+<path d="M120 167 L161 156 L169 130" fill="none" stroke="#fff" stroke-width="5" opacity=".85"/>
+<path d="M128 57 L151 63 L158 76 M128 159 L151 153 L158 140" fill="none" stroke="#ff7846" stroke-width="7"/>
+<!-- principal streamlined chassis -->
+<path d="M71 107 L97 77 C132 65 173 66 212 77 L321 103 Q342 108 321 113 L212 139 C173 150 132 151 97 139Z" fill="url(#hull)" stroke="#662d2b" stroke-width="6"/>
+<path d="M96 88 C144 77 178 78 222 88 L307 104 L312 108 L217 106 L97 106Z" fill="#ffd099" opacity=".67"/>
+<path d="M96 130 C144 141 178 140 222 130 L312 111 L217 110 L97 110Z" fill="#9e2a23" opacity=".42"/>
+<!-- primary left/right decorative panels -->
+<path d="M120 83 L181 79 L215 88 L211 93 L120 95Z" fill="#ffb361" stroke="#ffdfad" stroke-width="2"/>
+<path d="M120 133 L181 137 L215 128 L211 123 L120 121Z" fill="#be342a" stroke="#ff9863" stroke-width="2"/>
+<!-- enclosed single-seat canopy -->
+<path d="M146 107 C149 87 165 79 183 82 C205 85 215 97 217 108 C215 122 205 134 183 136 C165 137 149 129 146 107Z" fill="#102e44" stroke="#ffe4ad" stroke-width="5"/>
+<path d="M155 107 C157 94 166 88 182 88 C197 89 208 98 209 108 C207 122 197 129 182 130 C166 128 157 120 155 107Z" fill="url(#glass)" stroke="#3c9cb7" stroke-width="2"/>
+<path d="M165 95 Q176 87 191 92 M163 100 L177 93" fill="none" stroke="#edffff" stroke-width="5" opacity=".74"/>
+<path d="M207 97 L207 119" stroke="#b1e4e6" stroke-width="3" opacity=".8"/>
+<!-- white belly markings and safety chevrons -->
+<path d="M223 94 L267 104 L267 112 L223 123 L232 112 L252 108 L232 104Z" fill="#f4f8f1"/>
+<path d="M273 103 L313 107 L313 110 L273 115Z" fill="url(#nose)"/>
+<path d="M100 103 L117 103 L108 113 L92 113Z" fill="#fff0cc"/>
+<g stroke="#ffefc4" stroke-width="2"><path d="M102 89 L112 89 M102 127 L112 127 M240 94 L251 97 M240 122 L251 119"/></g>
+<circle cx="129" cy="108" r="5" fill="#e6f9ff" stroke="#21465a" stroke-width="2"/>
+<circle cx="288" cy="108" r="3" fill="#fcffff"/>
+<!-- tail fins -->
+<path d="M76 81 L104 77 L112 89 L80 96Z M76 135 L104 139 L112 127 L80 120Z" fill="#f97744" stroke="#fff0cc" stroke-width="2"/>
+</g>
+</svg>
