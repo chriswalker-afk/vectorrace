@@ -51,12 +51,33 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       document.querySelector('[data-mode="guided"]').click();
       if(document.getElementById('score').textContent!==originalScore)
         errors.push('Mode changed score');
-      // Selecting acceleration and moving must work via real UI controls.
+      // Interactive tutorial must also remain wholly visible on the same screen.
+      document.getElementById('help').click();
+      const coach=document.getElementById('tutorial');
+      if(coach.hidden) errors.push('How-to-play coach did not open');
+      const coachRect=coach.getBoundingClientRect();
+      const coachNext=document.getElementById('tourNext').getBoundingClientRect();
+      const coachText=document.getElementById('tourText').getBoundingClientRect();
+      if(coachRect.left < -1 || coachRect.right > width+1 ||
+         coachRect.top < -1 || coachRect.bottom > height+1)
+        errors.push('Tutorial overlay leaves viewport');
+      if(coachNext.bottom > coachRect.bottom+1 || coachNext.top < coachRect.top-1 ||
+         coachText.bottom > coachRect.bottom+1)
+        errors.push('Tutorial content or Next button clipped by overlay');
+      document.getElementById('tourNext').click();
+      if(document.getElementById('tourIndex').textContent!=='2 / 4')
+        errors.push('Tutorial did not advance to step 2');
       const east=document.querySelector('#accelerationPad [data-x="1"][data-y="0"]');
       east.click();
+      if(document.getElementById('tourIndex').textContent!=='3 / 4')
+        errors.push('Tutorial did not react to choosing an acceleration');
       document.getElementById('commit').click();
       if(document.getElementById('moves').textContent!=='01')
         errors.push('Committing first glide did not advance race');
+      if(document.getElementById('tourIndex').textContent!=='4 / 4')
+        errors.push('Tutorial did not react to glide');
+      document.getElementById('tourNext').click();
+      if(!coach.hidden) errors.push('Tutorial did not close after final step');
 
       const pass=errors.length===0;
       document.documentElement.dataset.qa=pass?'PASS':'FAIL';
