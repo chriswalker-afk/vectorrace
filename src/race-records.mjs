@@ -26,7 +26,7 @@ export function createRecordStore(storage) {
     if (session && validRecord(session)) return session;
     try {
       const raw = storage?.getItem(RECORD_KEY);
-      if (!raw || raw.length > 32000) return null;
+      if (!raw || raw.length > 80000) return null;
       const record = JSON.parse(raw);
       if (!validRecord(record)) return null;
       session = record;
