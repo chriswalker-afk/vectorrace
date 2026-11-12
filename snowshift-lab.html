@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNOWSHIFT — Visual Direction Lab</title>
+<style>
+:root{--night:#0a192b;--ice:#164b65;--frost:#b9eaf0;--snow:#eff8fb;--flare:#ff7557;--lime:#d4fc77;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--night);color:var(--snow);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 70% 8%,#37697d55,transparent 45%)}
+main{width:min(1500px,100%);margin:auto;padding:22px 24px 36px}
+header{display:flex;justify-content:space-between;align-items:center;gap:22px;margin-bottom:18px;border-bottom:1px solid #7ba0b233;padding-bottom:16px}
+.kicker{color:var(--lime);font-size:11px;font-weight:800;letter-spacing:.26em}h1{font-size:clamp(38px,6vw,84px);letter-spacing:-.065em;line-height:.94;margin:5px 0 2px;font-weight:1000;font-style:italic}h1 span{color:var(--flare)}header p{font-size:13px;color:#aac6d2;margin:7px 0}
+.stamp{border:1px solid #93c0ca88;transform:rotate(5deg);padding:11px 14px;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:900;text-align:center}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 305px;gap:16px}
+.stage{position:relative;border:1px solid #6ea7b55c;border-radius:12px;overflow:hidden;background:#294d60;aspect-ratio:1.38/1;min-height:420px}
+canvas{width:100%;height:100%;display:block;touch-action:manipulation}
+.stage-head{position:absolute;left:18px;top:18px;background:#081e30da;border:1px solid #b9eaf043;padding:9px 13px;pointer-events:none}
+.stage-head b{display:block;letter-spacing:.17em;font-size:12px}.stage-head small{color:#b9eaf0}
+.stage-foot{position:absolute;bottom:14px;left:14px;right:14px;display:flex;gap:8px;justify-content:space-between;align-items:end;pointer-events:none}
+.chip{background:#081e30d9;padding:9px 13px;border:1px solid #cce4e433;font-size:12px;font-weight:750}
+aside{background:#10283a;border:1px solid #6ea7b55c;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:#abc8d1;font-weight:850}
+.vector{display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace,Consolas,monospace;font-size:32px;font-weight:750}.vector span{color:var(--lime)}
+.stat{padding-bottom:12px;border-bottom:1px solid #b9eaf030}
+h2{font-size:22px;margin:0 0 7px;letter-spacing:-.04em}
+.accel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.accel button{border-radius:6px;padding:14px 0;color:var(--snow);border:1px solid #88b4c05c;background:#244456;font-size:21px;cursor:pointer;transition:.15s}
+.accel button:hover,.accel button.active{background:var(--lime);color:var(--night);font-weight:900;transform:translateY(-1px)}
+.action{width:100%;border:0;border-radius:6px;padding:15px 8px;background:var(--flare);color:var(--night);font-weight:1000;letter-spacing:.14em;font-size:13px;cursor:pointer}
+.action:disabled{opacity:.4;cursor:not-allowed}
+.secondary{background:transparent;border:1px solid #9cc1c780;color:var(--snow);border-radius:6px;padding:10px;cursor:pointer}
+.note{font-size:12px;line-height:1.5;color:#abc8d1;margin:0}
+.foot{padding-top:12px;color:#a6bbc3;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+strong{color:var(--snow)}.danger{color:var(--flare)}.good{color:var(--lime)}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stage{aspect-ratio:1.05/1;min-height:350px}aside{max-width:none}.accel{max-width:330px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body><main>
+<header><div><div class="kicker">VECTORRACE / DESIGN STUDY 001</div><h1>SNOW<span>SHIFT</span></h1><p>Think ahead. Slide faster. &nbsp; / &nbsp; Frozen lake racing</p></div><div class="stamp">POLAR SERIES<br>VISUAL LAB 01</div></header>
+<section class="layout">
+<div class="stage"><canvas id="map" aria-label="Interactive visual study of an arctic vector-racing track"></canvas><div class="stage-head"><b>01 / NORTHERN LOOP</b><small>GLACIER CIRCUIT · DESIGN STUDY</small></div><div class="stage-foot"><div class="chip">● <span id="status">CHOOSE A VECTOR</span></div><div class="chip">MOVES <span id="moves">00</span></div></div></div>
+<aside>
+<div><div class="eyebrow">THE PILOT'S VECTOR</div><h2>Glide telemetry</h2></div>
+<div class="stat"><div class="eyebrow">VELOCITY · CURRENT</div><div class="vector" id="vcurrent">( 0, 0 )</div></div>
+<div class="stat"><div class="eyebrow">ACCELERATION · SELECTED</div><div class="vector" id="accel">( +1, 0 )</div></div>
+<div class="stat"><div class="eyebrow">VELOCITY · NEXT</div><div class="vector" id="vnext"><span>( 1, 0 )</span></div></div>
+<div><div class="eyebrow" style="margin-bottom:9px">CHOOSE YOUR ACCELERATION</div><div class="accel" id="pad"></div></div>
+<button class="action" id="go">COMMIT VECTOR →</button>
+<button class="secondary" id="reset">↻ RESET THE RUN</button>
+<p class="note">This is a <strong>visual and controls study</strong>, not the finished racing engine. The glowing dots show potential next positions. A real lap-based circuit, full-segment collision tests, and opponents come later.</p>
+</aside>
+</section>
+<div class="foot"><span>ART DIRECTION: POLAR NIGHT · DEEP ICE · FLARE ORANGE · AURORA LIME</span><span>VECTORRACE · PROTOTYPE 01</span></div>
+</main>
+<script>
+(()=>{
+const c=document.getElementById('map'),ctx=c.getContext('2d');let W=960,H=700,step=27;
+let pos={x:13,y:10},v={x:0,y:0},a={x:1,y:0},count=0;
+const byId=id=>document.getElementById(id);const P={night:'#0a192b',ice:'#164b65',frost:'#b9eaf0',snow:'#eff8fb',flare:'#ff7557',lime:'#d4fc77'};
+const pad=byId('pad');const dirs=[[-1,1],[0,1],[1,1],[-1,0],[0,0],[1,0],[-1,-1],[0,-1],[1,-1]],sym=['↖','↑','↗','←','•','→','↙','↓','↘'];
+dirs.forEach(([x,y],i)=>{const b=document.createElement('button');b.textContent=sym[i];b.setAttribute('aria-label','Acceleration '+x+', '+y);b.addEventListener('click',()=>{a={x,y};update();});pad.appendChild(b)});
+const fmt=n=>n>0?'+'+n:String(n), vec=(x,y)=>'( '+fmt(x)+', '+fmt(y)+' )';
+function update(){byId('vcurrent').textContent=vec(v.x,v.y);byId('accel').textContent=vec(a.x,a.y);byId('vnext').textContent=vec(v.x+a.x,v.y+a.y);byId('moves').textContent=String(count).padStart(2,'0');[...pad.children].forEach((el,i)=>el.classList.toggle('active',dirs[i][0]===a.x&&dirs[i][1]===a.y));draw();}
+function resize(){const r=c.getBoundingClientRect();c.width=Math.round(r.width*devicePixelRatio);c.height=Math.round(r.height*devicePixelRatio);ctx.setTransform(c.width/W,0,0,c.height/H,0,0);draw();}
+function poly(points,fill,stroke,width=1){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke()}}
+function roundedRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
+function pine(x,y,s){ctx.fillStyle='#254957';ctx.beginPath();ctx.ellipse(x+5,y+7,s*.31,s*.12,-.3,0,Math.PI*2);ctx.fill();poly([[x,y-s],[x-s*.44,y+s*.42],[x+s*.44,y+s*.42]],'#123345','#80acb644',1.5);poly([[x,y-s*.48],[x-s*.4,y+s*.67],[x+s*.4,y+s*.67]],'#1e5360','#b9eaf055',1.3);ctx.strokeStyle='#e6f7fb';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y-s*.83);ctx.lineTo(x-s*.21,y-s*.22);ctx.stroke()}
+function track(){ctx.lineCap='round';ctx.lineJoin='round';const path=new Path2D();path.moveTo(125,365);path.bezierCurveTo(120,165,250,94,475,108);path.bezierCurveTo(729,120,867,178,830,365);path.bezierCurveTo(818,550,714,606,459,602);path.bezierCurveTo(213,594,125,550,125,365);ctx.strokeStyle='#e9f8fa';ctx.lineWidth=172;ctx.stroke(path);ctx.strokeStyle='#91c6d2';ctx.lineWidth=162;ctx.stroke(path);ctx.strokeStyle='#1a4057';ctx.lineWidth=154;ctx.stroke(path);ctx.strokeStyle='#28566b';ctx.lineWidth=145;ctx.stroke(path);ctx.strokeStyle='#aadfe8';ctx.globalAlpha=.20;ctx.lineWidth=2;ctx.setLineDash([12,16]);ctx.stroke(path);ctx.setLineDash([]);ctx.globalAlpha=1;return path;}
+function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#d0e8ec';ctx.fillRect(0,0,W,H);for(let y=0;y<H;y+=37)for(let x=0;x<W;x+=42){ctx.fillStyle=(x+y)%3===0?'#eaf6f5':'#b9d9e0';ctx.globalAlpha=.26;ctx.beginPath();ctx.ellipse(x+(y%2)*6,y,21,4,-.35,0,7);ctx.fill()}ctx.globalAlpha=1;
+for(let i=0;i<100;i++){let t=i*17.83,xx=(Math.sin(t*4.27)*.5+.5)*W,yy=(Math.cos(t*1.71)*.5+.5)*H;if((xx>90&&xx<880&&yy>75&&yy<635)&&i%3!==0)continue;pine(xx,yy,12+(i%5)*3)}
+const path=track();
+for(let i=0;i<13;i++){const x=60+(i*83)%850,y=44+(i*147)%617;if((x>190&&x<765&&y>180&&y<535))continue;pine(x,y,18+(i%4)*7)}
+ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.globalAlpha=.13;for(let x=25;x<W;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=25;y<H;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.globalAlpha=1;
+const p=world(pos.x,pos.y),n={x:pos.x+v.x+a.x,y:pos.y+v.y+a.y},end=world(n.x,n.y);
+for(const [dx,dy] of dirs){const q=world(pos.x+v.x+dx,pos.y+v.y+dy);ctx.beginPath();ctx.arc(q.x,q.y,7,0,Math.PI*2);ctx.fillStyle='#b9eaf0c0';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#10293d';ctx.stroke()}
+ctx.lineWidth=4;ctx.setLineDash([7,7]);ctx.strokeStyle=P.lime;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(end.x,end.y);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(end.x,end.y,13,0,Math.PI*2);ctx.strokeStyle=P.lime;ctx.lineWidth=3;ctx.stroke();
+ctx.save();ctx.translate(p.x,p.y);const ang=v.x||v.y?Math.atan2(-v.y,v.x):0;ctx.rotate(ang);ctx.fillStyle='#08172599';ctx.beginPath();ctx.ellipse(5,7,27,12,0,0,Math.PI*2);ctx.fill();roundedRect(-26,-13,51,6,3,'#dceef1');roundedRect(-26,7,51,6,3,'#dceef1');poly([[31,0],[-8,-17],[-23,-9],[-16,0],[-23,9],[-8,17]],P.flare,'#fff0d9',2);poly([[6,0],[-10,-7],[-15,0],[-10,7]],'#13364c',null);ctx.restore();
+ctx.fillStyle='#f7fbfe';ctx.font='900 14px system-ui';ctx.fillText('N O R T H E R N   L O O P',375,350);
+ctx.font='600 12px system-ui';ctx.fillStyle='#7196a4';ctx.fillText('A R C T I C    R A C I N G   S E R I E S',370,369);
+}
+function world(x,y){return{x:80+x*step,y:500-y*step}}
+byId('go').addEventListener('click',()=>{const nx=pos.x+v.x+a.x,ny=pos.y+v.y+a.y;if(nx<0||nx>29||ny<0||ny>23){byId('status').textContent='OUT OF GRID — RESET';return;}v={x:v.x+a.x,y:v.y+a.y};pos={x:nx,y:ny};count++;byId('status').textContent='GLIDE '+String(count).padStart(2,'0');update()});
+byId('reset').addEventListener('click',()=>{pos={x:13,y:10};v={x:0,y:0};a={x:1,y:0};count=0;byId('status').textContent='CHOOSE A VECTOR';update()});
+window.addEventListener('keydown',e=>{const map={Numpad1:[-1,-1],Numpad2:[0,-1],Numpad3:[1,-1],Numpad4:[-1,0],Numpad5:[0,0],Numpad6:[1,0],Numpad7:[-1,1],Numpad8:[0,1],Numpad9:[1,1]};if(map[e.code]){a={x:map[e.code][0],y:map[e.code][1]};update()}else if(e.code==='Enter')byId('go').click()});
+new ResizeObserver(resize).observe(c);update();
+})();
+</script></body></html>
