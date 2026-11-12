@@ -119,6 +119,21 @@ function restartGhostBrowser() {
   document.querySelector('[data-mode="guided"]').click();
   return {visible,text,canSee,before,toggledOff,toggledOn,expertHides};
 }
+
+function ghostLayoutBrowser() {
+  const ghost=document.getElementById('ghostToggle');
+  const rect=ghost.getBoundingClientRect();
+  const width=innerWidth,height=innerHeight;
+  return {
+    width,height,visible:!ghost.hidden,
+    inBounds:rect.width>=25&&rect.height>=24&&rect.left>=0&&rect.top>=0&&
+      rect.right<=width+1&&rect.bottom<=height+1,
+    noScroll:document.documentElement.scrollWidth<=width+1&&
+      document.documentElement.scrollHeight<=height+1,
+    hintHidden:getComputedStyle(document.getElementById('microHint')).display==='none'
+  };
+}
+
 function moveNorthOnceBrowser() {
   document.querySelector('#accelerationPad [data-x="0"][data-y="1"]').click();
   document.getElementById('commit').click();
@@ -246,6 +261,26 @@ async function main(){
     }else{
       console.log('PASS finish, Race Again and local ghost toggle; Expert hides ghost');
     }
+    // Once a record exists, the new GHOST control must also fit on small screens.
+    for(const [width,height] of [[390,844],[320,568],[844,390]]) {
+      await send('Emulation.setDeviceMetricsOverride',{
+        width,height,deviceScaleFactor:1,mobile:width<500,
+        screenWidth:width,screenHeight:height
+      });
+      await delay(170);
+      const layout=await evaluation(send,'('+ghostLayoutBrowser.toString()+')()');
+      if(!layout.visible || !layout.inBounds || !layout.noScroll || !layout.hintHidden ||
+         layout.width!==width || layout.height!==height){
+        console.error('FAIL recorded-ghost viewport',width+'x'+height,layout);
+        failed++;
+      }else{
+        console.log('PASS recorded ghost',width+'x'+height,'single screen');
+      }
+    }
+    await send('Emulation.setDeviceMetricsOverride',{
+      width:1280,height:720,deviceScaleFactor:1,mobile:false,
+      screenWidth:1280,screenHeight:720
+    });
     await evaluation(send,'('+moveNorthOnceBrowser.toString()+')()');
     await delay(350);
     const ghostPng=await send('Page.captureScreenshot',{
