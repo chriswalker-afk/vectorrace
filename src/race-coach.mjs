@@ -9,7 +9,7 @@ import { previewMove, possibleMoves } from './engine.mjs';
 import { NORTHERN_LOOP } from './circuit.mjs';
 
 export function brakingAcceleration(v) {
-  return { x: -Math.sign(v.x), y: -Math.sign(v.y) };
+  return { x: v.x === 0 ? 0 : -Math.sign(v.x), y: v.y === 0 ? 0 : -Math.sign(v.y) };
 }
 
 export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
@@ -41,7 +41,7 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
 }
 
 export function stoppingDisplacement(v) {
-  const component = n => Math.sign(n) * Math.abs(n) * (Math.abs(n) - 1) / 2;
+  const component = n => n === 0 ? 0 : Math.sign(n) * Math.abs(n) * (Math.abs(n) - 1) / 2;
   return { x: component(v.x), y: component(v.y) };
 }
 
