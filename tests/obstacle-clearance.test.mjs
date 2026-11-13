@@ -43,7 +43,7 @@ test('both upper and lower lanes have car-width clearance for the entire rock',(
 test('both lanes are reachable by real acceleration choices from the actual start',()=>{
   const choices=[
     {name:'lower',y:17,accelerations:[
-      p(1,-1),p(1,1),p(0,0),p(0,0),p(0,0)
+      p(1,-1),p(1,1),p(0,-1),p(0,1),p(0,0)
     ]},
     {name:'upper',y:21,accelerations:[
       p(1,1),p(1,-1),p(0,1),p(0,-1),p(0,0)
