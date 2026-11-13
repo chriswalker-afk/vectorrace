@@ -307,7 +307,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.lineWidth=3;
     ctx.lineJoin='round';
     ctx.strokeStyle='#fff1c9c9';
-    for(const y of [minY+39,minY+98]){
+    for(const y of [minY+60,minY+117]){
       for(let i=0;i<5;i++){
         const x=minX+28+i*41;
         ctx.beginPath();
@@ -325,7 +325,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     polygonPath(ctx,zone.polygon,world);
     ctx.stroke();
     ctx.setLineDash([]);
-    const label=world({x:21.5,y:23.8});
+    const label=world({x:21.5,y:23.15});
     ctx.textAlign='center';
     ctx.font='900 16px system-ui, sans-serif';
     ctx.lineWidth=3.6;
