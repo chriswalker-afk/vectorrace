@@ -1,5 +1,6 @@
 import { NORTHERN_LOOP as circuit } from './circuit.mjs';
 import { renderColumnVector, vectorDescription } from './vector-notation.mjs';
+import { ACCELERATION_GRID, drawAccelerationPad } from './acceleration-pad.mjs';
 import { createSnowshiftArtwork } from './race-art.mjs';
 import { modePolicy, moveExplanation } from './assistance.mjs';
 import { brakingForecast, corneringMessage } from './race-coach.mjs';
@@ -16,11 +17,6 @@ const COLORS = {
   night: '#0a192b', ice: '#164b65', frost: '#b9eaf0',
   white: '#eff8fb', flare: '#ff7557', lime: '#d4fc77'
 };
-const choices = [
-  [-1, 1, '↖'], [0, 1, '↑'], [1, 1, '↗'],
-  [-1, 0, '←'], [0, 0, '•'], [1, 0, '→'],
-  [-1, -1, '↙'], [0, -1, '↓'], [1, -1, '↘']
-];
 const useReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let state = createRace(circuit);
 let selection = { x: 1, y: 0 };
@@ -208,7 +204,7 @@ function paintPreview() {
 
 
 function paintGhost(now) {
-  if (!ghostEnabled || mode === 'expert' || !bestRecord) return;
+  if (!ghostEnabled || !modePolicy(mode).selectedDestination || !bestRecord) return;
   const frames = bestRecord.frames;
   const i = Math.min(state.moves, frames.length - 1);
   const prev = frames[Math.max(0, i - 1)];
@@ -359,7 +355,7 @@ function recordFinishedRace() {
   );
   bestRecord = result.best;
   $('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB —';
-  $('ghostToggle').hidden = !bestRecord || mode === 'expert';
+  $('ghostToggle').hidden = !bestRecord || !modePolicy(mode).selectedDestination;
   $('bestResult').textContent = result.improved
     ? result.persisted ? 'NEW LOCAL BEST! · ' + result.best.score :
       'NEW SESSION BEST · ' + result.best.score
@@ -448,7 +444,9 @@ function renderTutorial() {
   const step = tour[tutorialStep];
   $('tourIndex').textContent = (tutorialStep + 1) + ' / ' + tour.length;
   $('tourTitle').textContent = step.title;
-  $('tourText').textContent = step.text;
+  $('tourText').textContent = tutorialStep === 1 && mode === 'master'
+    ? 'Choose a column vector. Top is horizontal (x), bottom is vertical (y).'
+    : step.text;
   $('tourNext').textContent = step.next + ' ↗';
   document.querySelector('.acceleration-pad').classList.toggle('tour-focus', tutorialStep === 1);
   $('commit').classList.toggle('tour-focus', tutorialStep === 2);
@@ -476,7 +474,11 @@ function setMode(nextMode) {
   }
   $('showGrid').setAttribute('aria-pressed', String(gridEnabled));
   $('showGrid').querySelector('span').textContent = gridEnabled ? 'GRID ON' : 'GRID OFF';
-  $('ghostToggle').hidden = !bestRecord || mode === 'expert';
+  drawAccelerationPad($('accelerationPad'), mode);
+  $('accelNotationHint').textContent = policy.accelerationNotation === 'columns'
+    ? 'TOP x · BOTTOM y' : '−1, 0 or +1 each axis';
+  $('ghostToggle').hidden = !bestRecord || !policy.selectedDestination;
+  if (tutorialStep >= 0) renderTutorial();
   renderHUD();
   scheduleDraw();
 }
@@ -579,11 +581,12 @@ function reset() {
 }
 
 const pad = $('accelerationPad');
-for (const [x, y, symbol] of choices) {
+for (const { x, y, symbol } of ACCELERATION_GRID) {
   const button = document.createElement('button');
   button.type = 'button';
   button.dataset.x = x;
   button.dataset.y = y;
+  button.dataset.symbol = symbol;
   button.textContent = symbol;
   button.title = vectorDescription({ x, y }, 'Acceleration');
   button.setAttribute('aria-label', vectorDescription({ x, y }, 'Acceleration'));
