@@ -581,7 +581,9 @@ function renderHUD() {
     $('nextMoveLabel').dataset.tone = explanation.tone;
   }
   $('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB —';
-  $('message').textContent = state.lastEvent.toUpperCase();
+  $('message').textContent = circuit.id==='twin-routes' && state.moves===0
+    ? 'INNER SHORTCUT · OUTER WIDE'
+    : state.lastEvent.toUpperCase();
   $('commit').disabled = !!animation || state.finished;
 
   for (const button of $('accelerationPad').querySelectorAll('button')) {
