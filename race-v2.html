@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0a192b">
   <title>SNOWSHIFT — Northern Loop · Playable Race Prototype</title>
   <link rel="stylesheet" href="./styles/race-v2.css">
+<link rel="stylesheet" href="./styles/column-vectors.css">
   <script type="module" src="./src/race-ui.mjs"></script>
 </head>
 <body>
@@ -50,9 +51,9 @@
       <aside class="race-panel" aria-label="Race controls and vector telemetry">
         <div class="panel-title"><span class="eyebrow">RACE TELEMETRY / 01</span><h2>Plan your glide</h2></div>
         <div class="readout-grid">
-          <div><small>VELOCITY</small><strong id="currentVelocity">( 0, 0 )</strong></div>
-          <div><small>ACCELERATION</small><strong id="selectedAcceleration">( +1, 0 )</strong></div>
-          <div class="wide"><small>NEXT VELOCITY</small><strong id="nextVelocity" class="lime">( +1, 0 )</strong></div>
+          <div><small>VELOCITY</small><strong id="currentVelocity" class="vector-display" role="img" aria-label="Velocity column vector: top x-component 0, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">0</span><span data-component="y">0</span></span></strong></div>
+          <div><small>ACCELERATION</small><strong id="selectedAcceleration" class="vector-display" role="img" aria-label="Acceleration column vector: top x-component 1, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">1</span><span data-component="y">0</span></span></strong></div>
+          <div class="wide"><small>NEXT VELOCITY</small><strong id="nextVelocity" class="vector-display lime" role="img" aria-label="Next velocity column vector: top x-component 1, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">1</span><span data-component="y">0</span></span></strong></div>
         </div>
 
         <div class="controls-section">
