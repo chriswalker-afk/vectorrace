@@ -13,7 +13,7 @@ import {
 const p=(x,y)=>({x,y});
 
 test('third circuit appears after first two with no new physics/obstacle mechanics',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),[
+  assert.deepEqual(CIRCUITS.slice(0,3).map(c=>c.id),[
     'northern-loop','aurora-split','frost-chicane'
   ]);
   assert.strictEqual(getCircuit('frost-chicane'), FROST_CHICANE);
