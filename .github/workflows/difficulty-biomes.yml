@@ -1,0 +1,51 @@
+name: Four difficulty biomes, playable region and art gallery QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v10.html'
+      - 'theme-gallery.html'
+      - 'src/biomes.mjs'
+      - 'src/biome-scenery.mjs'
+      - 'src/race-art-v10.mjs'
+      - 'src/race-v10.mjs'
+      - 'src/ux-smoke-v10.mjs'
+      - 'src/biome-gallery.mjs'
+      - 'styles/biome-ui.css'
+      - 'styles/biome-gallery.css'
+      - 'scripts/viewport-smoke-v10.mjs'
+      - 'tests/biomes.test.mjs'
+      - '.github/workflows/difficulty-biomes.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  biome-visuals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate colour palettes, physics separation and existing maps
+        run: npm test
+      - name: Syntax check all new browser modules
+        run: npm run check
+      - name: Nine screen sizes, complete Master lap and four-region pixel gallery
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-biomes.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v10.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr13-four-world-biome-gallery
+          path: screenshots/snowshift-v10-*.png
+          if-no-files-found: warn

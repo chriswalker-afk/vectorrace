@@ -38,7 +38,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 02 | Aurora Split | Beginner 2 | Visible, small central rock and route choice | Base physics — implemented |
 | 03 | Frost Chicane | Beginner 3 | **Two closely spaced bends; reverse lateral velocity before the second** | Base physics — **this PR** |
 | 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — implemented |
-| 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — **this PR** |
+| 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — implemented |
 | 06 | Twin Routes | Intermediate 2 | Risky shortcut vs longer safe racing line | Base physics — planned |
 | 07 | Glass Ice | Intermediate 3 | One low-grip zone with an explicit braking rule | **New deterministic zone rule** — planned |
 | 08 | Crosswind Ridge | Intermediate 4 | One marked constant wind vector | **New wind-vector rule** — planned |
@@ -48,6 +48,19 @@ The table is a roadmap, not a claim that future tracks exist.
 | 12 | Arctic Grand Prix | Expert Track | Longer multistage final challenge | Existing extended rules — planned |
 
 For upcoming Track 04 onward, build from this checklist and commit a concise track-design note alongside the new geometry.
+
+## Visual regions by difficulty (from Snowshift V10)
+
+Each difficulty tier takes the player into a new cosmetic environment. Visual themes are separate from gameplay mechanics, with decorative scenery clipped to the non-drivable terrain. A track's existing `level` property automatically selects its region.
+
+| Difficulty | Region | Identity | Availability |
+|---|---|---|---|
+| Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
+| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow playable; later Intermediate tracks planned |
+| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Visual style ready; no playable Advanced track yet |
+| Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
+
+Every future track must match the region's look, retain the exact physics-to-art shoreline, and preserve readable skimmer, gates and vectors. The region name and difficulty tier must appear in text, not colour alone. The V9 build remains an unmodified visual baseline; `theme-gallery.html` shows all four regions using identical sample geometry. See [Difficulty Region Art Standards](PR13_DIFFICULTY_REGIONS.md).
 
 ## Physics and classroom clarity
 - Base mechanics remain `v_next = v_current + a`, then `position_next = position + v_next`, with `a_x, a_y` each in `{-1,0,+1}`.
