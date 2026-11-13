@@ -25,6 +25,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v4.html` — one-screen race experience with Guided / Standard / Expert modes, tutorial and responsive cockpit.
 - `race-v5.html` — single-screen cornering/braking guide, checkpoint/crash celebration and local personal-best ghost.
 - `race-v6.html` — two playable beginner circuits: Northern Loop and Aurora Split (two clear routes around a small rock), with a compact in-board map selector.
+- `race-v7.html` — three playable beginner circuits, including Frost Chicane's two quick bends with no new physics.
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
@@ -33,6 +34,8 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR7_MASTER_MODE.md` — challenge rules, matrix-key mapping and single-screen QA.
 - `docs/PR8_TWO_CIRCUITS.md` — second circuit design, collision geometry and test requirements.
 - `docs/PR9_ROCK_CLEARANCE.md` — small obstacle art, minimum skimmer-width margins and two-route manoeuvre tests.
+- `docs/TRACK_DIFFICULTY_ROADMAP.md` — permanent 12-track plan, 0–3 difficulty checklist, new-mechanic rules and release gates.
+- `docs/PR10_FROST_CHICANE.md` — Track 03 geometry, safe 26-turn race and layout acceptance.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -42,6 +45,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v6.html` for the two-circuit game. Add `?track=aurora-split` to jump directly to the new map.
+Open `http://localhost:8000/race-v7.html` for the three-circuit game. Add `?track=frost-chicane` to start on Beginner 3.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
