@@ -37,7 +37,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 01 | Northern Loop | Beginner 1 | Basic vector acceleration and braking | Base physics — implemented |
 | 02 | Aurora Split | Beginner 2 | Visible, small central rock and route choice | Base physics — implemented |
 | 03 | Frost Chicane | Beginner 3 | **Two closely spaced bends; reverse lateral velocity before the second** | Base physics — **this PR** |
-| 04 | Narrow Passage | Beginner 4 | Short, clear skimmer-width corridor | Base physics — planned |
+| 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — **this PR** |
 | 05 | Hairpin Hollow | Intermediate 1 | Sharp turn after a long straight | Base physics — planned |
 | 06 | Twin Routes | Intermediate 2 | Risky shortcut vs longer safe racing line | Base physics — planned |
 | 07 | Glass Ice | Intermediate 3 | One low-grip zone with an explicit braking rule | **New deterministic zone rule** — planned |
@@ -81,6 +81,12 @@ For upcoming Track 04 onward, build from this checklist and commit a concise tra
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 04 design note — Narrow Passage
+
+This course reuses Frost Chicane's consecutive bends, but adds **one short 3.2-unit-wide constriction** in the southern straight. The island reaches toward the outside bank for roughly 3.4 world units, with sloped approaches. At the centreline y=5 the skimmer retains >=1.2 units to the island and >=2 units to the outside bank, exceeding the existing 1.0-unit production minimum. The route should remain a manageable increase from Beginner 3. The racing challenge is precision through a **single clearly visible bottleneck**, not a new physics effect or a gratuitously long narrow road.
+
+The previous full-lap route is intentionally reused as a *quality control trajectory*: a line that was forgiving on Track 03 becomes more constrained on Track 04. Tests verify both full-segment clearance and that a higher, previously legal line is now blocked. Student playtesting is still required to establish perceived difficulty. See [Track 04 acceptance](PR11_NARROW_PASSAGE.md).
 
 ## When designing Track 03 specifically
 - Teach **successive changes of lateral velocity**, ideally one bend followed soon by a bend in the opposite direction.
