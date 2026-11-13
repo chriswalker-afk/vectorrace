@@ -1,0 +1,426 @@
+import { biomeForCircuit, biomeForLevel } from './biomes.mjs';
+import { paintBiomeAtmosphere, paintBiomeLand, paintBiomeBeacon } from './biome-scenery.mjs';
+
+/**
+ * Snowshift's original art layer (PR #3).
+ * No race state, collision decisions or gate logic are kept here.
+ *
+ * Everything composits on the same exact polygon geometry as src/engine.mjs.
+ * The SVG sprite and texture files are independent reusable assets.
+ */
+const ASSETS = Object.freeze({
+  skimmer: '../assets/art/ice-skimmer-flare.svg',
+  pine: '../assets/art/pine-canopy.svg',
+  rock: '../assets/art/granite-outcrop.svg',
+  cabin: '../assets/art/alpine-cabin.svg',
+  snow: '../assets/art/snowfield.svg',
+  ice: '../assets/art/ice-surface.svg',
+  flag: '../assets/art/race-flag.svg',
+  lantern: '../assets/art/lantern.svg'
+});
+
+const white = '#eff9fb';
+const ice = '#164b65';
+const raceOrange = '#ff7557';
+
+const outsideTrees = [
+  [-1, 25, 69], [2, 25.5, 52], [6, 25.7, 83], [10, 26.5, 49],
+  [25, 25.8, 62], [28.5, 26, 84], [34, 25, 76],
+  [34, 20, 67], [35, 16, 85], [35.1, 11, 67], [35, 5, 86],
+  [30.5, -.4, 62], [26, -1, 88], [20, -2, 57],
+  [11, -.4, 66], [7, -.8, 77], [1, -.3, 64],
+  [-1.4, 5, 80], [-2, 11, 70], [-2, 19, 63]
+];
+const islandTrees = [
+  [11.2, 13.4, 56], [13.1, 14.5, 60], [19.6, 14.6, 65],
+  [22.2, 12.5, 58], [19.9, 11.1, 60], [12.4, 11, 53]
+];
+
+function trace(ctx, polygon, world) {
+  const p = world(polygon[0]);
+  ctx.moveTo(p.x, p.y);
+  for (let i = 1; i < polygon.length; i++) {
+    const q = world(polygon[i]);
+    ctx.lineTo(q.x, q.y);
+  }
+  ctx.closePath();
+}
+
+function polygonPath(ctx, polygon, world) {
+  ctx.beginPath();
+  trace(ctx, polygon, world);
+}
+
+function corridorPath(ctx, circuit, world) {
+  ctx.beginPath();
+  trace(ctx, circuit.outer, world);
+  trace(ctx, circuit.inner, world);
+  for (const obstacle of circuit.obstacles ?? []) {
+    trace(ctx, obstacle.polygon, world);
+  }
+}
+
+function imgReady(img) {
+  return !!(img && img.complete && img.naturalWidth > 0);
+}
+
+export function createSnowshiftArtwork(requestRender = () => {}) {
+  const images = new Map();
+  const patterns = new Map();
+  let staticScene = null;
+  let sceneDirty = true;
+  let lastCircuitId = null;
+  let lastBiomeId = null;
+  let activeBiome = biomeForLevel('BEGINNER');
+  for (const [key, relativePath] of Object.entries(ASSETS)) {
+    const img = new Image();
+    images.set(key, img);
+    img.addEventListener('load', () => {
+      sceneDirty = true;
+      requestRender();
+    });
+    img.addEventListener('error', () => {
+      console.warn('Snowshift art asset unavailable:', relativePath);
+      sceneDirty = true;
+      requestRender();
+    });
+    img.src = new URL(relativePath, import.meta.url).href;
+  }
+
+  function stamp(ctx, key, x, y, width, height, alpha = 1) {
+    const img = images.get(key);
+    if (!imgReady(img)) return false;
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.drawImage(img, x - width / 2, y - height / 2, width, height);
+    ctx.restore();
+    return true;
+  }
+
+  function repeating(ctx, key, width, height, alpha = 1) {
+    const img = images.get(key);
+    if (!imgReady(img)) return false;
+    let entry = patterns.get(key);
+    // Patterns belong to their rendering context. The browser prototype uses one canvas.
+    if (!entry || entry.context !== ctx) {
+      entry = { context: ctx, pattern: ctx.createPattern(img, 'repeat') };
+      patterns.set(key, entry);
+    }
+    if (!entry.pattern) return false;
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.fillStyle = entry.pattern;
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+    return true;
+  }
+
+  function snowfield(ctx, width, height, biome=activeBiome) {
+    const g = ctx.createLinearGradient(0, 0, width, height);
+    for(const [index, stop] of [0,.38,.82,1].entries())
+      g.addColorStop(stop,biome.ground[index]);
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,width,height);
+    repeating(ctx,'snow',width,height,biome.groundTextureAlpha);
+
+    // Broad snow pillows + fine contour strokes give a miniature-diorama relief.
+    ctx.save();
+    ctx.strokeStyle = biome.contour;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 25; i++) {
+      const x = (i * 139 + i * i * 23) % (width + 160) - 80;
+      const y = (i * 89 + i * i * 37) % (height + 120) - 60;
+      ctx.globalAlpha = (biome.id==='beginner'?.15:.07) + (i % 3) * .035;
+      ctx.lineWidth = 3 + (i % 4) * 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x - 34, y);
+      ctx.bezierCurveTo(x - 8, y - 11, x + 20, y - 14, x + 41, y - 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    paintBiomeAtmosphere(ctx,width,height,biome);
+  }
+
+  function drawOutdoorScenery(ctx, world, circuit, width, height, biome=activeBiome) {
+    ctx.save();
+    // Exterior art is only visible outside the same mathematically defined road.
+    ctx.beginPath();
+    ctx.rect(0, 0, width, height);
+    trace(ctx, circuit.outer, world);
+    ctx.clip('evenodd');
+
+    if(biome.id!=='beginner'){
+      paintBiomeLand(ctx,world,circuit,biome,'outer');
+      ctx.restore();
+      return;
+    }
+    for (const [x, y, size] of outsideTrees) {
+      const p = world({ x, y });
+      stamp(ctx, 'pine', p.x, p.y, size, size);
+      if ((Math.round(x * 10) + Math.round(y * 10)) % 3 === 0) {
+        stamp(ctx, 'pine', p.x + size * .45, p.y + size * .26, size * .62, size * .62, .92);
+      }
+    }
+    for (const [x, y, w] of [
+      [-.8, 23.1, 140], [31.8, 24.2, 150],
+      [34, 6, 136], [2.5, .2, 158], [28.6, 1, 165]
+    ]) {
+      const p = world({ x, y });
+      stamp(ctx, 'rock', p.x, p.y, w, w * .69, .91);
+    }
+    ctx.restore();
+  }
+
+  function drawIsland(ctx, circuit, world, biome=activeBiome) {
+    ctx.save();
+    polygonPath(ctx, circuit.inner, world);
+    ctx.clip();
+    if(biome.id!=='beginner'){
+      paintBiomeLand(ctx,world,circuit,biome,'island');
+      ctx.restore();
+      return;
+    }
+
+    // Grounding: snow-coloured island is not part of the permitted track.
+    for (const [x, y, w] of [
+      [9.8, 12.5, 103], [15, 15.4, 118], [21.7, 14.3, 112]
+    ]) {
+      const p = world({ x, y });
+      stamp(ctx, 'rock', p.x, p.y, w, w * .69, .8);
+    }
+    const cabin = world({ x: 16.5, y: 12.1 });
+    stamp(ctx, 'cabin', cabin.x, cabin.y, 132, 108, 1);
+    for (const [x, y, size] of islandTrees) {
+      const p = world({ x, y });
+      stamp(ctx, 'pine', p.x, p.y, size, size);
+    }
+    ctx.restore();
+  }
+
+  function drawTrackSurface(ctx, circuit, world, width, height, biome=activeBiome) {
+    // The road itself is rendered from the physics polygons, not a painted bitmap.
+    ctx.save();
+    corridorPath(ctx, circuit, world);
+    ctx.fillStyle = biome.roadBase;
+    ctx.fill('evenodd');
+    ctx.clip('evenodd');
+
+    const g = ctx.createLinearGradient(0, 40, width, height);
+    for(const [index, stop] of [0,.4,.76,1].entries())
+      g.addColorStop(stop,biome.road[index]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, width, height);
+    repeating(ctx, 'ice', width, height, biome.iceTextureAlpha);
+
+    // Banks cast dark blue shadow onto the ice, *clipped within* the legal road.
+    for (const edge of [circuit.outer, circuit.inner]) {
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankShadow;
+      ctx.lineWidth = 32;
+      ctx.stroke();
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankGlow;
+      ctx.lineWidth = 15;
+      ctx.stroke();
+    }
+
+    // Subtle etched travel marks, not a false solid racing line.
+    ctx.strokeStyle = biome.etch;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 95; i++) {
+      const x = (i * 67 + i * i * 19) % width;
+      const y = (i * 131 + i * i * 11) % height;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 18 + i % 25, y - 3 - i % 7);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Bright snow ridges sit exactly on both hit-test boundaries.
+    for (const edge of [circuit.outer, circuit.inner]) {
+      ctx.save();
+      ctx.lineJoin = 'round';
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankDark;
+      ctx.lineWidth = 19;
+      ctx.stroke();
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankMid;
+      ctx.lineWidth = 14;
+      ctx.stroke();
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankLight;
+      ctx.lineWidth = 8;
+      ctx.stroke();
+      polygonPath(ctx, edge, world);
+      ctx.strokeStyle = biome.bankEdge;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawRockObstacles(ctx, circuit, world) {
+    for (const obstacle of circuit.obstacles ?? []) {
+      const polygon = obstacle.polygon;
+      ctx.save();
+      polygonPath(ctx, polygon, world);
+      ctx.clip();
+      const cx = polygon.reduce((n,p)=>n+p.x,0) / polygon.length;
+      const cy = polygon.reduce((n,p)=>n+p.y,0) / polygon.length;
+      const center = world({x:cx,y:cy});
+      const xValues = polygon.map(p=>world(p).x);
+      const yValues = polygon.map(p=>world(p).y);
+      const width = Math.max(...xValues)-Math.min(...xValues);
+      const height = Math.max(...yValues)-Math.min(...yValues);
+      const shadow = ctx.createRadialGradient(
+        center.x-8,center.y-11,2,center.x,center.y,Math.max(width,height)
+      );
+      shadow.addColorStop(0,'#fafffd');
+      shadow.addColorStop(.36,'#c0e1e5');
+      shadow.addColorStop(.9,'#548ca6');
+      ctx.fillStyle=shadow;
+      ctx.fillRect(Math.min(...xValues),Math.min(...yValues),width,height);
+      // Sized to the actual rock polygon. Previous 90×65px minimum made this
+      // 35px-wide obstacle look enormous next to the skimmer.
+      stamp(ctx, 'rock', center.x, center.y,
+        width * .92, height * .88, .87);
+      // Fine fractured ice visible on the obstacle, never painted into valid ice.
+      ctx.strokeStyle='#f6ffffcc';
+      ctx.lineWidth=1.1;
+      ctx.beginPath();
+      ctx.moveTo(center.x-width*.2,center.y-height*.1);
+      ctx.lineTo(center.x-width*.03,center.y+height*.09);
+      ctx.lineTo(center.x+width*.22,center.y-height*.13);
+      ctx.moveTo(center.x+width*.1,center.y+height*.2);
+      ctx.lineTo(center.x+width*.19,center.y+height*.03);
+      ctx.stroke();
+      ctx.restore();
+
+      // Small, precise rim. Broad 19–32px snowbank outlines belong to the
+      // main track edge and would visually swallow a one-cell obstacle.
+      ctx.save();
+      ctx.lineJoin='round';
+      polygonPath(ctx,polygon,world);
+      ctx.strokeStyle='#17485b';
+      ctx.lineWidth=3;
+      ctx.stroke();
+      polygonPath(ctx,polygon,world);
+      ctx.strokeStyle='#e4f8fc';
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawGateFlags(ctx, circuit, world, biome=activeBiome) {
+    // All flags are placed off-road; numerical gate segments stay canonical.
+    const positions = [
+      { x: 31.8, y: 12.6 },
+      { x: 16, y: 1.1 },
+      { x: .35, y: 12.5 },
+      { x: 16, y: 24.4 }
+    ];
+    for (const point of positions) {
+      const p = world(point);
+      if(biome.id==='beginner')stamp(ctx,'flag',p.x,p.y,37,52,1);
+      else paintBiomeBeacon(ctx,p.x,p.y,biome);
+    }
+    for (const point of [
+      { x: 2.5, y: 21.4 }, { x: 30.7, y: 21.3 },
+      { x: 3, y: 3.1 }, { x: 30.5, y: 3.5 }
+    ]) {
+      const p = world(point);
+      if(biome.id==='beginner')stamp(ctx,'lantern',p.x,p.y,70,70,.9);
+      else paintBiomeBeacon(ctx,p.x,p.y,biome);
+    }
+  }
+
+  function drawSkimmer(ctx, p, heading, speed = 0) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(heading);
+    const flare = Math.min(.9, Math.max(0, speed) * .14);
+    if (flare > 0) {
+      ctx.save();
+      ctx.globalAlpha = flare;
+      const exhaust = ctx.createRadialGradient(-27, 0, 0, -35, 0, 35);
+      exhaust.addColorStop(0, '#c9faffd6');
+      exhaust.addColorStop(.55, '#74d2ec80');
+      exhaust.addColorStop(1, '#74d2ec00');
+      ctx.fillStyle = exhaust;
+      ctx.beginPath();
+      ctx.ellipse(-36, 0, 42, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // Tiny trim strictly within the 72×40 skimmer artwork, never a larger hitbox.
+    if(activeBiome.id!=='beginner'){
+      ctx.strokeStyle=activeBiome.accent;
+      ctx.lineWidth=2.2;ctx.globalAlpha=.8;
+      ctx.beginPath();ctx.moveTo(-16,-2);ctx.lineTo(9,-2);ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+    // Exact physics center remains at (p.x,p.y); sprite is visual only.
+    if (!stamp(ctx, 'skimmer', 0, 0, 72, 40)) {
+      // Minimal fallback if an SVG fails to load.
+      ctx.fillStyle = raceOrange;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(28, 0);
+      ctx.lineTo(-15, -13);
+      ctx.lineTo(-9, 0);
+      ctx.lineTo(-15, 13);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function paintScene(ctx, width, height, world, circuit) {
+    activeBiome=biomeForCircuit(circuit);
+    if (circuit.id !== lastCircuitId || activeBiome.id !== lastBiomeId) {
+      sceneDirty=true;
+      lastCircuitId=circuit.id;
+      lastBiomeId=activeBiome.id;
+    }
+    const density = 2;
+    if (!staticScene || staticScene.width !== width * density ||
+        staticScene.height !== height * density) {
+      staticScene = document.createElement('canvas');
+      staticScene.width = width * density;
+      staticScene.height = height * density;
+      sceneDirty = true;
+    }
+    if (sceneDirty) {
+      const background = staticScene.getContext('2d');
+      background.setTransform(density, 0, 0, density, 0, 0);
+      background.clearRect(0, 0, width, height);
+      snowfield(background,width,height,activeBiome);
+      drawOutdoorScenery(background,world,circuit,width,height,activeBiome);
+      drawTrackSurface(background,circuit,world,width,height,activeBiome);
+      drawIsland(background,circuit,world,activeBiome);
+      drawRockObstacles(background,circuit,world);
+      drawGateFlags(background,circuit,world,activeBiome);
+      sceneDirty = false;
+    }
+    ctx.drawImage(staticScene, 0, 0, width, height);
+  }
+
+  return {
+    assets: ASSETS,
+    paintScene,
+    getBiome:()=>activeBiome,
+    snowfield,
+    drawOutdoorScenery,
+    drawTrackSurface,
+    drawIsland,
+    drawRockObstacles,
+    drawGateFlags,
+    drawSkimmer
+  };
+}
