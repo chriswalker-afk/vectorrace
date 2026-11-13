@@ -228,6 +228,9 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
         if(document.getElementById('moves').textContent!=='00'||
            document.getElementById('score').textContent!=='00')
           errors.push('Selecting '+id+' did not reset the race');
+        if(id==='twin-routes' &&
+           document.getElementById('message').textContent!=='INNER SHORTCUT · OUTER WIDE')
+          errors.push('Twin Routes does not clearly explain inner versus outer choice');
         if(document.querySelector('[data-circuit="'+id+'"]').getAttribute('aria-current')!=='true')
           errors.push('Track '+id+' not shown as selected');
         if(new URL(location.href).searchParams.get('track')!==id)
