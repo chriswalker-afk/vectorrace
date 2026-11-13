@@ -156,6 +156,25 @@ function verifyCircuitRecordsBrowser() {
   const restored=switchTo('twin-routes');
   return {twin,northern,aurora,frost,narrow,hairpin,restored};
 }
+function moveToForkBrowser(actions) {
+  document.getElementById('reset').click();
+  document.querySelector('[data-mode="guided"]').click();
+  for(const a of actions){
+    const control=document.querySelector(
+      '#accelerationPad [data-x="'+a.x+'"][data-y="'+a.y+'"]'
+    );
+    if(!control)throw new Error('Missing fork manoeuvre acceleration');
+    control.click();
+    document.getElementById('commit').click();
+  }
+  return {
+    turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    region:document.getElementById('biomeShort').textContent,
+    message:document.getElementById('message').textContent
+  };
+}
+
 function crashIntoGlacierBrowser() {
   document.getElementById('reset').click();
   document.getElementById('mapPicker').click();
@@ -425,6 +444,28 @@ async function main(){
     }else{
       console.log('PASS six independent track records: saved Twin Routes best survives switching');
     }
+    // Capture actual two-path approach positions. These previews also
+    // validate that a narrower, visible shortcut and wider scenic route are
+    // both navigable by the real on-screen acceleration controls.
+    for(const [name,pathSteps,count] of [
+      ['inner-shortcut',TWIN_ROUTES_SHORTCUT_LAP.slice(0,4),4],
+      ['outer-wide',TWIN_ROUTES_WIDE_LAP.slice(0,5),5]
+    ]){
+      const expression='('+moveToForkBrowser.toString()+')('+JSON.stringify(pathSteps)+')';
+      const position=await evaluation(send,expression);
+      if(position.crashes!=='00'||position.turns!==String(count).padStart(2,'0')||
+         position.region!=='AURORA'){
+        console.error('FAIL photographed '+name+' is not a legal Aurora racing line',position);
+        failed++;
+      }
+      await delay(220);
+      const forkPng=await send('Page.captureScreenshot',{
+        format:'png',captureBeyondViewport:false,fromSurface:true
+      });
+      writeFileSync('screenshots/snowshift-v11-'+name+'-fork.png',
+        Buffer.from(forkPng.data,'base64'));
+    }
+
     const glacierCrash=await evaluation(send,'('+crashIntoGlacierBrowser.toString()+')()');
     if(glacierCrash.turns!=='03' || glacierCrash.crashes!=='01' ||
        glacierCrash.score!=='06' || glacierCrash.velocity.join(',')!=='0,0' ||
