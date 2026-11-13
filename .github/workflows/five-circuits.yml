@@ -1,0 +1,50 @@
+name: Five-circuit Hairpin Hollow and responsive QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v9.html'
+      - 'src/circuit.mjs'
+      - 'src/race-v9.mjs'
+      - 'src/ux-smoke-v9.mjs'
+      - 'styles/map-selector-v9.css'
+      - 'scripts/hairpin-hollow-qa-route.mjs'
+      - 'scripts/viewport-smoke-v9.mjs'
+      - 'scripts/track-clearance.mjs'
+      - 'tests/hairpin-hollow.test.mjs'
+      - 'tests/narrow-passage.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - '.github/workflows/five-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fifth-circuit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate five circuits, hairpin physics, vehicle clearance and full lap
+        run: npm test
+      - name: Validate new game and browser modules
+        run: npm run check
+      - name: Nine viewport sizes, five map choices and complete Master-mode hairpin lap
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-five-circuits.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v9.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr12-hairpin-hollow-previews
+          path: screenshots/snowshift-v9-*.png
+          if-no-files-found: warn
