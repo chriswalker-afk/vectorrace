@@ -32,6 +32,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR5_GAMEPLAY.md` — exact braking lookahead, local records, racing feedback and QA.
 - `docs/PR7_MASTER_MODE.md` — challenge rules, matrix-key mapping and single-screen QA.
 - `docs/PR8_TWO_CIRCUITS.md` — second circuit design, collision geometry and test requirements.
+- `docs/PR9_ROCK_CLEARANCE.md` — small obstacle art, minimum skimmer-width margins and two-route manoeuvre tests.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
