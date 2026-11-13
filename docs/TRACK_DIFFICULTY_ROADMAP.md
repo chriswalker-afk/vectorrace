@@ -41,7 +41,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — implemented |
 | 06 | Twin Routes | Intermediate 2 | Choose between a tight inner shortcut and a wider outer detour | Base physics — **this PR** |
 | 07 | Glass Ice | Intermediate 3 | Marked ice permits changing at most one velocity component per turn | **New deterministic zone rule — this PR** |
-| 08 | Crosswind Ridge | Intermediate 4 | One marked constant wind vector | **New wind-vector rule** — planned |
+| 08 | Crosswind Ridge | Intermediate 4 | Counter a known southward wind vector (0,−1) in one marked field | **Deterministic external force — this PR** |
 | 09 | Icebound Rapids | Advanced 1 | Predictable boost strips and braking choices | **New boost rule** — planned |
 | 10 | Broken Passage | Advanced 2 | Moving obstacles on deterministic turn cycles | **Turn-indexed hazard rule** — planned |
 | 11 | Frozen Gauntlet | Advanced 3 | Combination of previously taught mechanics | Existing extended rules — planned |
@@ -56,7 +56,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 | Difficulty | Region | Identity | Availability |
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
-| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes and Glass Ice playable; Crosswind Ridge planned |
+| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes, Glass Ice and Crosswind Ridge playable; Advanced tracks planned |
 | Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Visual style ready; no playable Advanced track yet |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
@@ -66,7 +66,7 @@ Every future track must match the region's look, retain the exact physics-to-art
 - Base mechanics remain `v_next = v_current + a`, then `position_next = position + v_next`, with `a_x, a_y` each in `{-1,0,+1}`.
 - From speed `n` in one component, maximum componentwise braking yields displacement `n(n-1)/2` before reaching rest. Design corners around this stopping distance; students should be able to reason about it.
 - **Never call a normal frictionless region "slippery" without a real rule difference.** Glass Ice implements a marked start-of-turn one-axis acceleration rule, fully supported by tutorial, UI, exact braking forecast and solver.
-- **Wind** is a clearly labelled vector added to acceleration in marked zones: `v_next = v_current + a + w`. Define trigger consistently (recommend zone under skimmer at start of a turn) and show it in Guided/Standard without leaking Expert/Master hidden information.
+- **Wind** now adds a known constant vector on a marked road: `v_next = v_current + a + w`. Crosswind Ridge uses exactly `w=(0,−1)`, active when the skimmer starts a turn inside the painted polygon, including its boundary. Guided projections use the same calculation; Expert/Master show the known field but do not reveal hidden destinations.
 - **Boost strips** and **coasting zones** also need explicit turn timing, clearly marked boundaries and preview/solver support before release.
 - For moving hazards, publish the cycle and turn index; never make success depend on unpredictable randomness.
 - New mechanics **must not silently change earlier maps**. Track-specific data and versioned physics flags should be explicit.
@@ -94,6 +94,12 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 08 design note — Crosswind Ridge
+
+One large, precisely marked **southward wind field** on the eastbound Aurora Vale ridge (x=17–26; y=18.65–24.2) introduces our first external acceleration. The same **nine** choice vectors remain available: while inside the marked patch at the **start of a turn**, apply \(\mathbf v'=\mathbf v+\mathbf a+(0,-1)\), then \(\mathbf p'=\mathbf p+\mathbf v'\). Outside the patch, wind is zero.
+
+A student coasting east with velocity (3,0) is pushed to next velocity (3,−1); selecting \(a_y=+1\) counteracts the wind and preserves (3,0). **No random gusts** and no extra acceleration limits are introduced. A tested **24-turn, crash-free lap** uses three consecutive counterwind decisions and maintains **≥1.1 world units** of full-motion centre-to-bank clearance. Wind artwork includes downward arrows, a boundary derived from the exact physics zone, and a labelled wind vector. Guided braking forecasts account for the force, and all earlier seven circuits remain wind-free. See [Track 08 mathematical design and QA](PR16_CROSSWIND_RIDGE.md).
 
 ## Track 07 design note — Glass Ice
 
