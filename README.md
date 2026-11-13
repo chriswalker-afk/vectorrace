@@ -27,6 +27,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v6.html` — two playable beginner circuits: Northern Loop and Aurora Split (two clear routes around a small rock), with a compact in-board map selector.
 - `race-v7.html` — three playable beginner circuits, including Frost Chicane's two quick bends with no new physics.
 - `race-v8.html` — four beginner circuits, including a short skimmer-width bottleneck in Narrow Passage.
+- `race-v9.html` — fifth circuit, Hairpin Hollow (Intermediate 1): long straight into a real 180° velocity reversal.
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
@@ -38,6 +39,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/TRACK_DIFFICULTY_ROADMAP.md` — permanent 12-track plan, 0–3 difficulty checklist, new-mechanic rules and release gates.
 - `docs/PR10_FROST_CHICANE.md` — Track 03 geometry, safe 26-turn race and layout acceptance.
 - `docs/PR11_NARROW_PASSAGE.md` — Track 04 design, full-segment clearance and classroom challenge.
+- `docs/PR12_HAIRPIN_HOLLOW.md` — first Intermediate track: long straight, U-turn, braking distance and safe-line tests.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -47,6 +49,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v8.html` for the four-circuit game. Add `?track=narrow-passage` to start on Beginner 4.
+Open `http://localhost:8000/race-v9.html` for all five circuits. Add `?track=hairpin-hollow` for Intermediate 1.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
