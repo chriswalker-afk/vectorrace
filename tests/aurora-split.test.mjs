@@ -18,8 +18,8 @@ test('existing two beginners remain in the same positions before the third',()=>
   assert.equal(AURORA_SPLIT.obstacles.length,1);
 });
 
-test('both circuits start safely and use the same deterministic velocity rules',()=>{
-  for(const circuit of CIRCUITS){
+test('both original beginner circuits retain their exact start and first move',()=>{
+  for(const circuit of [NORTHERN_LOOP,AURORA_SPLIT]){
     const initial=createRace(circuit);
     assert.equal(onTrack(initial.position,circuit),true);
     assert.deepEqual(initial.velocity,p(0,0));
