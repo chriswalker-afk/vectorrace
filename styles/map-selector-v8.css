@@ -43,3 +43,32 @@
   .map-option-body strong { font-size: 10px; line-height: 1.04; white-space: normal; }
   .map-option-body small { font-size: 8px; line-height: 1.1; }
 }
+
+/* Small portrait phones cannot fit four vertically stacked cards under the
+   course label. Place them 2x2 within the existing on-course overlay. */
+@media (max-width: 365px) and (orientation: portrait) {
+  .map-menu:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    grid-template-rows: auto repeat(2,49px);
+    column-gap: 3px;
+    row-gap: 3px;
+    width: calc(100% - 8px);
+    left: 4px;
+    top: 47px;
+    max-height: calc(100% - 51px);
+    padding: 3px;
+    align-content: start;
+    overflow: hidden;
+  }
+  .map-menu-title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0 2px 1px;
+  }
+  .map-option { height: 49px; min-height: 49px; margin: 0; padding: 3px 4px; gap: 4px; }
+  .map-option-no { width: 20px; height: 20px; flex: 0 0 20px; font-size: 9px; }
+  .map-option-body { min-width: 0; gap: 2px; }
+  .map-option-body strong { font-size: 9px; line-height: 1.06; white-space: normal; }
+  .map-option-body small { font-size: 7px; line-height: 1.08; white-space: normal; }
+}
