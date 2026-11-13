@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRecordStore, validRecord, RECORD_KEY } from '../src/race-records.mjs';
+import { createRecordStore, validRecord, RECORD_KEY, recordKeyForCircuit } from '../src/race-records.mjs';
 
 function fakeStorage() {
   const entries=new Map();
@@ -64,4 +64,29 @@ test('invalid frame counts are not accepted as a personal best',()=>{
   const result=recorder.saveIfBetter(2,2,0,frames.slice(0,1));
   assert.equal(result.improved,false);
   assert.equal(result.best,null);
+});
+
+
+test('personal best records are isolated by circuit and the classic storage key is unchanged',()=>{
+  const storage=fakeStorage();
+  assert.equal(recordKeyForCircuit('northern-loop'),RECORD_KEY);
+  const otherKey=recordKeyForCircuit('aurora-split');
+  assert.notEqual(otherKey,RECORD_KEY);
+  const original=createRecordStore(storage,'northern-loop');
+  const second=createRecordStore(storage,'aurora-split');
+  assert.equal(original.saveIfBetter(2,2,0,frames).improved,true);
+  assert.equal(second.load(),null);
+  const secondFrames=[{x:13,y:19},{x:14,y:19},{x:16,y:19},{x:17,y:19}];
+  assert.equal(second.saveIfBetter(3,3,0,secondFrames).improved,true);
+  assert.equal(original.load().score,2);
+  assert.equal(second.load().score,3);
+  assert.equal(storage.raw.size,2);
+  assert.equal(createRecordStore(storage,'aurora-split').load().score,3);
+  assert.equal(createRecordStore(storage,'northern-loop').load().score,2);
+});
+
+test('only known-safe identifier shapes can become storage keys',()=>{
+  assert.throws(()=>recordKeyForCircuit('aurora split'),TypeError);
+  assert.throws(()=>recordKeyForCircuit('../foo'),TypeError);
+  assert.throws(()=>recordKeyForCircuit(''),TypeError);
 });
