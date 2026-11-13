@@ -245,6 +245,24 @@ async function main(){
       }else{
         console.log('PASS',size,'all controls inside viewport; modes and glide work');
       }
+      // The smallest portrait and landscape screens use a special 2×2
+      // selector. Preserve screenshots of the OPEN menu for actual readability
+      // QA, not just bounding-box assertions.
+      if(size==='320x568'||size==='667x375'){
+        await send('Page.navigate',{url:origin+'/race-v8.html?track=narrow-passage'});
+        await waitFor(send,async()=>{
+          const ready=await evaluation(send,
+            'document.readyState==="complete" && document.querySelectorAll("#mapMenu .map-option").length===4');
+          return ready?true:null;
+        });
+        await evaluation(send,'document.getElementById("mapPicker").click()');
+        await delay(180);
+        const menuPng=await send('Page.captureScreenshot',{
+          format:'png',captureBeyondViewport:false,fromSurface:true
+        });
+        writeFileSync('screenshots/snowshift-v8-open-menu-'+size+'.png',
+          Buffer.from(menuPng.data,'base64'));
+      }
       if(size==='1440x900'||size==='390x844'||size==='844x390'){
         await send('Page.navigate',{url:origin+'/race-v8.html?track=narrow-passage'});
         await waitFor(send,async()=>{
