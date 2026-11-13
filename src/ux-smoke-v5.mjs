@@ -34,7 +34,15 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       const pad=document.querySelectorAll('#accelerationPad button');
       if(pad.length!==9)errors.push('Expected nine acceleration buttons, got '+pad.length);
       const modeButtons=document.querySelectorAll('[data-mode]');
-      if(modeButtons.length!==3)errors.push('Expected three assistance modes');
+      if(modeButtons.length!==4)errors.push('Expected four assistance modes');
+      if([...modeButtons].map(b=>b.dataset.mode).join(',')!=='guided,standard,expert,master')
+        errors.push('Mode buttons are not ordered Guided → Standard → Expert → Master');
+      for(const button of modeButtons){
+        const rect=button.getBoundingClientRect();
+        if(rect.left < -1 || rect.right > width+1 || rect.top < -1 || rect.bottom > height+1 ||
+           rect.width < 30 || rect.height < 24)
+          errors.push('Mode button clipped or too small: '+button.dataset.mode);
+      }
       for(const id of ['currentVelocity','selectedAcceleration','nextVelocity']) {
         const box=document.getElementById(id);
         const matrix=box?.querySelector('.column-vector');
@@ -69,7 +77,53 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
 
       // Modes must apply immediately and never change the engine scoreboard.
       const originalScore=document.getElementById('score').textContent;
+      document.querySelector('[data-mode="master"]').click();
+      if(document.getElementById('accelerationPad').dataset.notation!=='columns')
+        errors.push('Master did not switch to column-vector controls');
+      if(document.querySelector('[data-mode="master"]').getAttribute('aria-pressed')!=='true')
+        errors.push('Master button not selected');
+      if(document.getElementById('nextVelocity').dataset.hidden!=='true' ||
+         [...document.querySelectorAll('#nextVelocity [data-component]')].some(el=>el.textContent!=='?'))
+        errors.push('Master leaked the next-velocity prediction');
+      if(!/No prediction/.test(document.getElementById('nextMoveLabel').textContent))
+        errors.push('Master leaked a predictive hint');
+      for(const button of pad) {
+        const matrix=button.querySelector('.column-vector');
+        const x=matrix?.querySelector('[data-component="x"]');
+        const y=matrix?.querySelector('[data-component="y"]');
+        if(!matrix || !x || !y) {
+          errors.push('Missing Master matrix for acceleration '+button.dataset.x+','+button.dataset.y);
+          continue;
+        }
+        if(x.textContent!==button.dataset.x || y.textContent!==button.dataset.y)
+          errors.push('Incorrect Master vector component order');
+        const rect=matrix.getBoundingClientRect();
+        const key=button.getBoundingClientRect();
+        const top=x.getBoundingClientRect(),bottom=y.getBoundingClientRect();
+        if(top.top>=bottom.top || top.bottom>bottom.top+1)
+          errors.push('Master vector entries overlap or reversed');
+        if(rect.left<key.left-1 || rect.right>key.right+1 ||
+           rect.top<key.top-1 || rect.bottom>key.bottom+1)
+          errors.push('Master matrix clipped by acceleration button');
+        if(!button.getAttribute('aria-label')?.includes('top x-component'))
+          errors.push('Missing Master accessibility label');
+      }
+      const downLeft=document.querySelector('#accelerationPad [data-x="-1"][data-y="-1"]');
+      downLeft.click();
+      if(downLeft.getAttribute('aria-pressed')!=='true' ||
+         document.querySelector('#selectedAcceleration [data-component="x"]').textContent!=='-1' ||
+         document.querySelector('#selectedAcceleration [data-component="y"]').textContent!=='-1')
+        errors.push('Selecting a Master column vector did not change the acceleration');
+      // Master guidance must describe the mathematical notation in its tutorial.
+      document.getElementById('help').click();
+      document.getElementById('tourNext').click();
+      if(!/column vector/.test(document.getElementById('tourText').textContent))
+        errors.push('Master tutorial does not explain column vector selection');
+      document.getElementById('closeTutorial').click();
       document.querySelector('[data-mode="expert"]').click();
+      if(document.getElementById('accelerationPad').dataset.notation!=='arrows' ||
+         [...pad].some(button=>button.querySelector('.column-vector')))
+        errors.push('Switching back from Master did not restore arrow controls');
       if(document.getElementById('nextVelocity').dataset.hidden!=='true' ||
          [...document.querySelectorAll('#nextVelocity [data-component]')].some(el=>el.textContent!=='?'))
         errors.push('Expert mode exposed next-velocity components');
