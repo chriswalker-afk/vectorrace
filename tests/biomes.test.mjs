@@ -13,7 +13,7 @@ import { createRace, previewMove, takeTurn, score } from '../src/engine.mjs';
 test('difficulty regions follow student progression, not assistance modes',()=>{
   assert.deepEqual(TIERS,['beginner','intermediate','advanced','expert']);
   assert.deepEqual(CIRCUITS.map(c=>biomeForCircuit(c).id),[
-    'beginner','beginner','beginner','beginner','intermediate'
+    'beginner','beginner','beginner','beginner','intermediate','intermediate'
   ]);
   assert.equal(tierFromLevel('BEGINNER 4'),'beginner');
   assert.equal(tierFromLevel('INTERMEDIATE 1'),'intermediate');
@@ -69,7 +69,7 @@ test('cosmetic regions contain no physics, obstacle or checkpoint overrides',()=
 });
 
 test('earlier circuits are untouched; visual renderer is isolated in V10',()=>{
-  assert.deepEqual(CIRCUITS,[
+  assert.deepEqual(CIRCUITS.slice(0,5),[
     NORTHERN_LOOP,AURORA_SPLIT,FROST_CHICANE,NARROW_PASSAGE,HAIRPIN_HOLLOW
   ]);
   const v9=readFileSync(new URL('../src/race-v9.mjs',import.meta.url),'utf8');
