@@ -1,0 +1,75 @@
+/* V13 — eight circuits in a compact, readable 3×3 selector.
+ * First two rows: three choices each. Final row: two wider options.
+ * Keep racing controls single-screen at 320×568 and 667×375.
+ */
+.map-menu[hidden]{display:none}
+.map-menu{
+  width:min(410px,calc(100% - 12px));
+  max-height:min(390px,calc(100% - 60px))
+}
+.map-option{min-height:36px;margin-bottom:2px}
+.map-option-body small{overflow-wrap:anywhere;white-space:normal}
+@media(max-width:920px) and (orientation:portrait){
+  .map-menu:not([hidden]){max-height:calc(100% - 49px);padding:4px}
+  .map-menu-title{margin:2px 3px 3px}
+  .map-option{height:36px;min-height:36px;margin-bottom:2px}
+}
+@media(max-width:440px) and (orientation:portrait),
+       (max-width:760px) and (orientation:landscape),
+       (max-height:450px) and (orientation:landscape){
+  .map-menu:not([hidden]){
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    grid-template-rows:auto repeat(3,45px);
+    align-content:start;
+    gap:3px;
+    left:4px;top:45px;
+    width:calc(100% - 8px);
+    padding:3px;
+    max-height:calc(100% - 49px);
+    overflow:hidden;
+  }
+  .map-menu-title{
+    grid-column:1/-1;grid-row:1;margin:0 3px 1px
+  }
+  .map-menu-title span{font-size:7px}
+  .map-option{
+    grid-column:span 2;
+    min-width:0;
+    height:45px;min-height:45px;
+    margin:0;padding:3px;
+    gap:3px;overflow:hidden;
+    justify-content:flex-start;
+  }
+  .map-option-no{height:21px;width:19px;flex:0 0 19px;font-size:9px}
+  .map-option-body{
+    min-width:0;
+    gap:2px;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .map-option-body strong{font-size:8px;line-height:1.05;white-space:normal}
+  .map-option-body small{font-size:7px;line-height:1.08;white-space:normal}
+  .map-option[data-circuit="glass-ice"],
+  .map-option[data-circuit="crosswind-ridge"]{
+    grid-column:span 3;
+    justify-content:flex-start;
+  }
+  .map-option[data-circuit="glass-ice"] .map-option-body,
+  .map-option[data-circuit="crosswind-ridge"] .map-option-body{
+    flex-direction:column;align-items:flex-start;gap:2px
+  }
+  .map-option[data-circuit="glass-ice"] .map-option-body strong,
+  .map-option[data-circuit="crosswind-ridge"] .map-option-body strong{
+    font-size:10px
+  }
+  .map-option[data-circuit="glass-ice"] .map-option-body small,
+  .map-option[data-circuit="crosswind-ridge"] .map-option-body small{
+    font-size:8px
+  }
+}
+@media(min-width:540px) and (max-height:450px) and (orientation:landscape){
+  .map-option-body strong{font-size:10px}
+  .map-option-body small{font-size:8px}
+  .map-option-no{width:23px;height:23px;flex:0 0 23px}
+}
