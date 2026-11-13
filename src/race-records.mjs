@@ -1,5 +1,5 @@
 /**
- * Local-only personal best for Northern Loop. Records are data, not commands.
+ * Local-only personal best for each circuit. Records are data, not commands.
  * Store position by attempted turn, including stationary turns/crashes.
  */
 export const RECORD_KEY = 'snowshift:northern-loop:personal-best:v1';
@@ -20,12 +20,21 @@ export function validRecord(record) {
     record.frames.length <= MAX_FRAMES &&
     record.frames.every(validPoint);
 }
-export function createRecordStore(storage) {
+export function recordKeyForCircuit(circuitId = 'northern-loop') {
+  if (typeof circuitId !== 'string' || !/^[a-z0-9-]{1,48}$/.test(circuitId)) {
+    throw new TypeError('Invalid circuit identifier');
+  }
+  return circuitId === 'northern-loop'
+    ? RECORD_KEY : 'snowshift:' + circuitId + ':personal-best:v1';
+}
+
+export function createRecordStore(storage, circuitId = 'northern-loop') {
+  const recordKey = recordKeyForCircuit(circuitId);
   let session = null;
   function load() {
     if (session && validRecord(session)) return session;
     try {
-      const raw = storage?.getItem(RECORD_KEY);
+      const raw = storage?.getItem(recordKey);
       if (!raw || raw.length > 80000) return null;
       const record = JSON.parse(raw);
       if (!validRecord(record)) return null;
@@ -46,7 +55,7 @@ export function createRecordStore(storage) {
     session = record;
     let persisted = false;
     try {
-      storage?.setItem(RECORD_KEY, JSON.stringify(record));
+      storage?.setItem(recordKey, JSON.stringify(record));
       persisted = !!storage;
     } catch { persisted = false; }
     return { best: record, improved: true, persisted };

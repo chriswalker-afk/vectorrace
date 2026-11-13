@@ -47,7 +47,10 @@ export function onTrack(point, circuit = NORTHERN_LOOP) {
   const outer = onPolygonEdge(point, circuit.outer) ||
     strictlyInsidePolygon(point, circuit.outer);
   const forbiddenIsland = strictlyInsidePolygon(point, circuit.inner);
-  return outer && !forbiddenIsland;
+  const forbiddenObstacle = (circuit.obstacles ?? []).some(
+    obstacle => strictlyInsidePolygon(point, obstacle.polygon)
+  );
+  return outer && !forbiddenIsland && !forbiddenObstacle;
 }
 
 // Insert every parameter where the moving segment intersects a polygon edge.
@@ -86,6 +89,9 @@ export function segmentOnTrack(from, to, circuit = NORTHERN_LOOP) {
   const ts = [0, 1];
   collectIntersectionParameters(from, to, circuit.outer, ts);
   collectIntersectionParameters(from, to, circuit.inner, ts);
+  for (const obstacle of circuit.obstacles ?? []) {
+    collectIntersectionParameters(from, to, obstacle.polygon, ts);
+  }
   ts.sort((a, b) => a - b);
   for (let i = 1; i < ts.length; i++) {
     if (ts[i] - ts[i - 1] < EPSILON) continue;

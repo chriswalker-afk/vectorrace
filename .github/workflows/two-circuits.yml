@@ -1,0 +1,51 @@
+name: Two-circuit race and obstacle verification
+
+on:
+  pull_request:
+    paths:
+      - 'src/circuit.mjs'
+      - 'src/engine.mjs'
+      - 'src/race-art.mjs'
+      - 'src/race-records.mjs'
+      - 'src/race-v6.mjs'
+      - 'src/ux-smoke-v6.mjs'
+      - 'race-v6.html'
+      - 'styles/map-selector.css'
+      - 'tests/aurora-split.test.mjs'
+      - 'tests/aurora-route.test.mjs'
+      - 'tests/race-records.test.mjs'
+      - 'scripts/viewport-smoke-v6.mjs'
+      - '.github/workflows/two-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  second-circuit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify both beginner circuits and full legal laps
+        run: npm test
+      - name: Syntax checks
+        run: npm run check
+      - name: Browser QA — 9 viewport sizes and complete Aurora Split lap
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-two-circuits.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v6.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr8-two-circuit-previews
+          path: screenshots/snowshift-v6-*.png
+          if-no-files-found: warn
