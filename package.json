@@ -6,6 +6,6 @@
   "description": "Deterministic vector-racing game prototype",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/engine.mjs && node --check src/circuit.mjs && node --check src/race-ui.mjs && node --check src/race-art.mjs && node --check src/race-v3.mjs && node --check src/assistance.mjs && node --check src/race-v4.mjs && node --check src/ux-smoke.mjs && node --check src/race-coach.mjs && node --check src/race-records.mjs && node --check src/race-v5.mjs && node --check src/ux-smoke-v5.mjs && node --check scripts/viewport-smoke-v5.mjs && node --check scripts/solve-lap.mjs && node --check src/vector-notation.mjs && node --check src/acceleration-pad.mjs"
+    "check": "node --check src/engine.mjs && node --check src/circuit.mjs && node --check src/race-ui.mjs && node --check src/race-art.mjs && node --check src/race-v3.mjs && node --check src/assistance.mjs && node --check src/race-v4.mjs && node --check src/ux-smoke.mjs && node --check src/race-coach.mjs && node --check src/race-records.mjs && node --check src/race-v5.mjs && node --check src/ux-smoke-v5.mjs && node --check scripts/viewport-smoke-v5.mjs && node --check scripts/solve-lap.mjs && node --check src/vector-notation.mjs && node --check src/acceleration-pad.mjs && node --check src/race-v6.mjs && node --check src/ux-smoke-v6.mjs && node --check scripts/viewport-smoke-v6.mjs"
   }
 }
