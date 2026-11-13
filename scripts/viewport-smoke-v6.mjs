@@ -153,10 +153,10 @@ function verifyCircuitRecordsBrowser() {
   };
   return {original,restored};
 }
-function crashThroughFloeBrowser() {
+function crashThroughRockBrowser() {
   document.getElementById('reset').click();
   const east=document.querySelector('#accelerationPad [data-x="1"][data-y="0"]');
-  for(let n=0;n<3;n++){east.click();document.getElementById('commit').click();}
+  for(let n=0;n<4;n++){east.click();document.getElementById('commit').click();}
   return {
     turns:document.getElementById('moves').textContent,
     crashes:document.getElementById('crashes').textContent,
@@ -356,14 +356,14 @@ async function main(){
     }else{
       console.log('PASS independent classic and Aurora Split best-score storage');
     }
-    const floeCrash=await evaluation(send,'('+crashThroughFloeBrowser.toString()+')()');
-    if(floeCrash.turns!=='03' || floeCrash.crashes!=='01' ||
-       floeCrash.score!=='06' || floeCrash.velocity.join(',')!=='0,0' ||
-       !/SNOWBANK/.test(floeCrash.toast)){
-      console.error('FAIL 3-turn central-floe collision',floeCrash);
+    const rockCrash=await evaluation(send,'('+crashThroughRockBrowser.toString()+')()');
+    if(rockCrash.turns!=='04' || rockCrash.crashes!=='01' ||
+       rockCrash.score!=='07' || rockCrash.velocity.join(',')!=='0,0' ||
+       !/SNOWBANK/.test(rockCrash.toast)){
+      console.error('FAIL 4-turn small-rock collision',rockCrash);
       failed++;
     }else{
-      console.log('PASS solid floe collision through actual acceleration controls');
+      console.log('PASS small-rock collision through actual acceleration controls');
     }
 
     const crash=await evaluation(send,'('+crashThreeNorthBrowser.toString()+')()');
