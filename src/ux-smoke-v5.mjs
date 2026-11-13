@@ -35,6 +35,24 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       if(pad.length!==9)errors.push('Expected nine acceleration buttons, got '+pad.length);
       const modeButtons=document.querySelectorAll('[data-mode]');
       if(modeButtons.length!==3)errors.push('Expected three assistance modes');
+      for(const id of ['currentVelocity','selectedAcceleration','nextVelocity']) {
+        const box=document.getElementById(id);
+        const matrix=box?.querySelector('.column-vector');
+        const x=matrix?.querySelector('[data-component="x"]');
+        const y=matrix?.querySelector('[data-component="y"]');
+        if(!matrix||!x||!y) {
+          errors.push('Column vector missing or out of order: '+id);continue;
+        }
+        const rect=matrix.getBoundingClientRect();
+        const r1=x.getBoundingClientRect(),r2=y.getBoundingClientRect();
+        if(r1.top>=r2.top || r1.bottom>r2.top+1)
+          errors.push('Column vector entries not vertically stacked: '+id);
+        if(rect.left < -1 || rect.right > width+1 || rect.top < -1 || rect.bottom > height+1)
+          errors.push('Column vector outside viewport: '+id);
+        if(!box.getAttribute('aria-label')?.includes('column vector'))
+          errors.push('Accessible vector description missing: '+id);
+      }
+
       if(!document.getElementById('recordBadge'))errors.push('Missing personal best marker');
       const ghostButton=document.getElementById('ghostToggle');
       if(!ghostButton)errors.push('Missing ghost button');
@@ -52,13 +70,15 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       // Modes must apply immediately and never change the engine scoreboard.
       const originalScore=document.getElementById('score').textContent;
       document.querySelector('[data-mode="expert"]').click();
-      if(document.getElementById('nextVelocity').textContent!=='( ?, ? )')
-        errors.push('Expert mode exposed prediction');
+      if(document.getElementById('nextVelocity').dataset.hidden!=='true' ||
+         [...document.querySelectorAll('#nextVelocity [data-component]')].some(el=>el.textContent!=='?'))
+        errors.push('Expert mode exposed next-velocity components');
       if(!/No prediction/.test(document.getElementById('nextMoveLabel').textContent))
         errors.push('Expert mode exposed predictive cornering advice');
       document.querySelector('[data-mode="standard"]').click();
-      if(document.getElementById('nextVelocity').textContent==='( ?, ? )')
-        errors.push('Standard mode hid prediction');
+      if(document.getElementById('nextVelocity').dataset.hidden!=='false' ||
+         [...document.querySelectorAll('#nextVelocity [data-component]')].some(el=>el.textContent==='?'))
+        errors.push('Standard mode hid next-velocity components');
       document.querySelector('[data-mode="guided"]').click();
       if(document.getElementById('score').textContent!==originalScore)
         errors.push('Mode changed score');
