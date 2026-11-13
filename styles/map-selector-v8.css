@@ -1,0 +1,45 @@
+/*
+ * Four-track picker, still inside the one-screen V8 race board.
+ * Tall displays: concise stack. Short landscape: 2×2 menu for legibility.
+ * Older V7 three-track version remains untouched.
+ */
+.map-menu[hidden] { display: none; }
+.map-menu { width: min(338px, calc(100% - 12px)); max-height: min(275px, calc(100% - 65px)); }
+.map-option { min-height: 40px; margin-bottom: 2px; }
+.map-option-body small { white-space: normal; line-height: 1.12; overflow-wrap: anywhere; }
+@media (max-width: 920px) and (orientation: portrait) {
+  .map-menu:not([hidden]) {
+    top: 47px;
+    max-height: calc(100% - 51px);
+    padding: 4px;
+    overflow: hidden;
+  }
+  .map-menu-title { margin: 1px 3px 3px; }
+  .map-option { min-height: 34px; height: 34px; padding: 2px 5px; gap: 6px; }
+  .map-option-no { width: 24px; height: 24px; flex: 0 0 24px; font-size: 10px; }
+  .map-option-body { gap: 1px; }
+  .map-option-body strong { font-size: 10px; }
+  .map-option-body small { font-size: 8px; }
+}
+@media (max-width: 760px) and (orientation: landscape),
+       (max-height: 450px) and (orientation: landscape) {
+  .map-menu:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    grid-template-rows: auto repeat(2, 48px);
+    align-content: start;
+    column-gap: 4px;
+    row-gap: 4px;
+    width: min(510px,calc(100% - 8px));
+    max-height: calc(100% - 49px);
+    top: 45px;
+    left: 4px;
+    padding: 4px;
+    overflow: hidden;
+  }
+  .map-menu-title { grid-column: 1 / -1; grid-row: 1; margin: 0 3px; }
+  .map-option { min-height: 48px; height: 48px; margin: 0; padding: 3px 6px; gap: 6px; }
+  .map-option-no { width: 25px; height: 25px; flex: 0 0 25px; }
+  .map-option-body strong { font-size: 10px; line-height: 1.04; white-space: normal; }
+  .map-option-body small { font-size: 8px; line-height: 1.1; }
+}
