@@ -1,0 +1,161 @@
+/*
+ * PR #8: two-circuit selector lives INSIDE the course display.
+ * No new global header row, no extra vertical scrolling or lost controls.
+ */
+.board-label {
+  z-index: 5;
+  padding: 0;
+  pointer-events: auto;
+  border-left: 3px solid #d4fc77;
+  min-width: 127px;
+  max-width: min(44%, 218px);
+}
+.map-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 47px;
+  padding: 6px 10px 6px 8px;
+  border: 0;
+  background: transparent;
+  color: #f1fbff;
+  text-align: left;
+  cursor: pointer;
+}
+.map-picker:focus-visible {
+  outline: 2px solid #d4fc77;
+  outline-offset: 2px;
+}
+.map-picker:hover,
+.map-picker[aria-expanded="true"] {
+  background: #1d5061dd;
+}
+.map-picker-kicker {
+  color: #d4fc77;
+  font-size: clamp(8px, .68vw, 10px);
+  font-weight: 950;
+  letter-spacing: .09em;
+  white-space: nowrap;
+}
+.map-picker strong {
+  font-size: clamp(10px, 1.0vw, 14px);
+  line-height: 1.1;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.map-picker-level {
+  color: #b6d3da;
+  font-size: clamp(8px, .68vw, 9px);
+  font-weight: 780;
+  white-space: nowrap;
+}
+.map-menu {
+  position: absolute;
+  z-index: 10;
+  left: clamp(6px,1vw,16px);
+  top: clamp(69px,7.3dvh,81px);
+  width: min(268px, calc(100% - 12px));
+  max-height: min(206px,calc(100% - 72px));
+  padding: 6px;
+  border: 2px solid #b3ebd8;
+  border-radius: 7px;
+  background: linear-gradient(160deg,#0b273af9,#102d3ffb);
+  box-shadow: 0 13px 34px #01111ed9;
+  overflow: hidden;
+}
+.map-menu-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 5px 6px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .07em;
+  color: #d4fc77;
+}
+.map-menu-title span { color: #a7d5e0; font-size: 8px; }
+.map-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  margin: 0 0 3px;
+  padding: 5px 8px;
+  border: 1px solid #8ac2cc71;
+  border-radius: 5px;
+  color: #e6fbff;
+  background: #204b5cb0;
+  text-align: left;
+}
+.map-option:hover,
+.map-option:focus-visible {
+  border-color: #d4fc77;
+  background: #306174;
+}
+.map-option[aria-current="true"] {
+  border-color: #d4fc77;
+  box-shadow: inset 3px 0 0 #d4fc77;
+}
+.map-option-no {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 4px;
+  color: #0e283a;
+  background: #d4fc77;
+  font: 900 13px ui-monospace,Consolas,monospace;
+}
+.map-option-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+.map-option-body strong {
+  font-size: 12px;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+.map-option-body small {
+  color: #bed9e0;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+/* The menu overlays the track; the rest of the course never moves. */
+@media (max-width: 920px) and (orientation: portrait) {
+  .map-picker {
+    padding: 4px 6px;
+    min-height: 39px;
+    gap: 1px;
+  }
+  .map-picker-kicker { font-size: 8px; }
+  .map-picker strong { font-size: 9px; }
+  .map-picker-level { font-size: 8px; }
+  .board-label { max-width: 44%; min-width: 119px; }
+  .map-menu {
+    top: 51px;
+    left: 5px;
+    padding: 4px;
+    max-height: calc(100% - 57px);
+  }
+  .map-menu-title { margin: 2px 3px 5px; }
+  .map-option { min-height: 42px; margin-bottom: 2px; }
+}
+@media (max-width: 760px) and (orientation: landscape),
+       (max-height: 450px) and (orientation: landscape) {
+  .board-label { min-width: 124px; }
+  .map-picker { min-height: 37px; padding: 3px 6px; gap: 1px; }
+  .map-picker strong { font-size: 10px; }
+  .map-picker-level { font-size: 8px; }
+  .map-menu {
+    top: 48px;
+    max-height: calc(100% - 55px);
+  }
+}
