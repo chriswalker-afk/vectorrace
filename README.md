@@ -30,6 +30,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v9.html` — fifth circuit, Hairpin Hollow (Intermediate 1): long straight into a real 180° velocity reversal.
 - `race-v10.html` — same five tracks, now with difficulty-based worlds: Snowbound Valley for Beginner and Aurora Vale for Intermediate. Advanced/Expert visual themes are prepared for future tracks.
 - `race-v11.html` — six tracks including Twin Routes (Intermediate 2): a visually narrower inner shortcut and a wider, longer scenic route around a fully collidable Aurora glacier.
+- `race-v12.html` — seven tracks including Glass Ice (Intermediate 3): a marked turquoise surface where only one velocity component can change per turn.
 - `theme-gallery.html` — all four region palettes shown using the same reference course (Advanced/Expert are visual concepts only).
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
@@ -45,6 +46,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR12_HAIRPIN_HOLLOW.md` — first Intermediate track: long straight, U-turn, braking distance and safe-line tests.
 - `docs/PR13_DIFFICULTY_REGIONS.md` — four-tier visual identity and safe track artwork standards.
 - `docs/PR14_TWIN_ROUTES.md` — Track 06 route-choice geometry, both tested full laps, skimmer-width clearance and six-track release checks.
+- `docs/PR15_GLASS_ICE.md` — Track 07 low-grip physics, true braking predictions, fair full-lap route and seven-track QA.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -54,6 +56,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v11.html` for all six tracks. Add `?track=twin-routes` to try Intermediate 2 in Aurora Vale. The V10 build remains at `/race-v10.html`, and `/theme-gallery.html` compares the four visual regions.
+Open `http://localhost:8000/race-v12.html` for all seven tracks. Add `?track=glass-ice` to explore the new Intermediate 3 rule; V11 remains available as the previous build.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
