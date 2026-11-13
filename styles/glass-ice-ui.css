@@ -1,0 +1,22 @@
+/* Visible ice-state cue without adding another row to the viewport. */
+html[data-biome="intermediate"] #accelNotationHint {transition:color .2s}
+.acceleration-pad button[data-glass-blocked="true"],
+html[data-biome="intermediate"] .acceleration-pad button[data-glass-blocked="true"]{
+  opacity:.39;filter:grayscale(.65);
+  cursor:not-allowed;
+  border-color:#9db9c686;
+  background:repeating-linear-gradient(135deg,#405775ab 0 5px,#223b59bc 5px 10px)
+}
+.acceleration-pad button[data-glass-blocked="true"] .column-vector{
+  text-decoration:line-through;text-decoration-color:#d4ffff
+}
+html[data-biome="intermediate"]:has(.acceleration-pad button[data-glass-blocked="true"]) #accelNotationHint{
+  color:#8dffff;font-weight:900;letter-spacing:.015em
+}
+.move-status[data-tone="glass"]{
+  color:#beffff!important;border-color:#71fbf5!important;
+  background:#12566b!important;
+}
+html[data-biome="intermediate"]:has(.acceleration-pad button[data-glass-blocked="true"]) .board-bottom #message{
+  color:#b8fff9;font-weight:900;text-shadow:0 1px 5px #052d42
+}
