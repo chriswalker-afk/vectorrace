@@ -183,8 +183,9 @@ function inspectActiveGlassBrowser(actions) {
   const before=document.getElementById('moves').textContent;
   const selectionBefore=document.getElementById('selectedAcceleration').textContent;
   const disallowed=pad.querySelector('[data-x="-1"][data-y="-1"]');
+  // Disabled diagonal must not select itself. Do NOT press GLIDE afterwards:
+  // GLIDE legitimately executes the still-selected legal acceleration.
   disallowed.click();
-  document.getElementById('commit').click();
   return {
     turns:document.getElementById('moves').textContent,
     unchanged:document.getElementById('moves').textContent===before &&
