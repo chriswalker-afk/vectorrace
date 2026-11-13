@@ -1,0 +1,50 @@
+name: Four-circuit Narrow Passage and screen QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v8.html'
+      - 'src/circuit.mjs'
+      - 'src/race-v8.mjs'
+      - 'src/ux-smoke-v8.mjs'
+      - 'styles/map-selector-v8.css'
+      - 'scripts/narrow-passage-qa-route.mjs'
+      - 'scripts/viewport-smoke-v8.mjs'
+      - 'scripts/track-clearance.mjs'
+      - 'tests/narrow-passage.test.mjs'
+      - 'tests/frost-chicane.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - '.github/workflows/four-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fourth-circuit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate four circuits, narrow throat and car clearance
+        run: npm test
+      - name: Validate all game and browser syntax
+        run: npm run check
+      - name: Nine device sizes, all map choices and full Master-mode lap
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-four-circuits.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v8.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr11-narrow-passage-previews
+          path: screenshots/snowshift-v8-*.png
+          if-no-files-found: warn
