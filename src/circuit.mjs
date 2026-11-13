@@ -115,7 +115,69 @@ export const AURORA_SPLIT = {
   ]
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT]);
+
+/**
+ * Beginner 3 — Frost Chicane.
+ * Two closely spaced, alternating bends in the eastbound northern straight.
+ * The corridor first ducks south around the outer snowbank's inward nose and
+ * then climbs north past the inner island's outward shoulder.
+ *
+ * This is pure geometry: NO rocks, wind, boosts, grip changes or special input.
+ * At the two pinches there is a clear, contiguous lane wide enough for the
+ * displayed skimmer + a safety margin. Unlike an obstacle, the landform is
+ * physically continuous with the corresponding bank.
+ */
+export const FROST_CHICANE = {
+  id: 'frost-chicane',
+  name: 'Frost Chicane',
+  subtitle: 'Arctic Series / Circuit 03',
+  level: 'BEGINNER 3',
+  tagline: 'Two quick bends · Reverse lateral momentum',
+  menuHint: 'Brake, change direction and accelerate through an S-bend',
+  outer: [
+    { x: 2, y: 8 }, { x: 7, y: 3 }, { x: 24, y: 3 },
+    { x: 30, y: 8 }, { x: 30, y: 17 }, { x: 27, y: 22 },
+    { x: 25, y: 23.4 }, { x: 23.6, y: 23.8 },
+    { x: 22, y: 23.4 }, { x: 21, y: 22.2 },
+    { x: 20, y: 18.9 }, { x: 18.5, y: 18.9 },
+    { x: 17, y: 22 }, { x: 7, y: 22 }, { x: 2, y: 17 }
+  ],
+  inner: [
+    { x: 7, y: 11 }, { x: 10, y: 8 }, { x: 21, y: 8 },
+    { x: 25, y: 11 }, { x: 25, y: 14 },
+    { x: 24.8, y: 17.5 }, { x: 23.6, y: 18.5 },
+    { x: 22.3, y: 17.8 }, { x: 21, y: 14.5 },
+    { x: 20, y: 13.1 }, { x: 18.5, y: 13.1 },
+    { x: 17, y: 16.4 }, { x: 10, y: 17 }, { x: 7, y: 14 }
+  ],
+  start: { x: 13, y: 19 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 16, y: 17 }, b: { x: 16, y: 22 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Gate',
+      a: { x: 25, y: 12.5 }, b: { x: 30, y: 12.5 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'South Gate',
+      a: { x: 16, y: 3 }, b: { x: 16, y: 8 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Gate',
+      a: { x: 2, y: 12.5 }, b: { x: 7, y: 12.5 },
+      direction: { x: 0, y: 1 }
+    }
+  ]
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;

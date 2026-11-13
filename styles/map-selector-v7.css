@@ -1,0 +1,52 @@
+/*
+ * Three beginner tracks in the original race-board overlay.
+ * Never add rows to the 100dvh game shell. Short landscape screens use a
+ * three-column picker; portrait devices retain simple stacked choices.
+ */
+.map-menu[hidden] { display: none; }
+.map-menu {
+  width: min(332px, calc(100% - 12px));
+  max-height: min(236px, calc(100% - 72px));
+}
+.map-option-body small {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+}
+
+.map-option { min-height: 42px; margin-bottom: 2px; }
+@media (max-width: 920px) and (orientation: portrait) {
+  .map-menu { top: 49px; max-height: calc(100% - 55px); }
+  .map-option { min-height: 36px; padding: 3px 6px; gap: 7px; }
+  .map-option-no { width: 27px; height: 27px; flex-basis: 27px; font-size: 11px; }
+  .map-option-body { gap: 2px; }
+  .map-option-body strong { font-size: 11px; }
+  .map-option-body small { font-size: 8px; }
+}
+@media (max-width: 760px) and (orientation: landscape),
+       (max-height: 450px) and (orientation: landscape) {
+  .map-menu:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 3px;
+    width: min(580px,calc(100% - 8px));
+    max-height: calc(100% - 49px);
+    top: 45px;
+    left: 4px;
+    padding: 4px;
+    align-content: start;
+    overflow: hidden;
+  }
+  .map-menu-title { grid-column: 1 / -1; margin: 1px 3px 2px; }
+  .map-option {
+    min-height: 53px;
+    height: 53px;
+    margin: 0;
+    gap: 4px;
+    padding: 3px 4px;
+    overflow: hidden;
+  }
+  .map-option-no { width: 24px; height: 24px; flex: 0 0 24px; font-size: 10px; }
+  .map-option-body strong { font-size: 9px; white-space: normal; line-height: 1.05; }
+  .map-option-body small { font-size: 8px; white-space: normal; line-height: 1.1; }
+}

@@ -8,8 +8,8 @@ import {
 
 const p=(x,y)=>({x,y});
 
-test('two differently shaped beginner courses are in stable menu order',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),['northern-loop','aurora-split']);
+test('existing two beginners remain in the same positions before the third',()=>{
+  assert.deepEqual(CIRCUITS.slice(0,2).map(c=>c.id),['northern-loop','aurora-split']);
   assert.strictEqual(getCircuit('northern-loop'), NORTHERN_LOOP);
   assert.strictEqual(getCircuit('aurora-split'), AURORA_SPLIT);
   assert.strictEqual(getCircuit('unknown'), NORTHERN_LOOP);

@@ -1,0 +1,50 @@
+name: Three-circuit difficulty progression and full-lap QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v7.html'
+      - 'src/circuit.mjs'
+      - 'src/race-v7.mjs'
+      - 'src/ux-smoke-v7.mjs'
+      - 'styles/map-selector-v7.css'
+      - 'scripts/frost-chicane-qa-route.mjs'
+      - 'scripts/viewport-smoke-v7.mjs'
+      - 'scripts/track-clearance.mjs'
+      - 'tests/frost-chicane.test.mjs'
+      - 'tests/aurora-split.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - '.github/workflows/three-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  third-circuit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all three layouts and skimmer-clear chicane
+        run: npm test
+      - name: Syntax validation
+        run: npm run check
+      - name: Nine viewport sizes, map selector and complete Frost Chicane race
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-three-circuits.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v7.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr10-frost-chicane-previews
+          path: screenshots/snowshift-v7-*.png
+          if-no-files-found: warn
