@@ -52,6 +52,9 @@ function corridorPath(ctx, circuit, world) {
   ctx.beginPath();
   trace(ctx, circuit.outer, world);
   trace(ctx, circuit.inner, world);
+  for (const obstacle of circuit.obstacles ?? []) {
+    trace(ctx, obstacle.polygon, world);
+  }
 }
 
 function imgReady(img) {
@@ -63,6 +66,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
   const patterns = new Map();
   let staticScene = null;
   let sceneDirty = true;
+  let lastCircuitId = null;
   for (const [key, relativePath] of Object.entries(ASSETS)) {
     const img = new Image();
     images.set(key, img);
@@ -197,7 +201,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     repeating(ctx, 'ice', width, height, .46);
 
     // Banks cast dark blue shadow onto the ice, *clipped within* the legal road.
-    for (const edge of [circuit.outer, circuit.inner]) {
+    for (const edge of [circuit.outer, circuit.inner, ...(circuit.obstacles ?? []).map(o => o.polygon)]) {
       polygonPath(ctx, edge, world);
       ctx.strokeStyle = '#071d33b0';
       ctx.lineWidth = 32;
@@ -223,7 +227,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.restore();
 
     // Bright snow ridges sit exactly on both hit-test boundaries.
-    for (const edge of [circuit.outer, circuit.inner]) {
+    for (const edge of [circuit.outer, circuit.inner, ...(circuit.obstacles ?? []).map(o => o.polygon)]) {
       ctx.save();
       ctx.lineJoin = 'round';
       polygonPath(ctx, edge, world);
@@ -242,6 +246,68 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2.5;
       ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawFloe(ctx, circuit, world) {
+    for (const obstacle of circuit.obstacles ?? []) {
+      const polygon = obstacle.polygon;
+      ctx.save();
+      polygonPath(ctx, polygon, world);
+      ctx.clip();
+      const cx = polygon.reduce((n,p)=>n+p.x,0) / polygon.length;
+      const cy = polygon.reduce((n,p)=>n+p.y,0) / polygon.length;
+      const center = world({x:cx,y:cy});
+      const xValues = polygon.map(p=>world(p).x);
+      const yValues = polygon.map(p=>world(p).y);
+      const width = Math.max(...xValues)-Math.min(...xValues);
+      const height = Math.max(...yValues)-Math.min(...yValues);
+      const shadow = ctx.createRadialGradient(
+        center.x-8,center.y-11,2,center.x,center.y,Math.max(width,height)
+      );
+      shadow.addColorStop(0,'#fafffd');
+      shadow.addColorStop(.36,'#c0e1e5');
+      shadow.addColorStop(.9,'#548ca6');
+      ctx.fillStyle=shadow;
+      ctx.fillRect(Math.min(...xValues),Math.min(...yValues),width,height);
+      stamp(ctx, 'rock',center.x+2,center.y-2,
+        Math.max(width*1.15,90),Math.max(height*.8,65),.9);
+      // Fine fractured ice visible on the obstacle, never painted into valid ice.
+      ctx.strokeStyle='#f6ffffcc';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(center.x-19,center.y-5);
+      ctx.lineTo(center.x-6,center.y+3);
+      ctx.lineTo(center.x+15,center.y-10);
+      ctx.moveTo(center.x+2,center.y+17);
+      ctx.lineTo(center.x+11,center.y+2);
+      ctx.stroke();
+      ctx.restore();
+
+      // These strokes follow the *exact* obstacle polygon used in physics.
+      ctx.save();
+      ctx.lineJoin='round';
+      polygonPath(ctx,polygon,world);
+      ctx.strokeStyle='#123a51';
+      ctx.lineWidth=8;
+      ctx.stroke();
+      polygonPath(ctx,polygon,world);
+      ctx.strokeStyle='#e4f8fc';
+      ctx.lineWidth=3.5;
+      ctx.stroke();
+      ctx.fillStyle='#072439e8';
+      ctx.strokeStyle='#d0f7ea';
+      ctx.lineWidth=1;
+      ctx.font='900 10px system-ui';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      const badge={x:center.x,y:center.y+height*.32};
+      ctx.beginPath();
+      ctx.roundRect(badge.x-20,badge.y-8,40,16,4);
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle='#e8fcf8';
+      ctx.fillText('FLOE',badge.x,badge.y+.5);
       ctx.restore();
     }
   }
@@ -304,6 +370,10 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
   }
 
   function paintScene(ctx, width, height, world, circuit) {
+    if (circuit.id !== lastCircuitId) {
+      sceneDirty = true;
+      lastCircuitId = circuit.id;
+    }
     const density = 2;
     if (!staticScene || staticScene.width !== width * density ||
         staticScene.height !== height * density) {
@@ -320,6 +390,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
       drawOutdoorScenery(background, world, circuit, width, height);
       drawTrackSurface(background, circuit, world, width, height);
       drawIsland(background, circuit, world);
+      drawFloe(background, circuit, world);
       drawGateFlags(background, circuit, world);
       sceneDirty = false;
     }
@@ -333,6 +404,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     drawOutdoorScenery,
     drawTrackSurface,
     drawIsland,
+    drawFloe,
     drawGateFlags,
     drawSkimmer
   };
