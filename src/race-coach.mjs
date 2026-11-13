@@ -6,7 +6,7 @@
  * must respect that restriction instead of drawing impossible diagonals.
  * Guided mode projects the selected move, then a legal braking sequence.
  */
-import { previewMove, possibleMoves, glassIceZoneAt } from './engine.mjs';
+import { previewMove, possibleMoves, glassIceZoneAt, windVectorAt } from './engine.mjs';
 import { NORTHERN_LOOP } from './circuit.mjs';
 
 export function brakingAcceleration(v) {
@@ -18,8 +18,29 @@ export function brakingAcceleration(v) {
  * move, spend this braking turn on the larger component (horizontal on ties).
  * Once off-glass, normal diagonal componentwise braking returns.
  */
+/**
+ * Choose an acceleration that minimizes NEXT speed after predictable wind
+ * is applied. For (0,-1) wind, v_y=0 requires a_y=+1 just to remain at rest;
+ * the old "brake only the velocity" formula would give false forecasts.
+ * Prefer lower acceleration magnitude when two outcomes are equally slow.
+ */
+function windAwareBrakingComponent(v,force) {
+  return [-1,0,1].reduce((best,a)=>{
+    const speed=Math.abs(v+a+force);
+    const bestSpeed=Math.abs(v+best+force);
+    return speed<bestSpeed ||
+      (speed===bestSpeed&&Math.abs(a)<Math.abs(best)) ? a : best;
+  },0);
+}
+
 export function surfaceBrakingAcceleration(position, velocity, circuit=NORTHERN_LOOP) {
-  const usual=brakingAcceleration(velocity);
+  const wind=windVectorAt(position,circuit);
+  const usual=wind.x||wind.y
+    ? {
+        x:windAwareBrakingComponent(velocity.x,wind.x),
+        y:windAwareBrakingComponent(velocity.y,wind.y)
+      }
+    : brakingAcceleration(velocity);
   if(!glassIceZoneAt(position,circuit) || !usual.x || !usual.y) return usual;
   return Math.abs(velocity.x)>=Math.abs(velocity.y)
     ? {x:usual.x,y:0}
@@ -37,7 +58,10 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
   if (maxComponent>128) throw new RangeError('Braking forecast velocity exceeds safe bounds');
   // On a patch the worst-case number of required braking turns is the sum
   // of the two speed components. On ordinary ice it remains the maximum.
-  const limit=Math.abs(velocity.x)+Math.abs(velocity.y);
+  // A wind may hold a component's speed unchanged until the vehicle leaves
+  // the zone. Allow extra steps to exit; never claim a stop that did not occur.
+  const limit=Math.abs(velocity.x)+Math.abs(velocity.y)+
+    ((circuit.windZones?.length??0)>0?16:0);
   const segments=[];
   let current={position:{...position},velocity:{...velocity}};
   for(let n=0;n<limit;n++){
@@ -55,8 +79,9 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
   }
   return {
     safe:current.velocity.x===0 && current.velocity.y===0,
-    segments,steps:segments.length,failedAt:null,
-    stop:{...current.position}
+    segments,steps:segments.length,
+    failedAt:current.velocity.x===0&&current.velocity.y===0?null:segments.length,
+    stop:current.velocity.x===0&&current.velocity.y===0?{...current.position}:null
   };
 }
 
