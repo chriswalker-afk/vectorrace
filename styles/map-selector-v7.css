@@ -4,7 +4,16 @@
  * three-column picker; portrait devices retain simple stacked choices.
  */
 .map-menu[hidden] { display: none; }
-.map-menu { max-height: min(230px, calc(100% - 72px)); }
+.map-menu {
+  width: min(332px, calc(100% - 12px));
+  max-height: min(236px, calc(100% - 72px));
+}
+.map-option-body small {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+}
+
 .map-option { min-height: 42px; margin-bottom: 2px; }
 @media (max-width: 920px) and (orientation: portrait) {
   .map-menu { top: 49px; max-height: calc(100% - 55px); }
