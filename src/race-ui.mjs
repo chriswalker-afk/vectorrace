@@ -1,4 +1,5 @@
 import { NORTHERN_LOOP as circuit } from './circuit.mjs';
+import { renderColumnVector, vectorDescription } from './vector-notation.mjs';
 import {
   createRace, previewMove, possibleMoves, takeTurn, score, onTrack
 } from './engine.mjs';
@@ -25,8 +26,6 @@ let flashUntil = 0;
 let requestedFrame = 0;
 
 const world = p => ({ x: OFFSET_X + p.x * SCALE, y: OFFSET_Y - p.y * SCALE });
-const vectorText = p => '( ' + (p.x > 0 ? '+' : '') + p.x + ', ' +
-  (p.y > 0 ? '+' : '') + p.y + ' )';
 const interpolate = (a, b, t) => ({
   x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t
 });
@@ -364,10 +363,10 @@ function setAcceleration(x, y) {
 }
 
 function renderHUD() {
-  $('currentVelocity').textContent = vectorText(state.velocity);
-  $('selectedAcceleration').textContent = vectorText(selection);
+  renderColumnVector($('currentVelocity'), state.velocity, { name: 'Velocity' });
+  renderColumnVector($('selectedAcceleration'), selection, { name: 'Acceleration' });
   const preview = previewMove(state, selection, circuit);
-  $('nextVelocity').textContent = vectorText(preview.velocity);
+  renderColumnVector($('nextVelocity'), preview.velocity, { name: 'Next velocity' });
   $('moves').textContent = String(state.moves).padStart(2, '0');
   $('crashes').textContent = String(state.crashes).padStart(2, '0');
   $('score').textContent = String(score(state, circuit)).padStart(2, '0');
@@ -433,8 +432,8 @@ for (const [x, y, symbol] of choices) {
   button.dataset.x = x;
   button.dataset.y = y;
   button.textContent = symbol;
-  button.title = 'Acceleration ' + vectorText({ x, y });
-  button.setAttribute('aria-label', 'Acceleration ' + vectorText({ x, y }));
+  button.title = vectorDescription({ x, y }, 'Acceleration');
+  button.setAttribute('aria-label', vectorDescription({ x, y }, 'Acceleration'));
   button.setAttribute('aria-pressed', 'false');
   button.addEventListener('click', () => setAcceleration(x, y));
   pad.appendChild(button);

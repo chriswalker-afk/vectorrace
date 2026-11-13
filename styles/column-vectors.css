@@ -1,0 +1,86 @@
+/*
+ * Column vectors, not coordinate tuples. The displayed x component is above y.
+ * Brackets are drawn with scalable CSS curved strokes; no font or image download.
+ */
+.readout-grid strong.vector-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  margin-top: 2px;
+  padding: 0;
+  line-height: 1;
+  white-space: normal;
+  letter-spacing: 0;
+}
+
+.column-vector {
+  position: relative;
+  display: inline-grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  box-sizing: border-box;
+  height: clamp(33px, 5.4dvh, 49px);
+  min-width: 2.3em;
+  padding: 2px .68em;
+  color: inherit;
+  font-family: Cambria, "Cambria Math", "Times New Roman", Georgia, serif;
+  font-size: clamp(15px, 2.3dvh, 22px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.column-vector [data-component] {
+  display: block;
+  text-align: center;
+  min-height: 1em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.column-vector::before,
+.column-vector::after {
+  position: absolute;
+  content: "";
+  top: 1px;
+  bottom: 1px;
+  width: .38em;
+  pointer-events: none;
+}
+.column-vector::before {
+  left: 0;
+  border-left: 2px solid currentColor;
+  border-radius: 90% 0 0 90% / 50% 0 0 50%;
+}
+.column-vector::after {
+  right: 0;
+  border-right: 2px solid currentColor;
+  border-radius: 0 90% 90% 0 / 0 50% 50% 0;
+}
+
+/* The older laboratory labels also use the same notation. */
+.vector .column-vector {
+  height: 56px;
+  font-size: 25px;
+}
+
+/* Avoid growing the compact HUD on very short landscape displays. */
+@media (max-height: 450px) and (orientation: landscape) {
+  .readout-grid strong.vector-display { margin-top: 0; }
+  .readout-grid .column-vector {
+    height: 30px;
+    min-width: 2.2em;
+    font-size: 14px;
+    padding: 1px .57em;
+  }
+}
+@media (max-width: 365px) and (orientation: portrait) {
+  .readout-grid .column-vector {
+    height: 33px;
+    font-size: 14px;
+    padding: 1px .54em;
+  }
+}

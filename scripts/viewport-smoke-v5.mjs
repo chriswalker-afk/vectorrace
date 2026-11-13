@@ -147,7 +147,8 @@ function crashThreeNorthBrowser() {
     turns:document.getElementById('moves').textContent,
     crashes:document.getElementById('crashes').textContent,
     score:document.getElementById('score').textContent,
-    velocity:document.getElementById('currentVelocity').textContent,
+    velocity:[...document.querySelectorAll('#currentVelocity [data-component]')]
+      .map(element=>element.textContent),
     toast:document.getElementById('eventToast').textContent
   };
 }
@@ -290,7 +291,7 @@ async function main(){
       Buffer.from(ghostPng.data,'base64'));
     const crash=await evaluation(send,'('+crashThreeNorthBrowser.toString()+')()');
     if(crash.turns!=='03' || crash.crashes!=='01' ||
-       crash.score!=='06' || !/0, 0/.test(crash.velocity) ||
+       crash.score!=='06' || crash.velocity?.join(',')!=='0,0' ||
        !/SNOWBANK/.test(crash.toast)){
       console.error('FAIL crash and penalty recovery',crash);
       failed++;

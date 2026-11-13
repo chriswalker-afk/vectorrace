@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SNOWSHIFT — Visual Direction Lab</title>
+<link rel="stylesheet" href="./styles/column-vectors.css">
 <style>
 :root{--night:#0a192b;--ice:#164b65;--frost:#b9eaf0;--snow:#eff8fb;--flare:#ff7557;--lime:#d4fc77;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--night);color:var(--snow);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -20,7 +21,7 @@ canvas{width:100%;height:100%;display:block;touch-action:manipulation}
 .chip{background:#081e30d9;padding:9px 13px;border:1px solid #cce4e433;font-size:12px;font-weight:750}
 aside{background:#10283a;border:1px solid #6ea7b55c;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:15px}
 .eyebrow{font-size:10px;letter-spacing:.2em;color:#abc8d1;font-weight:850}
-.vector{display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace,Consolas,monospace;font-size:32px;font-weight:750}.vector span{color:var(--lime)}
+.vector{display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace,Consolas,monospace;font-size:32px;font-weight:750}.vector span{color:inherit}.vector#vnext{color:var(--lime)}
 .stat{padding-bottom:12px;border-bottom:1px solid #b9eaf030}
 h2{font-size:22px;margin:0 0 7px;letter-spacing:-.04em}
 .accel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
@@ -42,9 +43,9 @@ strong{color:var(--snow)}.danger{color:var(--flare)}.good{color:var(--lime)}
 <div class="stage"><canvas id="map" aria-label="Interactive visual study of an arctic vector-racing track"></canvas><div class="stage-head"><b>01 / NORTHERN LOOP</b><small>GLACIER CIRCUIT · DESIGN STUDY</small></div><div class="stage-foot"><div class="chip">● <span id="status">CHOOSE A VECTOR</span></div><div class="chip">MOVES <span id="moves">00</span></div></div></div>
 <aside>
 <div><div class="eyebrow">THE PILOT'S VECTOR</div><h2>Glide telemetry</h2></div>
-<div class="stat"><div class="eyebrow">VELOCITY · CURRENT</div><div class="vector" id="vcurrent">( 0, 0 )</div></div>
-<div class="stat"><div class="eyebrow">ACCELERATION · SELECTED</div><div class="vector" id="accel">( +1, 0 )</div></div>
-<div class="stat"><div class="eyebrow">VELOCITY · NEXT</div><div class="vector" id="vnext"><span>( 1, 0 )</span></div></div>
+<div class="stat"><div class="eyebrow">VELOCITY · CURRENT</div><div class="vector" id="vcurrent" role="img" aria-label="Current velocity column vector: top x-component 0, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">0</span><span data-component="y">0</span></span></div></div>
+<div class="stat"><div class="eyebrow">ACCELERATION · SELECTED</div><div class="vector" id="accel" role="img" aria-label="Acceleration column vector: top x-component 1, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">1</span><span data-component="y">0</span></span></div></div>
+<div class="stat"><div class="eyebrow">VELOCITY · NEXT</div><div class="vector" id="vnext" role="img" aria-label="Next velocity column vector: top x-component 1, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">1</span><span data-component="y">0</span></span></div></div>
 <div><div class="eyebrow" style="margin-bottom:9px">CHOOSE YOUR ACCELERATION</div><div class="accel" id="pad"></div></div>
 <button class="action" id="go">COMMIT VECTOR →</button>
 <button class="secondary" id="reset">↻ RESET THE RUN</button>
@@ -53,15 +54,16 @@ strong{color:var(--snow)}.danger{color:var(--flare)}.good{color:var(--lime)}
 </section>
 <div class="foot"><span>ART DIRECTION: POLAR NIGHT · DEEP ICE · FLARE ORANGE · AURORA LIME</span><span>VECTORRACE · PROTOTYPE 01</span></div>
 </main>
-<script>
+<script type="module">
+import { renderColumnVector, vectorDescription } from './src/vector-notation.mjs';
 (()=>{
 const c=document.getElementById('map'),ctx=c.getContext('2d');let W=960,H=700,step=27;
 let pos={x:13,y:14},v={x:0,y:0},a={x:1,y:0},count=0;
 const byId=id=>document.getElementById(id);const P={night:'#0a192b',ice:'#164b65',frost:'#b9eaf0',snow:'#eff8fb',flare:'#ff7557',lime:'#d4fc77'};
 const pad=byId('pad');const dirs=[[-1,1],[0,1],[1,1],[-1,0],[0,0],[1,0],[-1,-1],[0,-1],[1,-1]],sym=['↖','↑','↗','←','•','→','↙','↓','↘'];
-dirs.forEach(([x,y],i)=>{const b=document.createElement('button');b.textContent=sym[i];b.setAttribute('aria-label','Acceleration '+x+', '+y);b.addEventListener('click',()=>{a={x,y};update();});pad.appendChild(b)});
-const fmt=n=>n>0?'+'+n:String(n), vec=(x,y)=>'( '+fmt(x)+', '+fmt(y)+' )';
-function update(){byId('vcurrent').textContent=vec(v.x,v.y);byId('accel').textContent=vec(a.x,a.y);byId('vnext').textContent=vec(v.x+a.x,v.y+a.y);byId('moves').textContent=String(count).padStart(2,'0');[...pad.children].forEach((el,i)=>el.classList.toggle('active',dirs[i][0]===a.x&&dirs[i][1]===a.y));draw();}
+dirs.forEach(([x,y],i)=>{const b=document.createElement('button');b.textContent=sym[i];b.setAttribute('aria-label',vectorDescription({x,y},'Acceleration'));b.addEventListener('click',()=>{a={x,y};update();});pad.appendChild(b)});
+
+function update(){renderColumnVector(byId('vcurrent'),v,{name:'Current velocity'});renderColumnVector(byId('accel'),a,{name:'Acceleration'});renderColumnVector(byId('vnext'),{x:v.x+a.x,y:v.y+a.y},{name:'Next velocity'});byId('moves').textContent=String(count).padStart(2,'0');[...pad.children].forEach((el,i)=>el.classList.toggle('active',dirs[i][0]===a.x&&dirs[i][1]===a.y));draw();}
 function resize(){const r=c.getBoundingClientRect();c.width=Math.round(r.width*devicePixelRatio);c.height=Math.round(r.height*devicePixelRatio);ctx.setTransform(c.width/W,0,0,c.height/H,0,0);draw();}
 function poly(points,fill,stroke,width=1){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke()}}
 function roundedRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
