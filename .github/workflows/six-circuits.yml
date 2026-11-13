@@ -1,0 +1,51 @@
+name: Six-circuit Twin Routes risk-vs-reward and responsive QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v11.html'
+      - 'src/circuit.mjs'
+      - 'src/race-art-v11.mjs'
+      - 'src/race-v11.mjs'
+      - 'src/ux-smoke-v11.mjs'
+      - 'styles/map-selector-v11.css'
+      - 'scripts/twin-routes-qa-laps.mjs'
+      - 'scripts/viewport-smoke-v11.mjs'
+      - 'tests/twin-routes.test.mjs'
+      - 'tests/hairpin-hollow.test.mjs'
+      - 'tests/biomes.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - '.github/workflows/six-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sixth-circuit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate six courses, both full routes, corridor clearance and physics
+        run: npm test
+      - name: Validate game and browser runner syntax
+        run: npm run check
+      - name: Nine viewports, both Master-mode laps, six map records and Aurora art
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-six-circuits.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v11.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr14-twin-routes-browser-previews
+          path: screenshots/snowshift-v11-*.png
+          if-no-files-found: warn
