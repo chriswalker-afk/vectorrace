@@ -1,13 +1,14 @@
 /**
- * QA-only 25-move lap, using actual nine-option accelerations.
- * Full line segments through both chicane bends maintain at least 1 world unit
- * of centreline clearance from each snowbank for the visible-width skimmer.
- * Distinct from the engine's minimum-move route, which may graze boundaries.
+ * QA-only 26-move completed lap driven with the normal acceleration pad.
+ * Exact moving segments through BOTH chicane bends maintain at least 1.2
+ * world units of clearance, enough for the full displayed skimmer and the
+ * main snowbank edge artwork. This is intentionally more forgiving than a
+ * mathematically shortest route, which can graze the boundary.
  * NEVER import this fixture into the playable game.
  */
 export const FROST_CHICANE_CLEAR_LAP = Object.freeze([
-  [1,-1],[0,1],[1,0],[-1,-1],[0,1],[1,1],[-1,0],[0,0],
-  [0,-1],[1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,1],[-1,1],
-  [-1,1],[0,1],[1,1],[1,1],[1,1],[1,1],[1,-1],[1,-1],
-  [1,-1],[1,-1]
+  [1,-1],[0,1],[1,0],[0,-1],[-1,1],[0,1],[0,1],[-1,-1],
+  [1,-1],[0,-1],[1,-1],[-1,-1],[-1,-1],[-1,1],[-1,1],
+  [-1,1],[-1,1],[0,0],[1,1],[1,1],[1,1],[1,0],[1,-1],
+  [1,-1],[1,-1],[1,0]
 ].map(([x,y])=>Object.freeze({x,y})));
