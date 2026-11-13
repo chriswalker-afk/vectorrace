@@ -250,7 +250,78 @@ export const NARROW_PASSAGE = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE]);
+
+/**
+ * Intermediate 1 — Hairpin Hollow.
+ *
+ * An extended eastbound top straight rewards building speed, but a tight
+ * 180-degree turn at the far eastern tip requires early braking and a genuine
+ * reversal of horizontal velocity. Racers return WEST along a separate lane.
+ * The western end is deliberately a broad, forgiving sweep, so the eastern
+ * hairpin is the single principal difficulty increase.
+ *
+ * The centreline of the hairpin has about 1.2+ world units of clearance to
+ * both snowbanks across a 25-move test-only route, making it driveable by the
+ * *visible* skimmer, not merely a mathematical point.
+ *
+ * No new movement/physics mechanics and no separate obstacles.
+ */
+export const HAIRPIN_HOLLOW = {
+  id: 'hairpin-hollow',
+  name: 'Hairpin Hollow',
+  subtitle: 'Arctic Series / Circuit 05',
+  level: 'INTERMEDIATE 1',
+  tagline: 'Long straight · Sharp 180° reversal',
+  menuHint: 'Brake early, reverse direction and return along the lower lane',
+  outer: [
+    { x: 3, y: 8 }, { x: 7, y: 4 }, { x: 12, y: 6 },
+    { x: 15, y: 10 }, { x: 24, y: 10 },
+    { x: 27.5, y: 11.5 }, { x: 29.8, y: 14 },
+    { x: 30, y: 17 }, { x: 29, y: 20 }, { x: 26, y: 22 },
+    { x: 7, y: 22 }, { x: 3, y: 20 },
+    { x: 1.5, y: 17 }, { x: 2, y: 12 }
+  ],
+  inner: [
+    { x: 7, y: 12 }, { x: 9, y: 10 }, { x: 13, y: 12 },
+    { x: 15, y: 15 }, { x: 24, y: 15 },
+    { x: 25.5, y: 15.5 }, { x: 26, y: 17 },
+    { x: 25.5, y: 18 }, { x: 24, y: 18.5 },
+    { x: 9, y: 18.5 }, { x: 7, y: 17 }
+  ],
+  start: { x: 10, y: 20 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 13, y: 18.5 }, b: { x: 13, y: 22 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Hairpin Gate',
+      a: { x: 26, y: 15.7 }, b: { x: 29.9, y: 15.7 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'Return Straight Gate',
+      a: { x: 19, y: 10 }, b: { x: 19, y: 15 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Sweep Gate',
+      a: { x: 2, y: 16 }, b: { x: 7, y: 16 },
+      direction: { x: 0, y: 1 }
+    }
+  ],
+  featuredHairpin: {
+    approach: { xMin: 10, xMax: 24, y: 20 },
+    nose: { x: 28, y: 17 },
+    returnLine: { xMin: 19, xMax: 25, y: 12 },
+    minVisibleClearance: 1.0
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;
