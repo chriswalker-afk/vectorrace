@@ -5,14 +5,18 @@ import { createRace, previewMove, takeTurn, score } from '../src/engine.mjs';
 import { MODES, modePolicy, moveExplanation } from '../src/assistance.mjs';
 
 test('assistance modes expose progressively less mathematical prediction', () => {
-  assert.deepEqual(MODES, ['guided','standard','expert']);
-  const guided=modePolicy('guided'),standard=modePolicy('standard'),expert=modePolicy('expert');
+  assert.deepEqual(MODES, ['guided','standard','expert','master']);
+  const guided=modePolicy('guided'),standard=modePolicy('standard'),expert=modePolicy('expert'),master=modePolicy('master');
   assert.equal(guided.allDestinations,true);
   assert.equal(standard.allDestinations,false);
   assert.equal(standard.selectedDestination,true);
   assert.equal(expert.selectedDestination,false);
   assert.equal(expert.nextVelocity,false);
   assert.equal(expert.warnings,false);
+  assert.equal(expert.accelerationNotation,'arrows');
+  assert.equal(master.accelerationNotation,'columns');
+  assert.deepEqual({...master,accelerationNotation:'arrows'},expert);
+  assert.equal(master.coordinateGrid,false);
   assert.throws(()=>modePolicy('unknown'),RangeError);
 });
 
@@ -26,8 +30,10 @@ test('difficulty changes hints but never changes the physics', () => {
   }));
   assert.deepEqual(outcomes[0].state,outcomes[1].state);
   assert.deepEqual(outcomes[1].state,outcomes[2].state);
+  assert.deepEqual(outcomes[2].state,outcomes[3].state);
   assert.equal(score(outcomes[0].state),1);
   assert.match(outcomes[2].message.message,/No prediction/);
+  assert.deepEqual(outcomes[2].message,outcomes[3].message);
 });
 
 test('Guided and Standard warn about a full-path crash; Expert does not disclose risk', () => {
@@ -39,7 +45,8 @@ test('Guided and Standard warn about a full-path crash; Expert does not disclose
     assert.equal(result.tone,'danger');
     assert.match(result.message,/CRASH RISK/);
   }
-  assert.equal(moveExplanation(state,{x:0,y:0},'expert',preview).tone,'neutral');
+  for(const mode of ['expert','master'])
+    assert.equal(moveExplanation(state,{x:0,y:0},mode,preview).tone,'neutral');
 });
 
 test('zero-velocity planning has a clear explanation',()=>{
