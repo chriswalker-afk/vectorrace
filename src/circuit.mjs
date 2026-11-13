@@ -405,7 +405,92 @@ export const TWIN_ROUTES = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES]);
+
+/**
+ * Intermediate 3 — Glass Ice.
+ *
+ * A visually unique flared northern ice shelf invites the player to carry
+ * speed towards an eastern hairpin. A SINGLE marked turquoise glass-ice patch
+ * sits on that approach (x 17–26, y 18.6–22.2).
+ *
+ * Explicit deterministic rule: when the skimmer STARTS a turn in the patch
+ * (boundary included), acceleration can change AT MOST ONE component. Four
+ * diagonal inputs are unavailable; cardinal and coast inputs remain legal.
+ * There is no random sliding, altered motion formula, or disguised friction.
+ *
+ * A carefully tested 24-move reference lap takes the eastward approach under
+ * this restriction and maintains >=1.0 world units of whole-path clearance
+ * from all snowbanks. Earlier courses contain no glassZones and use every
+ * original acceleration unchanged.
+ */
+export const GLASS_ICE = {
+  id: 'glass-ice',
+  name: 'Glass Ice',
+  subtitle: 'Arctic Series / Circuit 07',
+  level: 'INTERMEDIATE 3',
+  tagline: 'One marked low-grip zone · Plan braking early',
+  menuHint: 'On glass ice, accelerate or brake in only one axis per turn',
+  outer: [
+    { x: 3, y: 8 }, { x: 7, y: 4 }, { x: 12, y: 6 },
+    { x: 15, y: 10 }, { x: 24, y: 10 },
+    { x: 27.5, y: 11.5 }, { x: 29.8, y: 14 },
+    { x: 30, y: 17 }, { x: 29.4, y: 20.5 },
+    { x: 26.5, y: 23 }, { x: 18, y: 23.4 },
+    { x: 11, y: 22.8 }, { x: 7, y: 22.5 },
+    { x: 3, y: 20 }, { x: 1.5, y: 17 }, { x: 2, y: 12 }
+  ],
+  inner: [
+    { x: 7, y: 12 }, { x: 9, y: 10 }, { x: 13, y: 12 },
+    { x: 15, y: 15 }, { x: 24, y: 15 },
+    { x: 25.5, y: 15.5 }, { x: 26, y: 17 },
+    { x: 25.5, y: 18 }, { x: 24, y: 18.5 },
+    { x: 9, y: 18.5 }, { x: 7, y: 17 }
+  ],
+  glassZones: [
+    {
+      id: 'northern-glass',
+      label: 'Glass Ice',
+      rule: 'axis-only',
+      polygon: [
+        { x: 17, y: 18.6 }, { x: 26, y: 18.6 },
+        { x: 26, y: 22.2 }, { x: 17, y: 22.2 }
+      ]
+    }
+  ],
+  start: { x: 10, y: 20 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 13, y: 18.5 }, b: { x: 13, y: 22 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Glass Gate',
+      a: { x: 26, y: 15.7 }, b: { x: 29.9, y: 15.7 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'Return Straight Gate',
+      a: { x: 19, y: 10 }, b: { x: 19, y: 15 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Sweep Gate',
+      a: { x: 2, y: 16 }, b: { x: 7, y: 16 },
+      direction: { x: 0, y: 1 }
+    }
+  ],
+  featuredGlass: {
+    zoneId: 'northern-glass',
+    xMin: 17, xMax: 26, yMin: 18.6, yMax: 22.2,
+    entryRule: 'State position at start of each turn, including boundary',
+    minVisibleClearance: 1.0
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;

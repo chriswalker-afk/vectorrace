@@ -40,7 +40,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — implemented |
 | 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — implemented |
 | 06 | Twin Routes | Intermediate 2 | Choose between a tight inner shortcut and a wider outer detour | Base physics — **this PR** |
-| 07 | Glass Ice | Intermediate 3 | One low-grip zone with an explicit braking rule | **New deterministic zone rule** — planned |
+| 07 | Glass Ice | Intermediate 3 | Marked ice permits changing at most one velocity component per turn | **New deterministic zone rule — this PR** |
 | 08 | Crosswind Ridge | Intermediate 4 | One marked constant wind vector | **New wind-vector rule** — planned |
 | 09 | Icebound Rapids | Advanced 1 | Predictable boost strips and braking choices | **New boost rule** — planned |
 | 10 | Broken Passage | Advanced 2 | Moving obstacles on deterministic turn cycles | **Turn-indexed hazard rule** — planned |
@@ -56,7 +56,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 | Difficulty | Region | Identity | Availability |
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
-| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow and Twin Routes playable; later Intermediate tracks planned |
+| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes and Glass Ice playable; Crosswind Ridge planned |
 | Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Visual style ready; no playable Advanced track yet |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
@@ -65,7 +65,7 @@ Every future track must match the region's look, retain the exact physics-to-art
 ## Physics and classroom clarity
 - Base mechanics remain `v_next = v_current + a`, then `position_next = position + v_next`, with `a_x, a_y` each in `{-1,0,+1}`.
 - From speed `n` in one component, maximum componentwise braking yields displacement `n(n-1)/2` before reaching rest. Design corners around this stopping distance; students should be able to reason about it.
-- **Never call a normal frictionless region "slippery" without a real rule difference.** Proposed Glass Ice rule: marked ice limits changing at most one velocity component in a turn. Requires explicit tutorial, exact solver and collision implementation.
+- **Never call a normal frictionless region "slippery" without a real rule difference.** Glass Ice implements a marked start-of-turn one-axis acceleration rule, fully supported by tutorial, UI, exact braking forecast and solver.
 - **Wind** is a clearly labelled vector added to acceleration in marked zones: `v_next = v_current + a + w`. Define trigger consistently (recommend zone under skimmer at start of a turn) and show it in Guided/Standard without leaking Expert/Master hidden information.
 - **Boost strips** and **coasting zones** also need explicit turn timing, clearly marked boundaries and preview/solver support before release.
 - For moving hazards, publish the cycle and turn index; never make success depend on unpredictable randomness.
@@ -94,6 +94,12 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 07 design note — Glass Ice
+
+A single clearly marked **turquoise Glass Ice** patch on the northern approach to the hairpin (x=17–26; y=18.6–22.2) introduces the first new physics rule: **when the skimmer starts a turn in the painted patch (including its boundary), only an acceleration with at most one nonzero component is available**. Players retain five vectors: horizontal braking/acceleration, vertical braking/acceleration, or zero. The four diagonal choices are visibly disabled, and attempts do not consume turns or cause crashes.
+
+The vector formulas `v_next=v+a` and `p_next=p+v_next` remain unchanged. Only the *allowed* accelerations change, so simultaneous x/y braking that worked on normal ice now requires at least two turns. Guided forecasts calculate an actual legal stopping path and all modes show the rule. The glass patch is fully legal roadway, painted with a translucent crystalline surface exactly matching the zone polygon. A representative **24-move crash-free lap** begins with 3 restricted turns and maintains at least **1.0 world unit of entire-movement-segment clearance** for the visible vehicle. See [Track 07 design and release checks](PR15_GLASS_ICE.md).
 
 ## Track 06 design note — Twin Routes
 

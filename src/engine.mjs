@@ -43,6 +43,27 @@ function strictlyInsidePolygon(p, poly) {
   return inside;
 }
 
+/**
+ * A glass-ice rule is active only when the car STARTS its turn on the marked
+ * polygon, including the painted edge. Passing over a patch without landing
+ * inside does not retroactively alter a turn.
+ */
+export function glassIceZoneAt(point, circuit = NORTHERN_LOOP) {
+  return (circuit.glassZones ?? []).find(zone =>
+    onPolygonEdge(point,zone.polygon) ||
+    strictlyInsidePolygon(point,zone.polygon)
+  ) ?? null;
+}
+
+export function accelerationAllowed(state, acceleration, circuit = NORTHERN_LOOP) {
+  if (!validAcceleration(acceleration)) return false;
+  const zone=glassIceZoneAt(state.position,circuit);
+  // One-axis-only grip: legal accelerations are (±1,0), (0,±1), and (0,0).
+  // The normal nine-vector choice returns immediately on normal ice.
+  return !zone || zone.rule!=='axis-only' ||
+    acceleration.x===0 || acceleration.y===0;
+}
+
 export function onTrack(point, circuit = NORTHERN_LOOP) {
   const outer = onPolygonEdge(point, circuit.outer) ||
     strictlyInsidePolygon(point, circuit.outer);
@@ -162,12 +183,19 @@ export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) throw new RangeError('Acceleration components must be -1, 0 or 1');
   const nextVelocity = add(state.velocity, acceleration);
   const destination = add(state.position, nextVelocity);
+  const zone=glassIceZoneAt(state.position,circuit);
+  const zoneBlocked=!accelerationAllowed(state,acceleration,circuit);
+  const roadClear=!zoneBlocked && segmentOnTrack(state.position,destination,circuit);
   return {
     from: { ...state.position },
     to: destination,
     velocity: nextVelocity,
     acceleration: { ...acceleration },
-    valid: segmentOnTrack(state.position, destination, circuit)
+    valid: !zoneBlocked && roadClear,
+    // Rejected glass-ice controls are NOT collisions and incur no penalty.
+    zoneBlocked,
+    reason: zoneBlocked?'glass-axis-only':roadClear?null:'snowbank',
+    surface: zone?.id ?? null
   };
 }
 
@@ -182,6 +210,11 @@ export function score(state, circuit = NORTHERN_LOOP) {
 export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
   if (state.finished) return state;
   const move = previewMove(state, acceleration, circuit);
+  if (move.zoneBlocked) {
+    // Illegal diagonal commands do not advance a turn or cause a crash.
+    // The UI also greys them out; this is the authoritative engine guard.
+    return { ...state, lastEvent:'Glass Ice: one axis per turn' };
+  }
   if (!move.valid) {
     // A crash keeps the player at the last legal grid point, kills velocity,
     // and costs one attempted turn plus an additional score penalty.

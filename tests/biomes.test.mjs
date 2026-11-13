@@ -13,7 +13,7 @@ import { createRace, previewMove, takeTurn, score } from '../src/engine.mjs';
 test('difficulty regions follow student progression, not assistance modes',()=>{
   assert.deepEqual(TIERS,['beginner','intermediate','advanced','expert']);
   assert.deepEqual(CIRCUITS.map(c=>biomeForCircuit(c).id),[
-    'beginner','beginner','beginner','beginner','intermediate','intermediate'
+    'beginner','beginner','beginner','beginner','intermediate','intermediate','intermediate'
   ]);
   assert.equal(tierFromLevel('BEGINNER 4'),'beginner');
   assert.equal(tierFromLevel('INTERMEDIATE 1'),'intermediate');
