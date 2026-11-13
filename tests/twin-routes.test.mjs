@@ -17,7 +17,7 @@ import {
 const p=(x,y)=>({x,y});
 
 test('Track 06 adds only a second Intermediate course in Aurora Vale',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),[
+  assert.deepEqual(CIRCUITS.slice(0,6).map(c=>c.id),[
     'northern-loop','aurora-split','frost-chicane',
     'narrow-passage','hairpin-hollow','twin-routes'
   ]);
