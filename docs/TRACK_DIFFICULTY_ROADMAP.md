@@ -37,8 +37,8 @@ The table is a roadmap, not a claim that future tracks exist.
 | 01 | Northern Loop | Beginner 1 | Basic vector acceleration and braking | Base physics — implemented |
 | 02 | Aurora Split | Beginner 2 | Visible, small central rock and route choice | Base physics — implemented |
 | 03 | Frost Chicane | Beginner 3 | **Two closely spaced bends; reverse lateral velocity before the second** | Base physics — **this PR** |
-| 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — **this PR** |
-| 05 | Hairpin Hollow | Intermediate 1 | Sharp turn after a long straight | Base physics — planned |
+| 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — implemented |
+| 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — **this PR** |
 | 06 | Twin Routes | Intermediate 2 | Risky shortcut vs longer safe racing line | Base physics — planned |
 | 07 | Glass Ice | Intermediate 3 | One low-grip zone with an explicit braking rule | **New deterministic zone rule** — planned |
 | 08 | Crosswind Ridge | Intermediate 4 | One marked constant wind vector | **New wind-vector rule** — planned |
@@ -81,6 +81,10 @@ For upcoming Track 04 onward, build from this checklist and commit a concise tra
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 05 design note — Hairpin Hollow
+
+This is the first Intermediate circuit. A long upper straight leads into an eastern **180° U-turn** and a separate westbound lower return lane. The primary learning goal is to brake a positive horizontal velocity to zero and accelerate in the opposite direction while keeping to a roughly 4-unit-wide turn corridor. At the nose the central island ends around x=26, and the outer shoreline is near x=30. East (downward), South/Return (westward), and West (northward) gates ensure the player actually enters and exits the hairpin rather than bypassing it. A 25-turn QA lap maintains **more than 1.2 world units** of full-segment clearance with no special mechanics. See [Track 05 design and verification](PR12_HAIRPIN_HOLLOW.md).
 
 ## Track 04 design note — Narrow Passage
 

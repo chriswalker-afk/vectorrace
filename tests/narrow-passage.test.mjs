@@ -15,7 +15,7 @@ import {
 const p=(x,y)=>({x,y});
 
 test('fourth track extends beginner progression without new physics',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),[
+  assert.deepEqual(CIRCUITS.slice(0,4).map(c=>c.id),[
     'northern-loop','aurora-split','frost-chicane','narrow-passage'
   ]);
   assert.strictEqual(getCircuit('narrow-passage'),NARROW_PASSAGE);
