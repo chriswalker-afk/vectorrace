@@ -9,6 +9,10 @@ on:
       - 'src/assistance.mjs'
       - 'styles/race-v4.css'
       - 'tests/assistance.test.mjs'
+      - 'src/vector-notation.mjs'
+      - 'styles/column-vectors.css'
+      - 'tests/vector-notation.test.mjs'
+      - 'tests/vector-integration.test.mjs'
       - 'scripts/viewport-smoke.mjs'
       - '.github/workflows/one-screen-ux.yml'
   push:
