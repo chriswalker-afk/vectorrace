@@ -431,7 +431,7 @@ async function main(){
       return count?true:null;
     });
     await delay(850); // allow all reused SVG textures to finish loading
-    const imageProof=await evaluation(gallerySend,\`(()=>{
+    const imageProof=await evaluation(gallerySend,`(()=>{
       const ids=['beginner','intermediate','advanced','expert'];
       return ids.map(id=>{
         const canvas=document.getElementById('preview-'+id);
@@ -439,7 +439,7 @@ async function main(){
         const pixel=(x,y)=>Array.from(ctx.getImageData(x,y,1,1).data);
         return {id,road:pixel(460,180),ground:pixel(50,50),drawn:pixel(490,350)[3]===255};
       });
-    })()\`);
+    })()`);
     if(!imageProof?.every(p=>p.drawn) ||
        new Set(imageProof.map(p=>p.road.join(','))).size!==4 ||
        new Set(imageProof.map(p=>p.ground.join(','))).size!==4) {
