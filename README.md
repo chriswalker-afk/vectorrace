@@ -24,10 +24,12 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v3.html` — original Arctic environment/vehicle artwork integrated into the same racing engine.
 - `race-v4.html` — one-screen race experience with Guided / Standard / Expert modes, tutorial and responsive cockpit.
 - `race-v5.html` — single-screen cornering/braking guide, checkpoint/crash celebration and local personal-best ghost.
+  - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
 - `docs/PR4_UX.md` — strict one-screen design goals, interaction rules and automated viewport checks.
 - `docs/PR5_GAMEPLAY.md` — exact braking lookahead, local records, racing feedback and QA.
+- `docs/PR7_MASTER_MODE.md` — challenge rules, matrix-key mapping and single-screen QA.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
