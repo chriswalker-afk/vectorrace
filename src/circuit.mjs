@@ -490,7 +490,95 @@ export const GLASS_ICE = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE]);
+
+/**
+ * Intermediate 4 — Crosswind Ridge.
+ *
+ * First deterministic EXTERNAL FORCE. A single marked crosswind band
+ * straddles the upper eastbound straight and blows SOUTH with w=(0,-1).
+ * A turn STARTING inside the band (painted edge included) applies
+ *
+ *    v_next = v + a + w,     p_next = p + v_next.
+ *
+ * There is no random gust, extra friction or hidden movement. Outside the
+ * band, w=(0,0). All nine accelerations remain available. The broad windward
+ * snow shelf provides >1.0 unit of full skimmer clearance in a tested 24-move
+ * lap that deliberately counters the crosswind on three successive turns.
+ *
+ * The new terrain has a raised/wavy northern ridge and a broader returning
+ * bend; no older geometry or local-best keys are changed.
+ */
+export const CROSSWIND_RIDGE = {
+  id: 'crosswind-ridge',
+  name: 'Crosswind Ridge',
+  subtitle: 'Arctic Series / Circuit 08',
+  level: 'INTERMEDIATE 4',
+  tagline: 'Southward wind · Counter the drift',
+  menuHint: 'A marked wind field adds the vector (0, -1) to velocity each turn',
+  outer: [
+    { x: 3, y: 8 }, { x: 6.8, y: 3.6 },
+    { x: 12, y: 5.2 }, { x: 15.4, y: 9.8 },
+    { x: 24.4, y: 9.5 }, { x: 27.6, y: 11.3 },
+    { x: 30.4, y: 14 }, { x: 30.4, y: 17 },
+    { x: 29.6, y: 21 }, { x: 26.8, y: 24.4 },
+    { x: 20, y: 24.8 }, { x: 15.5, y: 24.5 },
+    { x: 10.4, y: 23.7 }, { x: 6.9, y: 23.2 },
+    { x: 3, y: 20.1 }, { x: 1.5, y: 16.8 }, { x: 2, y: 12 }
+  ],
+  inner: [
+    { x: 7, y: 12 }, { x: 9, y: 10 }, { x: 13, y: 12 },
+    { x: 15, y: 15 }, { x: 24, y: 15 },
+    { x: 25.5, y: 15.5 }, { x: 26, y: 17 },
+    { x: 25.5, y: 18 }, { x: 24, y: 18.5 },
+    { x: 9, y: 18.5 }, { x: 7, y: 17 }
+  ],
+  windZones: [
+    {
+      id: 'ridge-crosswind',
+      label: 'Southward Crosswind',
+      vector: { x: 0, y: -1 },
+      polygon: [
+        { x: 17, y: 18.65 }, { x: 26, y: 18.65 },
+        { x: 26, y: 24.2 }, { x: 17, y: 24.2 }
+      ]
+    }
+  ],
+  start: { x: 10, y: 20 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 13, y: 18.5 }, b: { x: 13, y: 22 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Wind Gate',
+      a: { x: 26, y: 15.7 }, b: { x: 29.9, y: 15.7 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'Return Straight Gate',
+      a: { x: 19, y: 9.5 }, b: { x: 19, y: 15 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Ridge Gate',
+      a: { x: 2, y: 16 }, b: { x: 7, y: 16 },
+      direction: { x: 0, y: 1 }
+    }
+  ],
+  featuredWind: {
+    zoneId: 'ridge-crosswind',
+    vector: { x: 0, y: -1 },
+    xMin: 17, xMax: 26,
+    yMin: 18.65, yMax: 24.2,
+    entryRule: 'Start-of-turn position (border included)',
+    minVisibleClearance: 1.0
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE, CROSSWIND_RIDGE]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;
