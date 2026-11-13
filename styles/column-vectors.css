@@ -79,8 +79,8 @@
 }
 @media (max-width: 365px) and (orientation: portrait) {
   .readout-grid .column-vector {
-    height: 31px;
+    height: 33px;
     font-size: 14px;
-    padding-inline: .54em;
+    padding: 1px .54em;
   }
 }
