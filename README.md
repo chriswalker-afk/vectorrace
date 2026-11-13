@@ -26,6 +26,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v5.html` — single-screen cornering/braking guide, checkpoint/crash celebration and local personal-best ghost.
 - `race-v6.html` — two playable beginner circuits: Northern Loop and Aurora Split (two clear routes around a small rock), with a compact in-board map selector.
 - `race-v7.html` — three playable beginner circuits, including Frost Chicane's two quick bends with no new physics.
+- `race-v8.html` — four beginner circuits, including a short skimmer-width bottleneck in Narrow Passage.
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
@@ -36,6 +37,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR9_ROCK_CLEARANCE.md` — small obstacle art, minimum skimmer-width margins and two-route manoeuvre tests.
 - `docs/TRACK_DIFFICULTY_ROADMAP.md` — permanent 12-track plan, 0–3 difficulty checklist, new-mechanic rules and release gates.
 - `docs/PR10_FROST_CHICANE.md` — Track 03 geometry, safe 26-turn race and layout acceptance.
+- `docs/PR11_NARROW_PASSAGE.md` — Track 04 design, full-segment clearance and classroom challenge.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -45,6 +47,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v7.html` for the three-circuit game. Add `?track=frost-chicane` to start on Beginner 3.
+Open `http://localhost:8000/race-v8.html` for the four-circuit game. Add `?track=narrow-passage` to start on Beginner 4.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
