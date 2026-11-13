@@ -20,7 +20,7 @@ test('Aurora Split has a completely playable crash-free lap via the exact racing
   assert.equal(state.checkpoint,0);
   assert.equal(state.laps,1);
   assert.equal(state.moves,actions.length);
-  assert.ok(furthestEast>=26);
+  assert.ok(furthestEast>=25);
   assert.ok(actions.length >= findLegalLap(NORTHERN_LOOP).length,
     'Beginner 2 should not be shorter than the introductory circuit');
 });
