@@ -18,7 +18,7 @@ import {
 const p=(x,y)=>({x,y});
 
 test('fifth circuit is Intermediate 1 and retains baseline vector rules',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),[
+  assert.deepEqual(CIRCUITS.slice(0,5).map(c=>c.id),[
     'northern-loop','aurora-split','frost-chicane',
     'narrow-passage','hairpin-hollow'
   ]);
