@@ -1,4 +1,5 @@
 import { NORTHERN_LOOP as circuit } from './circuit.mjs';
+import { renderColumnVector, vectorDescription } from './vector-notation.mjs';
 import { createSnowshiftArtwork } from './race-art.mjs';
 import { modePolicy, moveExplanation } from './assistance.mjs';
 import { brakingForecast, corneringMessage } from './race-coach.mjs';
@@ -40,8 +41,6 @@ let canvasFit = { scale: 1, offsetX: 0, offsetY: 0 };
 const artwork = createSnowshiftArtwork(() => scheduleDraw());
 
 const world = p => ({ x: OFFSET_X + p.x * SCALE, y: OFFSET_Y - p.y * SCALE });
-const vectorText = p => '( ' + (p.x > 0 ? '+' : '') + p.x + ', ' +
-  (p.y > 0 ? '+' : '') + p.y + ' )';
 const interpolate = (a, b, t) => ({
   x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t
 });
@@ -492,11 +491,11 @@ function setAcceleration(x, y) {
 function renderHUD() {
   const selected = previewMove(state, selection, circuit);
   const policy = modePolicy(mode);
-  $('currentVelocity').textContent = vectorText(state.velocity);
-  $('selectedAcceleration').textContent = vectorText(selection);
-  $('nextVelocity').textContent = policy.nextVelocity ? vectorText(selected.velocity) : '( ?, ? )';
-  $('nextVelocity').setAttribute('aria-label', policy.nextVelocity
-    ? 'Next velocity ' + vectorText(selected.velocity) : 'Next velocity hidden in Expert mode');
+  renderColumnVector($('currentVelocity'), state.velocity, { name: 'Velocity' });
+  renderColumnVector($('selectedAcceleration'), selection, { name: 'Acceleration' });
+  renderColumnVector($('nextVelocity'), selected.velocity, {
+    name: 'Next velocity', hidden: !policy.nextVelocity
+  });
   $('moves').textContent = String(state.moves).padStart(2, '0');
   $('crashes').textContent = String(state.crashes).padStart(2, '0');
   $('score').textContent = String(score(state, circuit)).padStart(2, '0');
@@ -586,8 +585,8 @@ for (const [x, y, symbol] of choices) {
   button.dataset.x = x;
   button.dataset.y = y;
   button.textContent = symbol;
-  button.title = 'Acceleration ' + vectorText({ x, y });
-  button.setAttribute('aria-label', 'Acceleration ' + vectorText({ x, y }));
+  button.title = vectorDescription({ x, y }, 'Acceleration');
+  button.setAttribute('aria-label', vectorDescription({ x, y }, 'Acceleration'));
   button.setAttribute('aria-pressed', 'false');
   button.addEventListener('click', () => setAcceleration(x, y));
   pad.appendChild(button);
