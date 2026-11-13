@@ -321,7 +321,91 @@ export const HAIRPIN_HOLLOW = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW]);
+
+/**
+ * Intermediate 2 — Twin Routes.
+ *
+ * A long, low glacier DIVIDER makes a meaningful decision on the upper
+ * eastbound straight. The INNER (southern) shortcut is shorter, but only about
+ * 3 world units wide; the OUTER (northern) detour is about 4.7 units wide and
+ * asks the player to spend extra turns/distance bending around the divider.
+ * Both lanes reconnect before the east checkpoint.
+ *
+ * This develops route choice and momentum management. It is intentionally
+ * different from Beginner 2's single small rock: the divider runs for about
+ * 9 units, the racing lines have visibly different widths, and QA provides two
+ * completed routes with distinct turn counts and safe width requirements.
+ *
+ * Polygon obstacles are the same exact collision geometry used to paint the
+ * glacier; no new physics, friction, wind or boost rules.
+ */
+export const TWIN_ROUTES = {
+  id: 'twin-routes',
+  name: 'Twin Routes',
+  subtitle: 'Arctic Series / Circuit 06',
+  level: 'INTERMEDIATE 2',
+  tagline: 'Short inner line · Wide outer detour',
+  menuHint: 'Choose the tighter shortcut or the wider scenic line',
+  outer: [
+    { x: 2, y: 8 }, { x: 7, y: 3 }, { x: 24, y: 3 },
+    { x: 30, y: 8 }, { x: 31, y: 17 }, { x: 30, y: 22 },
+    { x: 26, y: 25 }, { x: 14, y: 26.3 },
+    { x: 8, y: 25.5 }, { x: 3, y: 22 },
+    { x: 2, y: 17 }
+  ],
+  inner: [
+    { x: 7, y: 11 }, { x: 10, y: 8 }, { x: 21, y: 8 },
+    { x: 25, y: 11 }, { x: 25, y: 14 },
+    { x: 24, y: 16 }, { x: 23, y: 16 },
+    { x: 12, y: 15 }, { x: 9, y: 16 }, { x: 7, y: 15 }
+  ],
+  obstacles: [
+    {
+      id: 'glacier-divider',
+      label: 'Glacier Divider',
+      artStyle: 'glacial-divider',
+      polygon: [
+        { x: 13.6, y: 19.15 }, { x: 14.4, y: 18.45 },
+        { x: 21.8, y: 18.45 }, { x: 22.6, y: 19.15 },
+        { x: 22.6, y: 20.8 }, { x: 21.8, y: 21.5 },
+        { x: 14.4, y: 21.5 }, { x: 13.6, y: 20.8 }
+      ]
+    }
+  ],
+  start: { x: 9, y: 18 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 12, y: 15 }, b: { x: 12, y: 25.7 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Gate',
+      a: { x: 26, y: 12.5 }, b: { x: 31, y: 12.5 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'South Gate',
+      a: { x: 16, y: 3 }, b: { x: 16, y: 8 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Gate',
+      a: { x: 2, y: 12.5 }, b: { x: 7, y: 12.5 },
+      direction: { x: 0, y: 1 }
+    }
+  ],
+  featuredFork: {
+    dividerId: 'glacier-divider',
+    xMin: 13.6, xMax: 22.6, middleX: 18,
+    innerLineY: 17, outerLineY: 23.5,
+    minShortClearance: 1.0, minWideClearance: 1.4
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;

@@ -39,7 +39,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 03 | Frost Chicane | Beginner 3 | **Two closely spaced bends; reverse lateral velocity before the second** | Base physics — **this PR** |
 | 04 | Narrow Passage | Beginner 4 | Short 3.2-unit-wide bottleneck; maintain a precise centreline | Base physics — implemented |
 | 05 | Hairpin Hollow | Intermediate 1 | Long straight, then a genuine 180° east hairpin requiring horizontal velocity reversal | Base physics — implemented |
-| 06 | Twin Routes | Intermediate 2 | Risky shortcut vs longer safe racing line | Base physics — planned |
+| 06 | Twin Routes | Intermediate 2 | Choose between a tight inner shortcut and a wider outer detour | Base physics — **this PR** |
 | 07 | Glass Ice | Intermediate 3 | One low-grip zone with an explicit braking rule | **New deterministic zone rule** — planned |
 | 08 | Crosswind Ridge | Intermediate 4 | One marked constant wind vector | **New wind-vector rule** — planned |
 | 09 | Icebound Rapids | Advanced 1 | Predictable boost strips and braking choices | **New boost rule** — planned |
@@ -56,7 +56,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 | Difficulty | Region | Identity | Availability |
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
-| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow playable; later Intermediate tracks planned |
+| Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow and Twin Routes playable; later Intermediate tracks planned |
 | Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Visual style ready; no playable Advanced track yet |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
@@ -94,6 +94,16 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 06 design note — Twin Routes
+
+A long **solid glacier divider** (roughly x=13.6–22.6) in the eastbound upper straight introduces one intentional route-choice problem. The INNER shortcut runs near y=17 in a ~2.9-unit corridor, while the OUTER detour runs near y=23–24 through a ~4.4-unit corridor. Both fully reconnect before the East gate. They are not two equally wide lanes around a tiny rock as in Beginner 2.
+
+- A tested **23-turn inner lap** drives approximately **70.0 world units** with at least **1.0 unit** of full-segment centre-to-boundary clearance for the 1.6-unit illustrated skimmer.
+- A tested **24-turn outer lap** drives approximately **76.3 world units** with at least **1.4 units** of clearance. These are representative real acceleration-only routes, *not claims about an absolute theoretical best*.
+- The interior is **truly non-playable polygon land** with a clipped Aurora crystal spine, never a broad graphic obscuring otherwise legal road. Full-segment collision prevents jumping across it.
+- The game still uses exactly the same 3×3 accelerations, ordered gates and score formula. Track 06 automatically inherits **Aurora Vale** from its `INTERMEDIATE 2` label.
+- Students should be able to see two genuinely different choices and understand the space/speed tradeoff without requiring pixel-perfect manoeuvres. The exact visual safety rules and the two tested laps are documented in [Track 06 acceptance](PR14_TWIN_ROUTES.md).
 
 ## Track 05 design note — Hairpin Hollow
 
