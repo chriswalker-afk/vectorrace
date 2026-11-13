@@ -57,7 +57,7 @@ test('the actual engine finds a crash-free completed lap with a modest increase'
   assert.equal(race.laps,1);
 });
 
-test('a full chicane-driving lap stays a visible skimmer-width clear',()=>{
+test('a full chicane-driving lap stays clear of the skimmer AND painted snowbanks',()=>{
   let race=createRace(FROST_CHICANE);
   let passedFirstBend=false,passedSecondBend=false;
   let minClearance=Infinity;
@@ -74,17 +74,17 @@ test('a full chicane-driving lap stays a visible skimmer-width clear',()=>{
         race.position,next.position,FROST_CHICANE
       );
       minClearance=Math.min(minClearance,clearance);
-      assert.ok(clearance >= MIN_RECOMMENDED_CLEARANCE-1e-8,
+      assert.ok(clearance >= MIN_RECOMMENDED_CLEARANCE+0.2-1e-8,
         'turn '+next.moves+' has only '+clearance.toFixed(2)+
-        ' units of margin; at least '+MIN_RECOMMENDED_CLEARANCE+' needed');
+        ' units of margin; at least '+(MIN_RECOMMENDED_CLEARANCE+0.2)+' needed');
     }
-    if(next.position.x===18 && next.position.y===17)passedFirstBend=true;
-    if(next.position.x===23 && next.position.y===20)passedSecondBend=true;
+    if(next.position.x===19 && next.position.y===17)passedFirstBend=true;
+    if(next.position.x===23 && next.position.y===21)passedSecondBend=true;
     race=next;
   }
   assert.equal(passedFirstBend,true,'did not drive through the inward bend');
   assert.equal(passedSecondBend,true,'did not drive through the outward bend');
-  assert.ok(minClearance>=MIN_RECOMMENDED_CLEARANCE);
+  assert.ok(minClearance>=MIN_RECOMMENDED_CLEARANCE+0.2);
   assert.equal(race.moves,FROST_CHICANE_CLEAR_LAP.length);
   assert.equal(race.crashes,0);
   assert.equal(race.checkpoint,0);
