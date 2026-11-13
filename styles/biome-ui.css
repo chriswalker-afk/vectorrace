@@ -1,0 +1,195 @@
+/*
+ * V10 Visual Regions — tier-based appearance independent from physics/mode.
+ *
+ * Beginner = SNOWBOUND: bright alpine blue/green (near-classic V9)
+ * Intermediate = AURORA: violet twilight / cyan ice / crystal clusters
+ * Advanced = EMBER RIFT: basalt, charcoal ice, copper and ember lights
+ * Expert = ECLIPSE: nearly black glass ice / cream-gold eclipse beacons
+ *
+ * Every region keeps text and skimmer readable. No extra UI rows or height.
+ */
+:root {
+  --region-accent:#d4fc77;
+  --region-pale:#eff9fb;
+  --region-panel:#153a4e;
+  --region-panel-deep:#092435;
+  --region-board:#10354a;
+  --region-background:#081b2b;
+}
+html[data-biome="intermediate"] {
+  --lime:#d4a6ff; --frost:#d2bfff; --snow:#f6f0ff; --muted:#c6b8e6;
+  --region-accent:#d4a6ff;
+  --region-pale:#e9faff;
+  --region-panel:#302754;
+  --region-panel-deep:#151932;
+  --region-board:#1c1d48;
+  --region-background:#110f2c;
+}
+html[data-biome="advanced"] {
+  --lime:#ffbb76; --frost:#ffc28e; --snow:#fff0de; --muted:#d3b3a4;
+  --region-accent:#ffbb76;
+  --region-pale:#fff0de;
+  --region-panel:#493037;
+  --region-panel-deep:#241c27;
+  --region-board:#30242d;
+  --region-background:#1c151d;
+}
+html[data-biome="expert"] {
+  --lime:#ffe29c; --frost:#e4d7af; --snow:#fff5d6; --muted:#d2c5aa;
+  --region-accent:#ffe29c;
+  --region-pale:#fff5d6;
+  --region-panel:#1f2742;
+  --region-panel-deep:#0a1023;
+  --region-board:#0d172c;
+  --region-background:#060a15;
+}
+html[data-biome]:not([data-biome="beginner"]) body {
+  background: radial-gradient(ellipse 58% 52% at 61% -12%,
+    color-mix(in srgb,var(--region-accent) 16%,transparent),
+    transparent 77%),
+    linear-gradient(138deg,var(--region-background),
+      var(--region-panel-deep) 68%,var(--region-background));
+}
+html[data-biome]:not([data-biome="beginner"]) .topbar {
+  border-bottom-color: color-mix(in srgb,var(--region-accent) 39%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .brand strong {
+  filter:drop-shadow(0 3px 1px #020616);
+}
+html[data-biome]:not([data-biome="beginner"]) .brand strong span {
+  color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .build-tag {
+  color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .game-board {
+  background:var(--region-board);
+  border-color:color-mix(in srgb,var(--region-accent) 67%,#d5e5f5);
+  box-shadow:0 15px 42px #020610c9,
+    0 0 25px color-mix(in srgb,var(--region-accent) 14%,transparent),
+    inset 0 0 0 2px #ffffff13;
+}
+html[data-biome]:not([data-biome="beginner"]) .game-board:after {
+  box-shadow:inset 0 0 28px #010513ae;
+}
+html[data-biome]:not([data-biome="beginner"]) .race-panel {
+  border-color:color-mix(in srgb,var(--region-accent) 54%,#536681);
+  border-top-color:var(--region-accent);
+  background:linear-gradient(175deg,var(--region-panel),
+    var(--region-panel-deep) 65%,var(--region-background));
+}
+html[data-biome]:not([data-biome="beginner"]) .board-label,
+html[data-biome]:not([data-biome="beginner"]) .board-scores,
+html[data-biome]:not([data-biome="beginner"]) .board-bottom span {
+  background:color-mix(in srgb,var(--region-background) 94%,transparent);
+  border-color:color-mix(in srgb,var(--region-accent) 46%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .board-label {
+  border-left:3px solid var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .map-picker-kicker,
+html[data-biome]:not([data-biome="beginner"]) #biomeShort,
+html[data-biome]:not([data-biome="beginner"]) .record-badge,
+html[data-biome]:not([data-biome="beginner"]) #lap {
+  color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .map-picker[aria-expanded="true"],
+html[data-biome]:not([data-biome="beginner"]) .map-picker:hover {
+  background:color-mix(in srgb,var(--region-accent) 19%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .map-picker:focus-visible {
+  outline-color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .map-menu {
+  border-color:var(--region-accent);
+  background:linear-gradient(160deg,var(--region-panel-deep),var(--region-background));
+}
+html[data-biome]:not([data-biome="beginner"]) .map-menu-title {
+  color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .top-button,
+html[data-biome]:not([data-biome="beginner"]) .grid-toggle,
+html[data-biome]:not([data-biome="beginner"]) .mode-options button {
+  background:var(--region-panel-deep);
+  border-color:color-mix(in srgb,var(--region-accent) 32%,transparent);
+  color:var(--region-pale);
+}
+html[data-biome]:not([data-biome="beginner"]) .mode-options button[aria-pressed="true"] {
+  background:var(--region-accent);
+  border-color:var(--region-pale);
+  color:var(--region-background);
+}
+html[data-biome]:not([data-biome="beginner"]) .readout-grid {
+  border-color:color-mix(in srgb,var(--region-accent) 43%,transparent);
+  background:color-mix(in srgb,var(--region-accent) 22%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .readout-grid>div {
+  background:color-mix(in srgb,var(--region-panel) 82%,var(--region-panel-deep));
+}
+html[data-biome]:not([data-biome="beginner"]) .acceleration-pad button {
+  background:linear-gradient(180deg,var(--region-panel),
+    var(--region-panel-deep));
+  border-color:color-mix(in srgb,var(--region-accent) 58%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .acceleration-pad button:hover {
+  background:color-mix(in srgb,var(--region-accent) 30%,var(--region-panel));
+}
+html[data-biome]:not([data-biome="beginner"]) .acceleration-pad button[aria-pressed="true"] {
+  background:linear-gradient(180deg,var(--region-pale),var(--region-accent));
+  color:var(--region-background);
+  border-color:var(--region-pale);
+  box-shadow:0 0 10px color-mix(in srgb,var(--region-accent) 42%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .move-status {
+  background:var(--region-panel-deep);
+  border-color:color-mix(in srgb,var(--region-accent) 36%,transparent);
+}
+html[data-biome]:not([data-biome="beginner"]) .primary {
+  background:linear-gradient(180deg,var(--region-pale),var(--region-accent));
+  border-color:var(--region-pale);
+  color:var(--region-background);
+  box-shadow:0 3px 0 color-mix(in srgb,var(--region-accent) 45%,#060810);
+}
+html[data-biome]:not([data-biome="beginner"]) .primary:not(:disabled):hover {
+  background:var(--region-pale);
+}
+html[data-biome]:not([data-biome="beginner"]) .event-toast,
+html[data-biome]:not([data-biome="beginner"]) .tutorial,
+html[data-biome]:not([data-biome="beginner"]) .finish-card {
+  border-color:var(--region-accent);
+  background:linear-gradient(140deg,var(--region-panel-deep),var(--region-background));
+}
+html[data-biome]:not([data-biome="beginner"]) .event-toast[data-tone="crash"] {
+  border-color:#ff7557;
+}
+html[data-biome]:not([data-biome="beginner"]) .event-toast[data-tone="record"] {
+  color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .checkpoint-list li.active {
+  color:var(--region-accent);
+  border-color:var(--region-accent);
+}
+html[data-biome]:not([data-biome="beginner"]) .checkpoint-list li.cleared .checkpoint-icon {
+  background:var(--region-accent);
+  border-color:var(--region-accent);
+  color:var(--region-background);
+}
+/*
+ * Each option advertises its next world before selection. Text still names
+ * Beginner, Intermediate, Advanced or Expert to avoid colour-only status.
+ */
+.map-option[data-tier] { border-left:3px solid var(--option-accent,#d4fc77); }
+.map-option[data-tier="beginner"] { --option-accent:#d4fc77; }
+.map-option[data-tier="intermediate"] { --option-accent:#d4a6ff; }
+.map-option[data-tier="advanced"] { --option-accent:#ffbb76; }
+.map-option[data-tier="expert"] { --option-accent:#ffe29c; }
+.map-option[data-tier] .map-option-no {
+  background:var(--option-accent);
+  color:#101b29;
+}
+.map-option[data-tier][aria-current="true"] {
+  border-color:var(--option-accent);
+  box-shadow:inset 2px 0 0 var(--option-accent);
+}
+/* Don't let the tier-rules override the current track's textual readability. */
+.map-picker .map-picker-kicker { color:var(--region-accent); }
