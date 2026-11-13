@@ -81,6 +81,11 @@ async function waitFor(send,predicate,timeout=10000){
 }
 
 function playLegalLapInBrowser(actions, recordKey) {
+  document.querySelector('[data-mode="master"]').click();
+  const masterPad = document.getElementById('accelerationPad');
+  const allColumns = masterPad.dataset.notation === 'columns' &&
+    masterPad.querySelectorAll('button .column-vector').length === 9;
+  const nextHidden = document.getElementById('nextVelocity').dataset.hidden === 'true';
   const gateMessages = [];
   for(const a of actions) {
     const button=document.querySelector('#accelerationPad [data-x="'+a.x+'"][data-y="'+a.y+'"]');
@@ -99,7 +104,9 @@ function playLegalLapInBrowser(actions, recordKey) {
     record,gateMessages,
     score:document.getElementById('score').textContent,
     badge:document.getElementById('recordBadge').textContent,
-    ghostHidden:document.getElementById('ghostToggle').hidden
+    ghostHidden:document.getElementById('ghostToggle').hidden,
+    masterSelected:document.querySelector('[data-mode="master"]').getAttribute('aria-pressed')==='true',
+    allColumns, nextHidden
   };
 }
 function restartGhostBrowser() {
@@ -108,6 +115,8 @@ function restartGhostBrowser() {
   const visible=!finish.hidden;
   document.getElementById('raceAgain').click();
   const toggle=document.getElementById('ghostToggle');
+  const masterHides=toggle.hidden; // Restart retains the completed race's Master mode.
+  document.querySelector('[data-mode="guided"]').click();
   const canSee=!toggle.hidden;
   const before=document.getElementById('score').textContent;
   toggle.click();
@@ -116,8 +125,10 @@ function restartGhostBrowser() {
   const toggledOn=toggle.getAttribute('aria-pressed')==='true';
   document.querySelector('[data-mode="expert"]').click();
   const expertHides=toggle.hidden;
+  document.querySelector('[data-mode="master"]').click();
+  const backToMasterHides=toggle.hidden;
   document.querySelector('[data-mode="guided"]').click();
-  return {visible,text,canSee,before,toggledOff,toggledOn,expertHides};
+  return {visible,text,canSee,before,toggledOff,toggledOn,expertHides,masterHides,backToMasterHides};
 }
 
 function ghostLayoutBrowser() {
@@ -205,6 +216,13 @@ async function main(){
         await delay(650);
         const screenshot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
         writeFileSync('screenshots/snowshift-v5-'+size+'.png',Buffer.from(screenshot.data,'base64'));
+        await evaluation(send,'document.querySelector(\'[data-mode="master"]\').click()');
+        await delay(150);
+        const masterScreenshot=await send('Page.captureScreenshot',{
+          format:'png',captureBeyondViewport:false,fromSurface:true
+        });
+        writeFileSync('screenshots/snowshift-v5-master-'+size+'.png',
+          Buffer.from(masterScreenshot.data,'base64'));
       }
     }finally{
       ws.close();
@@ -243,11 +261,12 @@ async function main(){
        lap.record.frames?.length!==actions.length+1 ||
        lap.record.score!==actions.length ||
        !lap.commitDisabled || lap.crashes!=='00' ||
-       lap.gateMessages.length!==3 || lap.ghostHidden){
+       lap.gateMessages.length!==3 || !lap.ghostHidden ||
+       !lap.masterSelected || !lap.allColumns || !lap.nextHidden){
       console.error('FAIL full-lap browser integration',lap,'expected moves',actions.length);
       failed++;
     }else{
-      console.log('PASS full lap',actions.length,'moves / 3 checkpoints / local best persisted');
+      console.log('PASS Master full lap',actions.length,'moves / 9 column controls / 3 checkpoints / local best persisted');
     }
     await waitFor(send,async()=>{
       const visible=await evaluation(send,'!document.getElementById("finishPanel").hidden');
@@ -256,11 +275,12 @@ async function main(){
     const restart=await evaluation(send,'('+restartGhostBrowser.toString()+')()');
     if(!restart.visible || !restart.canSee || restart.before!=='00' ||
        !restart.toggledOff || !restart.toggledOn || !restart.expertHides ||
+       !restart.masterHides || !restart.backToMasterHides ||
        !/NEW LOCAL BEST/.test(restart.text)){
       console.error('FAIL ghost / personal-best / restart',restart);
       failed++;
     }else{
-      console.log('PASS finish, Race Again and local ghost toggle; Expert hides ghost');
+      console.log('PASS finish, Race Again and local ghost toggle; Expert/Master hide ghost');
     }
     // Once a record exists, the new GHOST control must also fit on small screens.
     for(const [width,height] of [[390,844],[320,568],[844,390]]) {

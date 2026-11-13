@@ -5,6 +5,10 @@ on:
     paths:
       - 'race-v5.html'
       - 'src/race-v5.mjs'
+      - 'src/assistance.mjs'
+      - 'src/acceleration-pad.mjs'
+      - 'styles/master-mode.css'
+      - 'tests/master-pad.test.mjs'
       - 'src/race-coach.mjs'
       - 'src/race-records.mjs'
       - 'src/ux-smoke-v5.mjs'

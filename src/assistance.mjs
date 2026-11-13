@@ -1,16 +1,24 @@
 /** Assistance only: these policies never alter movement, scoring or collision physics. */
-export const MODES = Object.freeze(['guided', 'standard', 'expert']);
+export const MODES = Object.freeze(['guided', 'standard', 'expert', 'master']);
 export function modePolicy(mode) {
   switch (mode) {
     case 'guided':
       return Object.freeze({ allDestinations: true, selectedDestination: true,
-        nextVelocity: true, warnings: true, coordinateGrid: true });
+        nextVelocity: true, warnings: true, coordinateGrid: true,
+        accelerationNotation: 'arrows' });
     case 'standard':
       return Object.freeze({ allDestinations: false, selectedDestination: true,
-        nextVelocity: true, warnings: true, coordinateGrid: false });
+        nextVelocity: true, warnings: true, coordinateGrid: false,
+        accelerationNotation: 'arrows' });
     case 'expert':
       return Object.freeze({ allDestinations: false, selectedDestination: false,
-        nextVelocity: false, warnings: false, coordinateGrid: false });
+        nextVelocity: false, warnings: false, coordinateGrid: false,
+        accelerationNotation: 'arrows' });
+    case 'master':
+      // Same challenge rules as Expert, but mathematical rather than arrow input.
+      return Object.freeze({ allDestinations: false, selectedDestination: false,
+        nextVelocity: false, warnings: false, coordinateGrid: false,
+        accelerationNotation: 'columns' });
     default: throw new RangeError('Unknown assistance mode: ' + mode);
   }
 }

@@ -1,0 +1,69 @@
+/*
+ * PR7: the same nine tap targets, but Master reads and selects accelerations
+ * mathematically. No arrows are rendered inside the Master keypad.
+ */
+.mode-options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: none;
+}
+.mode-strip .section-label {
+  flex: 0 0 auto;
+}
+.mode-options button {
+  min-width: 0;
+  padding-inline: 1px;
+  font-size: clamp(8px, .69vw, 10px);
+  letter-spacing: 0;
+}
+.mode-options button[data-mode="master"][aria-pressed="true"] {
+  background: #ffb47c;
+  color: #112536;
+  border-color: #ffe0af;
+}
+.acceleration-pad[data-notation="columns"] button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+  overflow: hidden;
+  font-size: inherit;
+}
+/* Reuses the same curved-bracket matrix as the main velocity readouts.
+   The matrix is slightly smaller to fit the exact existing pad-cell height. */
+.acceleration-pad[data-notation="columns"] .column-vector {
+  height: calc(var(--pad-cell) - 4px);
+  min-width: 2.1em;
+  max-width: 100%;
+  padding: 1px .47em;
+  font-size: clamp(11px, 2.1dvh, 18px);
+  font-weight: 750;
+  line-height: 1;
+}
+.acceleration-pad[data-notation="columns"] .column-vector [data-component] {
+  min-height: 0;
+  line-height: 1;
+}
+.acceleration-pad[data-notation="columns"] .column-vector::before,
+.acceleration-pad[data-notation="columns"] .column-vector::after {
+  top: 1px;
+  bottom: 1px;
+  border-width: 2px;
+}
+/* The label is a hint only, so it never makes an extra row. */
+#accelNotationHint { text-align: right; }
+@media (max-width: 920px) and (orientation: portrait) {
+  .mode-options button { font-size: clamp(8px, 2.25vw, 10px); }
+}
+@media (max-width: 760px) and (orientation: landscape),
+       (max-height: 450px) and (orientation: landscape) {
+  .mode-options button { min-height: 25px; font-size: 8px; }
+  .acceleration-pad[data-notation="columns"] .column-vector {
+    font-size: 11px;
+    height: calc(var(--pad-cell) - 4px);
+  }
+}
+@media (max-width: 350px) and (orientation: portrait) {
+  .mode-strip .section-label { display: none; }
+  .mode-options { max-width: 100%; }
+  .mode-options button { font-size: 9px; }
+}

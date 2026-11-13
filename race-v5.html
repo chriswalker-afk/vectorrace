@@ -7,6 +7,7 @@
 <title>SNOWSHIFT · Northern Loop · Race Feel 05</title>
 <link rel="stylesheet" href="./styles/race-v5.css">
 <link rel="stylesheet" href="./styles/column-vectors.css">
+<link rel="stylesheet" href="./styles/master-mode.css">
 <script type="module" src="./src/race-v5.mjs"></script>
 <script type="module" src="./src/ux-smoke-v5.mjs"></script>
 </head>
@@ -56,11 +57,12 @@
     </section>
     <aside class="race-panel" aria-label="Single-screen race controls">
       <div class="mode-strip">
-        <span class="section-label">ASSIST</span>
+        <span class="section-label">MODE</span>
         <div id="modeOptions" class="mode-options" role="group" aria-label="Mathematical assistance">
           <button type="button" data-mode="guided" aria-pressed="true">GUIDED</button>
           <button type="button" data-mode="standard" aria-pressed="false">STANDARD</button>
           <button type="button" data-mode="expert" aria-pressed="false">EXPERT</button>
+          <button type="button" data-mode="master" aria-pressed="false">MASTER</button>
         </div>
       </div>
       <div class="readout-grid" aria-label="Vector telemetry">
@@ -69,7 +71,7 @@
         <div><small>NEXT <i>v</i></small><strong id="nextVelocity" class="vector-display lime" role="img" aria-label="Next velocity column vector: top x-component 1, bottom y-component 0"><span class="column-vector" aria-hidden="true"><span data-component="x">1</span><span data-component="y">0</span></span></strong></div>
       </div>
       <section class="controls-section">
-        <div class="drive-title"><span class="section-label">CHOOSE ACCELERATION</span><small>−1, 0 or +1 each axis</small></div>
+        <div class="drive-title"><span class="section-label">CHOOSE ACCELERATION</span><small id="accelNotationHint">−1, 0 or +1 each axis</small></div>
         <div class="drive-row">
           <div id="accelerationPad" class="acceleration-pad" role="group" aria-label="Choose a change in velocity"></div>
           <div class="drive-action">
