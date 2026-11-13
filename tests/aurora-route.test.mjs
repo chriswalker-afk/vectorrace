@@ -20,16 +20,16 @@ test('Aurora Split has a completely playable crash-free lap via the exact racing
   assert.equal(state.checkpoint,0);
   assert.equal(state.laps,1);
   assert.equal(state.moves,actions.length);
-  assert.ok(furthestEast>=26);
+  assert.ok(furthestEast>=25);
   assert.ok(actions.length >= findLegalLap(NORTHERN_LOOP).length,
     'Beginner 2 should not be shorter than the introductory circuit');
 });
 
 test('the course obstruction actually forces an upper or lower lane',()=>{
   const c=AURORA_SPLIT;
-  for(const point of [{x:18,y:20},{x:22,y:20}])
+  for(const point of [{x:18,y:19},{x:22,y:19}])
     assert.equal(onTrack(point,c),true);
-  for(const y of [18,22])
+  for(const y of [17,21])
     assert.equal(segmentOnTrack({x:17,y},{x:23,y},c),true);
-  assert.equal(segmentOnTrack({x:17,y:20},{x:23,y:20},c),false);
+  assert.equal(segmentOnTrack({x:17,y:19},{x:23,y:19},c),false);
 });

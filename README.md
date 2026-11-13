@@ -24,7 +24,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v3.html` — original Arctic environment/vehicle artwork integrated into the same racing engine.
 - `race-v4.html` — one-screen race experience with Guided / Standard / Expert modes, tutorial and responsive cockpit.
 - `race-v5.html` — single-screen cornering/braking guide, checkpoint/crash celebration and local personal-best ghost.
-- `race-v6.html` — two playable beginner circuits: Northern Loop and Aurora Split (two lanes around a solid ice floe), with a compact in-board map selector.
+- `race-v6.html` — two playable beginner circuits: Northern Loop and Aurora Split (two clear routes around a small rock), with a compact in-board map selector.
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
@@ -32,6 +32,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR5_GAMEPLAY.md` — exact braking lookahead, local records, racing feedback and QA.
 - `docs/PR7_MASTER_MODE.md` — challenge rules, matrix-key mapping and single-screen QA.
 - `docs/PR8_TWO_CIRCUITS.md` — second circuit design, collision geometry and test requirements.
+- `docs/PR9_ROCK_CLEARANCE.md` — small obstacle art, minimum skimmer-width margins and two-route manoeuvre tests.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 

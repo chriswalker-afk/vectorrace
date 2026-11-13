@@ -49,13 +49,13 @@ export const NORTHERN_LOOP = {
 
 /**
  * Beginner 2 — Aurora Split.
- * The top straight forks around a solid snow-covered ice floe.
+ * A compact snow-covered rock sits within a deliberately wider northern straight.
  * The southern edge has a gentle dogleg, so straight-line speed must be
  * managed through a second kind of corner. Same acceleration and lap rules.
  *
  * An obstacle is a genuinely impassable polygon IN the road corridor, not an
  * image overlaid on a legal part of the track. Players can choose either
- * the upper or lower channel; crossing the floe is a crash even when both
+ * the upper or lower channel with skimmer-width clearance; crossing the rock is a crash even when both
  * endpoints are on ice.
  */
 export const AURORA_SPLIT = {
@@ -63,8 +63,8 @@ export const AURORA_SPLIT = {
   name: 'Aurora Split',
   subtitle: 'Arctic Series / Circuit 02',
   level: 'BEGINNER 2',
-  tagline: 'Forked straight · Tight southern bend',
-  menuHint: 'Choose a line around the central ice floe',
+  tagline: 'Small rock · Tighter southern bend',
+  menuHint: 'Steer above or below a small snow-covered rock',
   outer: [
     { x: 2, y: 8 }, { x: 7, y: 3 }, { x: 14, y: 3 },
     { x: 16, y: 4 }, { x: 23, y: 3 }, { x: 30, y: 8 },
@@ -74,17 +74,17 @@ export const AURORA_SPLIT = {
   inner: [
     { x: 7, y: 11 }, { x: 10, y: 8 }, { x: 13, y: 8 },
     { x: 15, y: 9 }, { x: 19, y: 9 }, { x: 22, y: 8 },
-    { x: 25, y: 11 }, { x: 25, y: 15 }, { x: 21, y: 17 },
-    { x: 12, y: 17 }, { x: 9, y: 16 }, { x: 7, y: 15 }
+    { x: 25, y: 11 }, { x: 25, y: 15 }, { x: 21, y: 15.7 },
+    { x: 12, y: 15.7 }, { x: 9, y: 16 }, { x: 7, y: 15 }
   ],
   obstacles: [
     {
-      id: 'fallen-ice-floe',
-      label: 'Fallen Ice Floe',
+      id: 'snow-boulder',
+      label: 'Snow-covered Rock',
       polygon: [
-        { x: 18.35, y: 19.9 }, { x: 19.2, y: 18.65 },
-        { x: 20.65, y: 18.75 }, { x: 21.25, y: 20.15 },
-        { x: 20.1, y: 21.4 }, { x: 18.6, y: 21.15 }
+        { x: 19.5, y: 19.15 }, { x: 19.9, y: 18.72 },
+        { x: 20.68, y: 18.68 }, { x: 21.05, y: 19.17 },
+        { x: 20.57, y: 19.72 }, { x: 19.75, y: 19.67 }
       ]
     }
   ],

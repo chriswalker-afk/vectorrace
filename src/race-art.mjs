@@ -201,7 +201,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     repeating(ctx, 'ice', width, height, .46);
 
     // Banks cast dark blue shadow onto the ice, *clipped within* the legal road.
-    for (const edge of [circuit.outer, circuit.inner, ...(circuit.obstacles ?? []).map(o => o.polygon)]) {
+    for (const edge of [circuit.outer, circuit.inner]) {
       polygonPath(ctx, edge, world);
       ctx.strokeStyle = '#071d33b0';
       ctx.lineWidth = 32;
@@ -227,7 +227,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.restore();
 
     // Bright snow ridges sit exactly on both hit-test boundaries.
-    for (const edge of [circuit.outer, circuit.inner, ...(circuit.obstacles ?? []).map(o => o.polygon)]) {
+    for (const edge of [circuit.outer, circuit.inner]) {
       ctx.save();
       ctx.lineJoin = 'round';
       polygonPath(ctx, edge, world);
@@ -250,7 +250,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     }
   }
 
-  function drawFloe(ctx, circuit, world) {
+  function drawRockObstacles(ctx, circuit, world) {
     for (const obstacle of circuit.obstacles ?? []) {
       const polygon = obstacle.polygon;
       ctx.save();
@@ -271,43 +271,34 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
       shadow.addColorStop(.9,'#548ca6');
       ctx.fillStyle=shadow;
       ctx.fillRect(Math.min(...xValues),Math.min(...yValues),width,height);
-      stamp(ctx, 'rock',center.x+2,center.y-2,
-        Math.max(width*1.15,90),Math.max(height*.8,65),.9);
+      // Sized to the actual rock polygon. Previous 90×65px minimum made this
+      // 35px-wide obstacle look enormous next to the skimmer.
+      stamp(ctx, 'rock', center.x, center.y,
+        width * .92, height * .88, .87);
       // Fine fractured ice visible on the obstacle, never painted into valid ice.
       ctx.strokeStyle='#f6ffffcc';
-      ctx.lineWidth=2;
+      ctx.lineWidth=1.1;
       ctx.beginPath();
-      ctx.moveTo(center.x-19,center.y-5);
-      ctx.lineTo(center.x-6,center.y+3);
-      ctx.lineTo(center.x+15,center.y-10);
-      ctx.moveTo(center.x+2,center.y+17);
-      ctx.lineTo(center.x+11,center.y+2);
+      ctx.moveTo(center.x-width*.2,center.y-height*.1);
+      ctx.lineTo(center.x-width*.03,center.y+height*.09);
+      ctx.lineTo(center.x+width*.22,center.y-height*.13);
+      ctx.moveTo(center.x+width*.1,center.y+height*.2);
+      ctx.lineTo(center.x+width*.19,center.y+height*.03);
       ctx.stroke();
       ctx.restore();
 
-      // These strokes follow the *exact* obstacle polygon used in physics.
+      // Small, precise rim. Broad 19–32px snowbank outlines belong to the
+      // main track edge and would visually swallow a one-cell obstacle.
       ctx.save();
       ctx.lineJoin='round';
       polygonPath(ctx,polygon,world);
-      ctx.strokeStyle='#123a51';
-      ctx.lineWidth=8;
+      ctx.strokeStyle='#17485b';
+      ctx.lineWidth=3;
       ctx.stroke();
       polygonPath(ctx,polygon,world);
       ctx.strokeStyle='#e4f8fc';
-      ctx.lineWidth=3.5;
+      ctx.lineWidth=1.5;
       ctx.stroke();
-      ctx.fillStyle='#072439e8';
-      ctx.strokeStyle='#d0f7ea';
-      ctx.lineWidth=1;
-      ctx.font='900 10px system-ui';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      const badge={x:center.x,y:center.y+height*.32};
-      ctx.beginPath();
-      ctx.roundRect(badge.x-20,badge.y-8,40,16,4);
-      ctx.fill();ctx.stroke();
-      ctx.fillStyle='#e8fcf8';
-      ctx.fillText('FLOE',badge.x,badge.y+.5);
       ctx.restore();
     }
   }
@@ -390,7 +381,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
       drawOutdoorScenery(background, world, circuit, width, height);
       drawTrackSurface(background, circuit, world, width, height);
       drawIsland(background, circuit, world);
-      drawFloe(background, circuit, world);
+      drawRockObstacles(background, circuit, world);
       drawGateFlags(background, circuit, world);
       sceneDirty = false;
     }
@@ -404,7 +395,7 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     drawOutdoorScenery,
     drawTrackSurface,
     drawIsland,
-    drawFloe,
+    drawRockObstacles,
     drawGateFlags,
     drawSkimmer
   };

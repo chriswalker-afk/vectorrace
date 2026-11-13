@@ -32,19 +32,19 @@ test('both circuits start safely and use the same deterministic velocity rules',
   }
 });
 
-test('the ice floe is genuinely impassable although it sits inside the road',()=>{
+test('the small rock is still impassable although it sits inside the road',()=>{
   const c=AURORA_SPLIT;
-  assert.equal(onTrack(p(17,20),c),true);
-  assert.equal(onTrack(p(23,20),c),true);
-  assert.equal(onTrack(p(19.7,20),c),false);
-  assert.equal(segmentOnTrack(p(17,20),p(23,20),c),false);
-  assert.equal(segmentOnTrack(p(17,22),p(23,22),c),true);
-  assert.equal(segmentOnTrack(p(17,18),p(23,18),c),true);
+  assert.equal(onTrack(p(17,19),c),true);
+  assert.equal(onTrack(p(23,19),c),true);
+  assert.equal(onTrack(p(20.3,19.2),c),false);
+  assert.equal(segmentOnTrack(p(17,19),p(23,19),c),false);
+  assert.equal(segmentOnTrack(p(17,21),p(23,21),c),true);
+  assert.equal(segmentOnTrack(p(17,17),p(23,17),c),true);
 });
 
 test('the polygon is not just decorative: a legal-point jump through it crashes',()=>{
   const c=AURORA_SPLIT;
-  const s={...createRace(c),position:p(17,20),velocity:p(5,0)};
+  const s={...createRace(c),position:p(17,19),velocity:p(5,0)};
   const move=previewMove(s,p(1,0),c);
   assert.equal(onTrack(move.from,c),true);
   assert.equal(onTrack(move.to,c),true);
@@ -56,7 +56,7 @@ test('the polygon is not just decorative: a legal-point jump through it crashes'
   assert.deepEqual(next.position,s.position);
 });
 
-test('touching the physical floe boundary remains legal like other snowbanks',()=>{
+test('touching the physical rock boundary remains legal like other snowbanks',()=>{
   const c=AURORA_SPLIT;
   const tip=c.obstacles[0].polygon[0];
   assert.equal(onTrack(tip,c),true);
