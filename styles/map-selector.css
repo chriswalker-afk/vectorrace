@@ -151,11 +151,14 @@
 @media (max-width: 760px) and (orientation: landscape),
        (max-height: 450px) and (orientation: landscape) {
   .board-label { min-width: 124px; }
-  .map-picker { min-height: 37px; padding: 3px 6px; gap: 1px; }
+  /* Original V4 hides decorative label spans on low landscape screens.
+     The interactive course name, level and picker arrow must stay visible. */
+  .board-label .map-picker span { display: inline; }
+  .map-picker { min-height: 42px; padding: 3px 6px; gap: 1px; }
   .map-picker strong { font-size: 10px; }
   .map-picker-level { font-size: 8px; }
   .map-menu {
-    top: 48px;
+    top: 53px;
     max-height: calc(100% - 55px);
   }
 }
