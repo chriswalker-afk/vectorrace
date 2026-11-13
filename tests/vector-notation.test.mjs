@@ -11,7 +11,7 @@ test('column notation has x above y, never an ordered pair', () => {
 test('assistive label makes the component order explicit', () => {
   assert.equal(vectorDescription({x:3,y:-2},'Velocity'),
     'Velocity column vector: top x-component 3, bottom y-component -2');
-  assert.doesNotMatch(vectorDescription({x:3,y:-2}),/\\(.*,. *\\)/);
+  assert.ok(!vectorDescription({x:3,y:-2}).includes('(3, -2)'));
 });
 
 test('expert mode conceals both entries without exposing values', () => {
