@@ -13,6 +13,8 @@ on:
       - 'styles/map-selector.css'
       - 'tests/aurora-split.test.mjs'
       - 'tests/aurora-route.test.mjs'
+      - 'tests/obstacle-clearance.test.mjs'
+      - 'scripts/track-clearance.mjs'
       - 'tests/race-records.test.mjs'
       - 'scripts/viewport-smoke-v6.mjs'
       - '.github/workflows/two-circuits.yml'
