@@ -23,7 +23,7 @@
     padding: 3px;
   }
   .map-menu-title { margin: 2px 3px 4px; }
-  .map-option { height: 33px; min-height: 33px; padding: 2px 5px; margin-bottom: 2px; }
+  .map-option { height: 36px; min-height: 36px; padding: 2px 5px; margin-bottom: 2px; }
   .map-option-no { width: 24px; height: 24px; flex: 0 0 24px; }
   .map-option-body strong { font-size: 10px; }
   .map-option-body small { font-size: 8px; }
