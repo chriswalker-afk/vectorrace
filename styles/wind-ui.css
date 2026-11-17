@@ -1,0 +1,30 @@
+/*
+ * Fixed-field overlay uses existing HUD regions: NO extra row or extra
+ * hidden predictive information in Expert/Master. Wind is public course
+ * geography; the exact next velocity remains hidden in difficult modes.
+ */
+html[data-surface="wind"] #accelNotationHint{
+  color:#ffe0a4;
+  font-weight:900;
+  letter-spacing:.01em;
+  font-size:clamp(8px,.87vw,11px);
+}
+html[data-surface="wind"] .readout-grid{
+  border-color:#f3d39d;
+  box-shadow:0 0 14px #f9d09b2c;
+}
+html[data-surface="wind"] .acceleration-pad button:not([disabled]){
+  border-color:#dbc6ecb5;
+}
+html[data-surface="wind"] #message{
+  color:#ffeed0;
+  font-weight:900;
+  text-shadow:0 2px 5px #242049;
+}
+html[data-surface="wind"] #nextMoveLabel[data-tone="safe"]{
+  border-color:#a0e5f2;
+}
+html[data-surface="wind"] #accelerationPad{
+  outline:1px solid #f6d99b7d;
+  border-radius:5px;
+}

@@ -55,6 +55,23 @@ export function glassIceZoneAt(point, circuit = NORTHERN_LOOP) {
   ) ?? null;
 }
 
+/**
+ * Predictable wind applies only if the skimmer STARTS the turn in the marked
+ * zone. A point on the painted polygon border counts as inside. Unlike
+ * Glass Ice, the wind NEVER disables a player's 3×3 acceleration choices.
+ */
+export function windZoneAt(point, circuit = NORTHERN_LOOP) {
+  return (circuit.windZones ?? []).find(zone =>
+    onPolygonEdge(point,zone.polygon) ||
+    strictlyInsidePolygon(point,zone.polygon)
+  ) ?? null;
+}
+
+export function windVectorAt(point, circuit = NORTHERN_LOOP) {
+  const zone=windZoneAt(point,circuit);
+  return zone ? {...zone.vector} : {x:0,y:0};
+}
+
 export function accelerationAllowed(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) return false;
   const zone=glassIceZoneAt(state.position,circuit);
@@ -181,8 +198,9 @@ export function createRace(circuit = NORTHERN_LOOP) {
 
 export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) throw new RangeError('Acceleration components must be -1, 0 or 1');
-  const nextVelocity = add(state.velocity, acceleration);
-  const destination = add(state.position, nextVelocity);
+  const wind=windVectorAt(state.position,circuit);
+  const nextVelocity=add(add(state.velocity,acceleration),wind);
+  const destination=add(state.position,nextVelocity);
   const zone=glassIceZoneAt(state.position,circuit);
   const zoneBlocked=!accelerationAllowed(state,acceleration,circuit);
   const roadClear=!zoneBlocked && segmentOnTrack(state.position,destination,circuit);
@@ -195,7 +213,9 @@ export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
     // Rejected glass-ice controls are NOT collisions and incur no penalty.
     zoneBlocked,
     reason: zoneBlocked?'glass-axis-only':roadClear?null:'snowbank',
-    surface: zone?.id ?? null
+    surface: zone?.id ?? null,
+    wind,
+    windZone:windZoneAt(state.position,circuit)?.id ?? null
   };
 }
 

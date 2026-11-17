@@ -1,0 +1,54 @@
+name: Eight-circuit Crosswind Ridge wind-vector and browser quality gates
+
+on:
+  pull_request:
+    paths:
+      - 'race-v13.html'
+      - 'src/circuit.mjs'
+      - 'src/engine.mjs'
+      - 'src/race-coach.mjs'
+      - 'src/race-art-v13.mjs'
+      - 'src/race-v13.mjs'
+      - 'src/ux-smoke-v13.mjs'
+      - 'styles/map-selector-v13.css'
+      - 'styles/wind-ui.css'
+      - 'scripts/crosswind-ridge-qa-route.mjs'
+      - 'scripts/viewport-smoke-v13.mjs'
+      - 'tests/crosswind-ridge.test.mjs'
+      - 'tests/biomes.test.mjs'
+      - 'tests/glass-ice.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - '.github/workflows/eight-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crosswind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate exact wind arithmetic, all eight tracks and safe full lap
+        run: npm test
+      - name: Syntax-check all new source and QA modules
+        run: npm run check
+      - name: Nine viewports, 24-turn Master lap and actual counterwind arithmetic
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-crosswind.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v13.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr16-crosswind-ridge-verified-previews
+          path: screenshots/snowshift-v13-*.png
+          if-no-files-found: warn
