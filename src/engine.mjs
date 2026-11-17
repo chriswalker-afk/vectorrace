@@ -72,6 +72,23 @@ export function windVectorAt(point, circuit = NORTHERN_LOOP) {
   return zone ? {...zone.vector} : {x:0,y:0};
 }
 
+/**
+ * A fixed boost is added only on a move that STARTS on a copper strip.
+ * Each circuit's polygon is the shared physics/visual source of truth.
+ * A strip's +2 horizontal push cannot be canceled by a single -1 input.
+ */
+export function boostZoneAt(point, circuit = NORTHERN_LOOP) {
+  return (circuit.boostZones ?? []).find(zone =>
+    onPolygonEdge(point,zone.polygon) ||
+    strictlyInsidePolygon(point,zone.polygon)
+  ) ?? null;
+}
+
+export function boostVectorAt(point, circuit = NORTHERN_LOOP) {
+  const zone=boostZoneAt(point,circuit);
+  return zone ? {...zone.vector} : {x:0,y:0};
+}
+
 export function accelerationAllowed(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) return false;
   const zone=glassIceZoneAt(state.position,circuit);
@@ -199,7 +216,8 @@ export function createRace(circuit = NORTHERN_LOOP) {
 export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) throw new RangeError('Acceleration components must be -1, 0 or 1');
   const wind=windVectorAt(state.position,circuit);
-  const nextVelocity=add(add(state.velocity,acceleration),wind);
+  const boost=boostVectorAt(state.position,circuit);
+  const nextVelocity=add(add(add(state.velocity,acceleration),wind),boost);
   const destination=add(state.position,nextVelocity);
   const zone=glassIceZoneAt(state.position,circuit);
   const zoneBlocked=!accelerationAllowed(state,acceleration,circuit);
@@ -215,7 +233,9 @@ export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
     reason: zoneBlocked?'glass-axis-only':roadClear?null:'snowbank',
     surface: zone?.id ?? null,
     wind,
-    windZone:windZoneAt(state.position,circuit)?.id ?? null
+    windZone:windZoneAt(state.position,circuit)?.id ?? null,
+    boost,
+    boostZone:boostZoneAt(state.position,circuit)?.id ?? null
   };
 }
 
@@ -255,7 +275,9 @@ export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
     checkpoint: progress.checkpoint,
     laps: progress.laps,
     finished: progress.finished,
-    lastEvent: progress.message || 'Clean glide',
+    lastEvent: progress.message || (move.boostZone
+      ? (move.boost.x > 0 ? 'Boost engaged: +2 east' : 'Boost engaged: -2 west')
+      : 'Clean glide'),
     trail: [...state.trail, { from: move.from, to: move.to, velocity: move.velocity }]
   };
 }

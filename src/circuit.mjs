@@ -578,7 +578,104 @@ export const CROSSWIND_RIDGE = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE, CROSSWIND_RIDGE]);
+/**
+ * Advanced 1 — Icebound Rapids, the first course in Ember Rift.
+ *
+ * Two copper acceleration strips add a known +2 vector ALONG THE TRACK:
+ * east on the northern straight, west on the lower return. Unlike the
+ * Crosswind Ridge field, even maximum counter-acceleration (-1/+1) cannot
+ * completely cancel a +2 boost. Racers must regulate speed before a pad.
+ *
+ * A strip fires only when the skimmer STARTS its turn on its painted polygon,
+ * including its boundary. Crossing a strip without landing is not a trigger.
+ * Both strips remain legal roadway, using their exact physics polygons for art.
+ * A tested 23-turn lap engages both strips and retains >=1.2 world units of
+ * whole-path centreline clearance from the basalt banks.
+ *
+ * Earlier courses have no boostZones and retain unchanged physics and records.
+ */
+export const ICEBOUND_RAPIDS = {
+  id: 'icebound-rapids',
+  name: 'Icebound Rapids',
+  subtitle: 'Arctic Series / Circuit 09',
+  level: 'ADVANCED 1',
+  tagline: 'Twin boost strips · Brake before the surge',
+  menuHint: 'Copper strips force +2 east or -2 west: plan your velocity early',
+  outer: [
+    { x: 3, y: 8 }, { x: 6.5, y: 3.2 },
+    { x: 11.5, y: 4.1 }, { x: 15.3, y: 8.2 },
+    { x: 22.7, y: 8 }, { x: 26.4, y: 9.7 },
+    { x: 29.4, y: 12 }, { x: 31.2, y: 15.4 },
+    { x: 30.7, y: 18.4 }, { x: 28.4, y: 22.8 },
+    { x: 25.6, y: 24.8 }, { x: 21.5, y: 25.1 },
+    { x: 18, y: 24.3 }, { x: 15, y: 25.1 },
+    { x: 10.2, y: 24.6 }, { x: 6.5, y: 22.8 },
+    { x: 3.3, y: 20.5 }, { x: 1.5, y: 16.8 },
+    { x: 1.9, y: 12 }
+  ],
+  inner: [
+    { x: 7.1, y: 12 }, { x: 9.2, y: 10.2 },
+    { x: 12.4, y: 11.8 }, { x: 15.5, y: 14.6 },
+    { x: 24.3, y: 14.9 }, { x: 25.9, y: 15.9 },
+    { x: 26.3, y: 17.2 }, { x: 25.5, y: 18.1 },
+    { x: 23.5, y: 18.3 }, { x: 17, y: 18.1 },
+    { x: 12.2, y: 18.7 }, { x: 9, y: 18.3 },
+    { x: 7.1, y: 17 }
+  ],
+  boostZones: [
+    {
+      id: 'east-rapids',
+      label: 'Eastbound Boost +2',
+      vector: { x: 2, y: 0 },
+      polygon: [
+        { x: 15.5, y: 18.8 }, { x: 19.5, y: 18.8 },
+        { x: 19.5, y: 24.1 }, { x: 15.5, y: 24.1 }
+      ]
+    },
+    {
+      id: 'west-rapids',
+      label: 'Westbound Boost -2',
+      vector: { x: -2, y: 0 },
+      polygon: [
+        { x: 13.5, y: 8.8 }, { x: 17.5, y: 8.8 },
+        { x: 17.5, y: 11.3 }, { x: 13.5, y: 11.3 }
+      ]
+    }
+  ],
+  start: { x: 9, y: 21 },
+  targetLaps: 1,
+  crashPenalty: 3,
+  finish: {
+    id: 'finish', label: 'Start / finish',
+    a: { x: 13, y: 18.7 }, b: { x: 13, y: 24.8 },
+    direction: { x: 1, y: 0 }
+  },
+  checkpoints: [
+    {
+      id: 'east', label: 'East Rapids Gate',
+      a: { x: 26.3, y: 15.7 }, b: { x: 31, y: 15.7 },
+      direction: { x: 0, y: -1 }
+    },
+    {
+      id: 'south', label: 'South Return Gate',
+      a: { x: 19, y: 8.1 }, b: { x: 19, y: 14.6 },
+      direction: { x: -1, y: 0 }
+    },
+    {
+      id: 'west', label: 'West Rift Gate',
+      a: { x: 2, y: 16 }, b: { x: 7.1, y: 16 },
+      direction: { x: 0, y: 1 }
+    }
+  ],
+  featuredBoosts: {
+    stripIds: ['east-rapids', 'west-rapids'],
+    entryRule: 'Start-of-turn position (painted edge included)',
+    magnitude: 2,
+    minVisibleClearance: 1.0
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE, CROSSWIND_RIDGE, ICEBOUND_RAPIDS]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;

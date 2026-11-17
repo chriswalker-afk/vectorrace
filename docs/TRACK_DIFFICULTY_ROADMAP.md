@@ -42,7 +42,7 @@ The table is a roadmap, not a claim that future tracks exist.
 | 06 | Twin Routes | Intermediate 2 | Choose between a tight inner shortcut and a wider outer detour | Base physics — **this PR** |
 | 07 | Glass Ice | Intermediate 3 | Marked ice permits changing at most one velocity component per turn | **New deterministic zone rule — this PR** |
 | 08 | Crosswind Ridge | Intermediate 4 | Counter a known southward wind vector (0,−1) in one marked field | **Deterministic external force — this PR** |
-| 09 | Icebound Rapids | Advanced 1 | Predictable boost strips and braking choices | **New boost rule** — planned |
+| 09 | Icebound Rapids | Advanced 1 | Twin fixed boost strips and advance braking | **New +2 boost rule** — implemented in PR #17 (pending merge) |
 | 10 | Broken Passage | Advanced 2 | Moving obstacles on deterministic turn cycles | **Turn-indexed hazard rule** — planned |
 | 11 | Frozen Gauntlet | Advanced 3 | Combination of previously taught mechanics | Existing extended rules — planned |
 | 12 | Arctic Grand Prix | Expert Track | Longer multistage final challenge | Existing extended rules — planned |
@@ -57,7 +57,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
 | Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes, Glass Ice and Crosswind Ridge playable; Advanced tracks planned |
-| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Visual style ready; no playable Advanced track yet |
+| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | First playable Advanced circuit Icebound Rapids implemented in PR #17 (pending merge) |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
 Every future track must match the region's look, retain the exact physics-to-art shoreline, and preserve readable skimmer, gates and vectors. The region name and difficulty tier must appear in text, not colour alone. The V9 build remains an unmodified visual baseline; `theme-gallery.html` shows all four regions using identical sample geometry. See [Difficulty Region Art Standards](PR13_DIFFICULTY_REGIONS.md).
@@ -94,6 +94,10 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 09 design note — Icebound Rapids
+
+Two copper boost strips add fixed signed horizontal vectors: (+2,0) northbound/eastbound and (-2,0) on the southern westbound return. The effect triggers when the skimmer STARTS a turn in the painted strip or on its boundary, never on mid-turn pass-through. Next velocity = previous velocity + chosen acceleration + boost vector; next position = previous position + next velocity. Because player acceleration magnitude is at most 1 per component, a +/-2 boost cannot be completely cancelled on its active turn. Students must brake *before* the marked strips. The two strips sit entirely on drivable ice and use exactly the same polygons for paint and physics. A 23-move full lap engages both boosts on turns 5 and 15 and has at least 1.2 world units of full-line clearance to either bank. The first eight tracks retain their existing physics and records. The new Advanced course inherits the Ember Rift palette and has its own asymmetric silhouette. See [Track 09 maths, geometry and release checks](PR17_ICEBOUND_RAPIDS.md). Classroom playtesting is still needed.
 
 ## Track 08 design note — Crosswind Ridge
 
