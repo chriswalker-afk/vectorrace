@@ -1,0 +1,16 @@
+/* Ember Rift boost shares the normal one-screen cockpit.
+   Public +2 force is always announced, but Expert/Master keep next v hidden. */
+html[data-surface="boost"] #accelNotationHint{
+  color:#fff1cb;font-weight:900;letter-spacing:.01em;
+  font-size:clamp(8px,.87vw,11px);
+}
+html[data-surface="boost"] .readout-grid{
+  border-color:#ffc56b;box-shadow:0 0 14px #ff883e4f;
+}
+html[data-surface="boost"] .acceleration-pad button:not([disabled]){border-color:#ffd0a1c2}
+html[data-surface="boost"] #message{
+  color:#ffda93;font-weight:900;text-shadow:0 2px 5px #44241f;
+}
+html[data-surface="boost"] #accelerationPad{
+  outline:1px solid #ffcc829a;border-radius:5px;
+}
