@@ -6,7 +6,7 @@
  * must respect that restriction instead of drawing impossible diagonals.
  * Guided mode projects the selected move, then a legal braking sequence.
  */
-import { previewMove, possibleMoves, glassIceZoneAt, windVectorAt } from './engine.mjs';
+import { previewMove, possibleMoves, glassIceZoneAt, windVectorAt, boostVectorAt } from './engine.mjs';
 import { NORTHERN_LOOP } from './circuit.mjs';
 
 export function brakingAcceleration(v) {
@@ -19,12 +19,12 @@ export function brakingAcceleration(v) {
  * Once off-glass, normal diagonal componentwise braking returns.
  */
 /**
- * Choose an acceleration that minimizes NEXT speed after predictable wind
- * is applied. For (0,-1) wind, v_y=0 requires a_y=+1 just to remain at rest;
- * the old "brake only the velocity" formula would give false forecasts.
+ * Choose an acceleration that minimizes NEXT speed after the published wind
+ * or boost vector. A +2 boost is impossible to cancel with a -1 input;
+ * reporting a full stop inside that strip would give a false forecast.
  * Prefer lower acceleration magnitude when two outcomes are equally slow.
  */
-function windAwareBrakingComponent(v,force) {
+function forceAwareBrakingComponent(v,force) {
   return [-1,0,1].reduce((best,a)=>{
     const speed=Math.abs(v+a+force);
     const bestSpeed=Math.abs(v+best+force);
@@ -35,10 +35,12 @@ function windAwareBrakingComponent(v,force) {
 
 export function surfaceBrakingAcceleration(position, velocity, circuit=NORTHERN_LOOP) {
   const wind=windVectorAt(position,circuit);
-  const usual=wind.x||wind.y
+  const boost=boostVectorAt(position,circuit);
+  const force={x:wind.x+boost.x,y:wind.y+boost.y};
+  const usual=force.x||force.y
     ? {
-        x:windAwareBrakingComponent(velocity.x,wind.x),
-        y:windAwareBrakingComponent(velocity.y,wind.y)
+        x:forceAwareBrakingComponent(velocity.x,force.x),
+        y:forceAwareBrakingComponent(velocity.y,force.y)
       }
     : brakingAcceleration(velocity);
   if(!glassIceZoneAt(position,circuit) || !usual.x || !usual.y) return usual;
@@ -58,14 +60,20 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
   if (maxComponent>128) throw new RangeError('Braking forecast velocity exceeds safe bounds');
   // On a patch the worst-case number of required braking turns is the sum
   // of the two speed components. On ordinary ice it remains the maximum.
-  // A wind may hold a component's speed unchanged until the vehicle leaves
-  // the zone. Allow extra steps to exit; never claim a stop that did not occur.
+  // Forces can persist even at zero velocity: a +2 boost cannot be
+  // cancelled by the nine allowed inputs. Continue until genuinely able
+  // to remain stationary, or report the path unsafe. Never fake a stop.
   const limit=Math.abs(velocity.x)+Math.abs(velocity.y)+
-    ((circuit.windZones?.length??0)>0?16:0);
+    ((circuit.windZones?.length??0)>0 || (circuit.boostZones?.length??0)>0?24:0);
+  const canHoldStop=point=>{
+    const wind=windVectorAt(point,circuit),boost=boostVectorAt(point,circuit);
+    return Math.abs(wind.x+boost.x)<=1 && Math.abs(wind.y+boost.y)<=1;
+  };
+  const isStopped=s=>s.velocity.x===0&&s.velocity.y===0&&canHoldStop(s.position);
   const segments=[];
   let current={position:{...position},velocity:{...velocity}};
   for(let n=0;n<limit;n++){
-    if(current.velocity.x===0&&current.velocity.y===0) break;
+    if(isStopped(current)) break;
     const move=previewMove(current,
       surfaceBrakingAcceleration(current.position,current.velocity,circuit),circuit);
     segments.push(move);
@@ -78,10 +86,10 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
     current={position:move.to,velocity:move.velocity};
   }
   return {
-    safe:current.velocity.x===0 && current.velocity.y===0,
+    safe:isStopped(current),
     segments,steps:segments.length,
-    failedAt:current.velocity.x===0&&current.velocity.y===0?null:segments.length,
-    stop:current.velocity.x===0&&current.velocity.y===0?{...current.position}:null
+    failedAt:isStopped(current)?null:segments.length,
+    stop:isStopped(current)?{...current.position}:null
   };
 }
 

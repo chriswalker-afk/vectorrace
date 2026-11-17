@@ -21,7 +21,7 @@ import {
 const p=(x,y)=>({x,y});
 
 test('Track 08 is Intermediate 4 with one explicit constant southward wind field',()=>{
-  assert.deepEqual(CIRCUITS.map(c=>c.id),[
+  assert.deepEqual(CIRCUITS.slice(0,8).map(c=>c.id),[
     'northern-loop','aurora-split','frost-chicane',
     'narrow-passage','hairpin-hollow','twin-routes',
     'glass-ice','crosswind-ridge'
