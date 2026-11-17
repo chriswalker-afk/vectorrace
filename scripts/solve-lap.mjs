@@ -2,12 +2,16 @@
  * Test-only shortest legal lap reconstruction.
  * Engine is the single source of truth. This solver is NOT imported by game UI.
  */
-import { ACCELERATIONS, createRace, previewMove, gateProgress } from '../src/engine.mjs';
+import { ACCELERATIONS, createRace, previewMove, gateProgress, movingObstaclePeriod } from '../src/engine.mjs';
 import { NORTHERN_LOOP } from '../src/circuit.mjs';
 
 export function findLegalLap(circuit = NORTHERN_LOOP) {
   const start = createRace(circuit);
-  const key = s => [s.position.x,s.position.y,s.velocity.x,s.velocity.y,s.checkpoint].join(',');
+  const period=movingObstaclePeriod(circuit);
+  // Waiting can be strategically crucial: revisit the SAME cell at a
+  // DIFFERENT hazard phase. Old static circuits still use a single phase.
+  const key = s => [s.position.x,s.position.y,s.velocity.x,s.velocity.y,
+    s.checkpoint,(s.moves??0)%period].join(',');
   const nodes = [{ state: start, parent: -1, acceleration: null, depth: 0 }];
   const visited = new Set([key(start)]);
   const maxStates = 220000;
@@ -23,7 +27,8 @@ export function findLegalLap(circuit = NORTHERN_LOOP) {
         position: move.to,
         velocity: move.velocity,
         checkpoint: progress.checkpoint,
-        laps: progress.laps
+        laps: progress.laps,
+        moves: node.state.moves+1
       };
       // Completion must be checked BEFORE visited-key deduplication: after the
       // finish the checkpoint counter wraps to zero and can match an older state.

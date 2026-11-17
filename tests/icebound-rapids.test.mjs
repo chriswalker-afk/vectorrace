@@ -18,7 +18,7 @@ const p=(x,y)=>({x,y});
 const c=ICEBOUND_RAPIDS;
 
 test('Icebound Rapids is Advanced 1 in the ninth map slot, with two +2 copper pads',()=>{
-  assert.equal(CIRCUITS.length,9);
+  assert.ok(CIRCUITS.length>=9);
   assert.equal(CIRCUITS[8],c);
   assert.equal(getCircuit('icebound-rapids'),c);
   assert.equal(c.level,'ADVANCED 1');

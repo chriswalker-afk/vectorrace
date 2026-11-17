@@ -49,7 +49,7 @@ export function surfaceBrakingAcceleration(position, velocity, circuit=NORTHERN_
     : {x:0,y:usual.y};
 }
 
-export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
+export function brakeRun(position, velocity, circuit = NORTHERN_LOOP, startTurn = 0) {
   if (![position.x, position.y, velocity.x, velocity.y].every(Number.isFinite)) {
     throw new TypeError('Position and velocity must have finite components');
   }
@@ -74,7 +74,7 @@ export function brakeRun(position, velocity, circuit = NORTHERN_LOOP) {
   let current={position:{...position},velocity:{...velocity}};
   for(let n=0;n<limit;n++){
     if(isStopped(current)) break;
-    const move=previewMove(current,
+    const move=previewMove({...current,moves:startTurn+n},
       surfaceBrakingAcceleration(current.position,current.velocity,circuit),circuit);
     segments.push(move);
     if(!move.valid){
@@ -106,9 +106,10 @@ export function brakingForecast(state, acceleration, circuit = NORTHERN_LOOP) {
       risk: selected.zoneBlocked?'glass':'crash'
     };
   }
-  const projected = { position: selected.to, velocity: selected.velocity };
+  const nextTurn=(state.moves??0)+1;
+  const projected = { position: selected.to, velocity: selected.velocity,moves:nextTurn };
   const legalNext = possibleMoves(projected, circuit).filter(move => move.valid).length;
-  const braking = brakeRun(selected.to, selected.velocity, circuit);
+  const braking = brakeRun(selected.to, selected.velocity, circuit,nextTurn);
   return {
     selected, legalNext, braking,
     risk: legalNext === 0 ? 'trapped' : braking.safe ? 'clear' : 'braking-line'
