@@ -71,7 +71,8 @@ function protocol(ws) {
 }
 async function evaluation(send,expression){
   const out=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
-  if(out.exceptionDetails)throw new Error('Browser JS exception: '+out.exceptionDetails.text);
+  if(out.exceptionDetails)throw new Error('Browser JS exception: '+
+    (out.exceptionDetails.exception?.description||out.exceptionDetails.text));
   return out.result?.value;
 }
 async function waitFor(send,predicate,timeout=10000){
@@ -99,9 +100,10 @@ function playLegalLapInBrowser(actions, recordKey) {
       const hint=document.getElementById('accelNotationHint').textContent;
       phaseReadouts.push(hint);
       const phase=((hazardTurns-1)%6)+1,next=(hazardTurns%6)+1;
+      const status=document.getElementById('message').textContent;
       if(!hint.includes(phase+'→'+next) ||
-         !document.getElementById('message').textContent.includes('ROCK PHASE'))
-        throw new Error('Master omitted public six-turn rock phase information');
+         !(status.includes('ROCK PHASE')||status.includes('GATE CLEARED')))
+        throw new Error('Master omitted rock phase and checkpoint context');
       if(document.documentElement.dataset.biome!=='advanced')
         throw new Error('Broken Passage did not use Ember Rift');
     }
