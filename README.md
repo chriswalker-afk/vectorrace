@@ -35,10 +35,9 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v14.html` — nine circuits, with Icebound Rapids (Advanced 1): two copper boost strips push +2 east and -2 west in Ember Rift.
 - `race-v15.html` — **ten playable tracks**, now including Broken Passage (Advanced 2): two moving basalt slabs with a published six-turn clock, synchronized swept collision checks and safety recovery.
 - `race-v16.html` — **eleven playable tracks**, now including Frozen Gauntlet (Advanced 3): one shared Glass+Wind polygon, a westward boost through a timed moving-rock crossing and a second Glass Ice strip.
-- `race-v17.html` — **the full twelve-track Arctic Series**, ending with **Arctic Grand Prix (Expert 1 / Eclipse Summit)**: a distinct black-glass and gilded mountain circuit, two continuous laps, three timed sentinels, coupled Glass+Wind, boosted basalt and return Glass Ice.
+- `race.html` — **the current twelve-track Arctic Series**, ending with **Arctic Grand Prix (Expert 1 / Eclipse Summit)**: a distinct black-glass and gilded mountain circuit, two continuous laps, three timed sentinels, coupled Glass+Wind, boosted basalt and return Glass Ice.
 - `theme-gallery.html` — all four region palettes shown using the same reference course (Expert remains a visual concept; Advanced is now playable).
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
-- `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
 - `docs/PR3_ARTWORK.md` — visual QA and artwork provenance.
 - `docs/PR4_UX.md` — strict one-screen design goals, interaction rules and automated viewport checks.
 - `docs/PR5_GAMEPLAY.md` — exact braking lookahead, local records, racing feedback and QA.
@@ -66,6 +65,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v17.html` to choose from all twelve tracks. Add `?track=arctic-grand-prix` for the final two-lap Eclipse Cup. The V16 eleven-track build remains available for comparison.
+Open `http://localhost:8000/race.html` to choose from all twelve tracks. Add `?track=arctic-grand-prix` for the final two-lap Eclipse Cup. The V16 eleven-track build remains available for comparison.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
