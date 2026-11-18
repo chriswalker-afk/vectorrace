@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="./styles/map-selector-v17.css">
 <link rel="stylesheet" href="./styles/grand-prix-ui.css">
 <link rel="stylesheet" href="./styles/pass-play.css">
+<link rel="stylesheet" href="./styles/force-notation.css">
 <script type="module" src="./src/race-v18.mjs"></script>
 <script type="module" src="./src/ux-smoke-v18.mjs"></script>
 </head>
@@ -35,7 +36,7 @@
   <header class="topbar">
     <div class="brand" aria-label="Snowshift vector racing">
       <strong>SNOW<span>SHIFT</span></strong>
-      <small>VECTOR RACING <span class="build-tag">19</span></small>
+      <small>VECTOR RACING <span class="build-tag">20</span></small>
     </div>
     <div class="top-controls">
       <a id="homeLink" class="top-button home-link" href="./index.html" title="Return to game-mode home" aria-label="Home">⌂ <span>HOME</span></a>
@@ -59,6 +60,8 @@
         <div><small>CRASH</small><strong id="crashes">00</strong></div>
         <div><small>SCORE</small><strong id="score">00</strong></div>
       </div>
+      <div id="appliedForces" class="applied-forces" role="group"
+        aria-label="External vectors added to velocity on this turn" hidden></div>
       <div id="eventToast" class="event-toast" aria-live="polite" hidden></div>
       <div class="board-bottom">
         <span id="message" role="status" aria-live="polite">READY TO RACE</span>

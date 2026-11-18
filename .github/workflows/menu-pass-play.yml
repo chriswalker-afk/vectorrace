@@ -11,13 +11,19 @@ on:
       - 'src/pass-play.mjs'
       - 'src/car-customization.mjs'
       - 'src/race-v18.mjs'
+      - 'src/force-notation.mjs'
+      - 'src/race-art-v17.mjs'
+      - 'src/engine.mjs'
+      - 'src/circuit.mjs'
       - 'src/ux-smoke-v18.mjs'
       - 'styles/track-select.css'
       - 'styles/car-garage.css'
       - 'styles/pass-play.css'
+      - 'styles/force-notation.css'
       - 'tests/pass-play.test.mjs'
       - 'tests/car-customization.test.mjs'
       - 'tests/navigation.test.mjs'
+      - 'tests/force-notation.test.mjs'
       - 'scripts/menu-pass-play-smoke.mjs'
       - 'package.json'
       - '.github/workflows/menu-pass-play.yml'
@@ -41,7 +47,7 @@ jobs:
         run: npm test
       - name: Syntax-check current game and archived versions
         run: npm run check
-      - name: Browser test custom cars, mode -> map -> race and 3-player handoffs
+      - name: Browser test live force vectors, custom cars, menus and Pass & Play
         run: |
           set -e
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/snowshift-v18-http.log 2>&1 &

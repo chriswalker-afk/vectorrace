@@ -81,3 +81,7 @@ PR #3 introduces original reusable SVG vehicles, scenery and surface materials. 
 The **Choose a Circuit** screen includes a built-in **Garage**. A single player can choose one of four visible car silhouettes (**Skimmer, Arrow, Rally or Glider**), a body colour and a separate trim colour using preset swatches or the colour picker. The solo car is saved locally on the device. In Pass & Play, each of the 2–4 players customises their own car by selecting their racer tab in the same garage.
 
 Custom cars use the same Canvas renderer in garage previews, on the course and at the player handoff. The appearances travel with the race link (cars=...) and stay intact through race reset, turn changes and **Track / Garage** navigation. Changes are purely visual and do not modify the track, engine, hitbox, scores, lap records or solo physics. Invalid appearance data safely falls back to default skins. No account or additional image asset is required.
+
+## Build 20: vector-notation consistency
+
+Wind and boost zones now display proper two-component **column vectors** on the tracks, on the circuit chooser and when active in the race HUD. Eastbound boost is (2, 0), westbound boost is (−2, 0) and southward wind is (0, −1), always x above y in graphical column notation. Help messages, toasts and accessibility labels use the same real zone vector values. The game retains the exact same physics and scores. See docs/VECTOR_NOTATION_AUDIT.md for the audit and tests.

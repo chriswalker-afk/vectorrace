@@ -1,5 +1,6 @@
 import { CIRCUITS, getCircuit } from './circuit.mjs';
 import { renderColumnVector, vectorDescription } from './vector-notation.mjs';
+import { inlineVector, inlineForce, forceDirection, describeAppliedForce } from './force-notation.mjs';
 import { ACCELERATION_GRID, drawAccelerationPad } from './acceleration-pad.mjs';
 import { createSnowshiftArtwork } from './race-art-v17.mjs';
 import { drawCar, paintCarPreview, decodeCars, loadSoloCar, styleName } from './car-customization.mjs';
@@ -633,15 +634,15 @@ function renderTutorial() {
             : tutorialStep === 3 && circuit.id === 'glass-ice'
               ? 'The turquoise GLASS ICE patch allows only one nonzero acceleration component per turn. No diagonal changes of velocity until you leave. Brake early before the hairpin.'
               : tutorialStep === 3 && circuit.id === 'crosswind-ridge'
-                ? 'The purple WIND zone adds (0, −1) to velocity on each turn STARTING in the patch: next v = v + a + w. Select a_y = +1 to cancel the southward drift. All nine vectors still work.'
+                ? 'The purple WIND zone adds the wind vector '+inlineVector(circuit.windZones[0].vector)+' to velocity on every turn STARTING in the patch: v next = v + a + w. Choose the acceleration vector (0, 1) to cancel the southward drift. All nine acceleration vectors remain available.'
                 : tutorialStep === 3 && circuit.id === 'icebound-rapids'
-                  ? 'Welcome to Ember Rift. Copper BOOST strips add +2 east or −2 west on a move STARTING inside the patch: next v = v + a + boost. Since your acceleration is limited to −1, 0 or +1 per axis, you cannot cancel a +2 boost in one turn. Brake BEFORE the strip and plan the next bend.'
+                  ? 'Copper BOOST strips add the vectors '+inlineVector(circuit.boostZones[0].vector)+' east or '+inlineVector(circuit.boostZones[1].vector)+' west when your turn STARTS on a strip: v next = v + a + b. Since your acceleration is limited to −1, 0 or +1 in each component, a boost of magnitude 2 cannot be cancelled in one turn. Brake BEFORE the strip.'
                   : tutorialStep === 3 && circuit.id === 'broken-passage'
                     ? 'Two basalt rocks follow a six-turn cycle. Every GLIDE moves both one step, even on a crash. Solid rocks mark NOW; dashed rings mark NEXT. The rocks and skimmer move together, so crossing paths can crash even if the landing point looks clear. Watch the phase number and brake before crossing.'
                     : tutorialStep === 3 && circuit.id === 'frozen-gauntlet'
-                      ? 'UPPER: GLASS and WIND work together. Use just one acceleration axis, then add the known wind (0,−1). LOWER: a BOOST (−2,0) adds speed while the two rocks follow their six-step clock. Filled rock = NOW; dashed ring = NEXT. Brake before the boost, and time the crossing.'
+                      ? 'UPPER: GLASS restricts acceleration to one axis while the wind vector '+inlineVector(circuit.windZones[0].vector)+' is added to velocity. LOWER: the boost vector '+inlineVector(circuit.boostZones[0].vector)+' changes velocity while two rocks follow their six-step cycle. Filled rock = NOW; dashed ring = NEXT. Brake and time the crossing.'
                     : tutorialStep === 3 && circuit.id === 'arctic-grand-prix'
-                      ? 'THE ECLIPSE CUP: Race TWO laps without a restart. THREE moving sentinels advance each GLIDE (filled = now; dashed = next). Glass + Wind restricts acceleration to one axis and adds (0,−1); a westward BOOST adds (−2,0). Your speed and rock phase carry into lap two. Clear all gates on BOTH laps.'
+                      ? 'THE ECLIPSE CUP: TWO laps, THREE moving sentinels each GLIDE (filled = now; dashed = next). Glass Ice restricts acceleration to one axis, while the wind vector '+inlineVector(circuit.windZones[0].vector)+' and westbound boost vector '+inlineVector(circuit.boostZones[0].vector)+' add to velocity in their zones. Velocity and rock phase carry into lap two.'
                     : step.text;
   $('tourNext').textContent = step.next + ' ↗';
   document.querySelector('.acceleration-pad').classList.toggle('tour-focus', tutorialStep === 1);
@@ -687,6 +688,26 @@ function setAcceleration(x, y) {
   scheduleDraw();
 }
 
+function renderAppliedForces(windZone,boostZone){
+  const container=$('appliedForces');
+  container.replaceChildren();
+  for(const [kind,zone] of [['WIND',windZone],['BOOST',boostZone]]){
+    if(!zone)continue;
+    const wrapper=document.createElement('div');
+    wrapper.className='applied-force';
+    wrapper.dataset.kind=kind;
+    const title=document.createElement('span');
+    title.className='force-name';
+    title.textContent=kind+' '+forceDirection(zone.vector);
+    const vector=document.createElement('strong');
+    renderColumnVector(vector,zone.vector,{name:kind+' added to velocity'});
+    wrapper.title=describeAppliedForce(kind,zone.vector);
+    wrapper.append(title,vector);
+    container.appendChild(wrapper);
+  }
+  container.hidden=container.childElementCount===0;
+}
+
 function renderHUD() {
   // Screen-reader and automated QA identity follows the currently active racer.
   document.documentElement.dataset.carStyle=currentCar().style;
@@ -695,6 +716,7 @@ function renderHUD() {
   const glassZone=glassIceZoneAt(state.position,circuit);
   const windZone=windZoneAt(state.position,circuit);
   const boostZone=boostZoneAt(state.position,circuit);
+  renderAppliedForces(windZone,boostZone);
   const obstaclePeriod=movingObstaclePeriod(circuit);
   const hazardPhase=state.moves%obstaclePeriod;
   const nextHazardPhase=(hazardPhase+1)%obstaclePeriod;
@@ -716,26 +738,26 @@ function renderHUD() {
   const defaultNotation=modePolicy(mode).accelerationNotation==='columns'
     ? 'TOP x · BOTTOM y' : '−1, 0 or +1 each axis';
   $('accelNotationHint').textContent=isGauntlet
-    ? coupled?'GLASS + WIND ↓ · R'+(hazardPhase+1)+'→'+(nextHazardPhase+1)
-      : boostZone?'BOOST ← −2 · R'+(hazardPhase+1)+'→'+(nextHazardPhase+1)
+    ? coupled?'GLASS + '+inlineForce('WIND',windZone.vector)+' · R'+(hazardPhase+1)+'→'+(nextHazardPhase+1)
+      : boostZone?inlineForce('BOOST',boostZone.vector)+' · R'+(hazardPhase+1)+'→'+(nextHazardPhase+1)
       : glassZone?'GLASS 1 AXIS · R'+(hazardPhase+1)+'→'+(nextHazardPhase+1)
       : phaseLabel
     : hasHazards ? phaseLabel
-    : boostZone ? (boostZone.vector.x>0?'BOOST → (+2,0)':'BOOST ← (−2,0)')
-    : windZone ? 'WIND ↓ (0,−1)'
+    : boostZone ? inlineForce('BOOST',boostZone.vector)
+    : windZone ? inlineForce('WIND',windZone.vector)
     : glassZone ? 'GLASS ICE · 1 AXIS' : defaultNotation;
   $('accelerationPad').setAttribute('aria-label',isGauntlet
     ? (coupled
-      ? 'Coupled Glass Ice and southward wind: choose only one acceleration axis; (0,-1) wind still adds to the next velocity. Basalt phase '+(hazardPhase+1)+' to '+(nextHazardPhase+1)
+      ? 'Coupled Glass Ice: choose only one acceleration axis; '+describeAppliedForce('Wind',windZone.vector)+'. Basalt phase '+(hazardPhase+1)+' to '+(nextHazardPhase+1)
       : boostZone
-        ? 'Westward (-2,0) boost adds velocity while the moving basalt slabs advance from phase '+(hazardPhase+1)+' to '+(nextHazardPhase+1)
+        ? describeAppliedForce('Boost',boostZone.vector)+'. Moving basalt slabs advance from phase '+(hazardPhase+1)+' to '+(nextHazardPhase+1)
         : glassZone
           ? 'Return Glass Ice: only one acceleration axis allowed; moving basalt phases '+(hazardPhase+1)+' to '+(nextHazardPhase+1)
           : 'Moving basalt phases '+(hazardPhase+1)+' to '+(nextHazardPhase+1)+' of '+obstaclePeriod+'; choose a vector')
     : hasHazards
       ? 'Two basalt rocks move together from step '+(hazardPhase+1)+' to '+(nextHazardPhase+1)+' of '+obstaclePeriod+' when you glide; all nine accelerations available'
-    : boostZone ? 'Boost adds '+(boostZone.vector.x>0?'+2 east':'-2 west')+' to velocity this turn; all nine acceleration choices remain'
-    : windZone ? 'Crosswind adds (0,-1) to velocity this turn; all nine accelerations remain available'
+    : boostZone ? describeAppliedForce('Boost',boostZone.vector)+'; all nine acceleration vectors remain available'
+    : windZone ? describeAppliedForce('Wind',windZone.vector)+'; all nine acceleration vectors remain available'
     : glassZone ? 'Glass ice: only five single-axis acceleration vectors available'
     : 'Choose a change in velocity');
   const policy = modePolicy(mode);
@@ -755,13 +777,13 @@ function renderHUD() {
     $('nextMoveLabel').textContent='MOVING ROCK · CHANGE LINE OR PHASE';
     $('nextMoveLabel').dataset.tone='danger';
   }else if(isGauntlet && coupled && !state.finished){
-    $('nextMoveLabel').textContent='GLASS + WIND · ONE AXIS · (0,−1) ADDED';
+    $('nextMoveLabel').textContent='GLASS + WIND · ONE AXIS · '+inlineVector(windZone.vector)+' ADDED';
     $('nextMoveLabel').dataset.tone='glass';
   }else if(glassZone && !state.finished){
     $('nextMoveLabel').textContent='GLASS ICE · ONE AXIS PER TURN';
     $('nextMoveLabel').dataset.tone='glass';
   }else if(isGauntlet && boostZone && !state.finished){
-    $('nextMoveLabel').textContent='BOOST −2 WEST · WATCH THE MOVING SLAB';
+    $('nextMoveLabel').textContent=inlineForce('BOOST',boostZone.vector)+' · WATCH THE MOVING SLAB';
     $('nextMoveLabel').dataset.tone='danger';
   }else if (mode === 'guided' && !state.finished) {
     const forecast = brakingForecast(state, selection, circuit);
@@ -781,8 +803,8 @@ function renderHUD() {
         ? 'LAP ONE COMPLETE · FINAL LAP · PHASE '+(hazardPhase+1)+' / 6'
       : isGrandPrix&&state.moves===0
         ? 'ARCTIC GRAND PRIX · TWO LAPS · THREE TIMED SENTINELS'
-      : coupled?'GLASS 1 AXIS + WIND ↓ (0,−1) · '+phaseLabel
-      : boostZone?'BOOST ← (−2,0) + MOVING ROCK · '+phaseLabel
+      : coupled?'GLASS 1 AXIS + '+inlineForce('WIND',windZone.vector)+' · '+phaseLabel
+      : boostZone?inlineForce('BOOST',boostZone.vector)+' + MOVING ROCK · '+phaseLabel
       : glassZone?'GLASS 1 AXIS · '+phaseLabel
       : state.moves===0?'FROZEN GAUNTLET · COMBINE WIND, GLASS, BOOST AND TIMING'
       : isGrandPrix?'ECLIPSE CUP · '+phaseLabel
@@ -792,13 +814,13 @@ function renderHUD() {
       ? state.lastEvent.toUpperCase()
       : 'ROCK PHASE '+(hazardPhase+1)+'→'+(nextHazardPhase+1)+' / '+obstaclePeriod+' · GLIDE ADVANCES BOTH')
     : boostZone && !state.finished
-    ? (boostZone.vector.x>0?'BOOST → (+2,0) · BRAKE BEFORE THE BEND':'BOOST ← (−2,0) · BRAKE BEFORE THE SWEEP')
+    ? inlineForce('BOOST',boostZone.vector)+(boostZone.vector.x>0?' · BRAKE BEFORE THE BEND':' · BRAKE BEFORE THE SWEEP')
     : circuit.id==='icebound-rapids' && state.moves===0
       ? 'TWIN BOOST STRIPS AHEAD · PLAN YOUR BRAKING'
       : windZone && !state.finished
-        ? 'WIND ↓ (0,−1) · COUNTER ↑ (+1 y)'
+        ? inlineForce('WIND',windZone.vector)+' · COUNTER '+inlineForce('a',{x:0,y:1})
     : circuit.id==='crosswind-ridge' && state.moves===0
-      ? 'CROSSWIND AHEAD ↓ (0,−1)'
+      ? 'CROSSWIND AHEAD '+inlineForce('WIND',circuit.windZones[0].vector)
       : glassZone && !state.finished
         ? 'GLASS ICE · NO DIAGONALS'
         : circuit.id==='glass-ice' && state.moves===0
@@ -878,7 +900,7 @@ function commit() {
       if (!useReducedMotion.matches) spawnBurst(state.position, 'gate', now);
       showToast(state.lastEvent.toUpperCase() + ' ✓', 'gate', 900);
     } else if (boostAtStart) {
-      showToast(boostAtStart.vector.x>0?'BOOST +2 EAST!':'BOOST -2 WEST!', 'gate', 900);
+      showToast(inlineForce('BOOST',boostAtStart.vector)+' ADDED TO VELOCITY!', 'gate', 900);
     }
   }
   // Every attempt, including a crash, advances the six-step oscillator.

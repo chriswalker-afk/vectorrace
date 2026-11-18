@@ -6,6 +6,11 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { ICEBOUND_RAPIDS_CLEAR_LAP } from './icebound-rapids-qa-route.mjs';
+import { CROSSWIND_RIDGE_CLEAR_LAP } from './crosswind-ridge-qa-route.mjs';
+import { FROZEN_GAUNTLET_CLEAR_LAP } from './frozen-gauntlet-qa-route.mjs';
+import { ARCTIC_GRAND_PRIX_CLEAR_RACE } from './arctic-grand-prix-qa-route.mjs';
+
 
 const origin='http://127.0.0.1:8765';
 const sizes=[[1440,900],[390,844],[320,568],[667,375]];
@@ -172,6 +177,65 @@ async function verify(send,size){
     'Change Track did not preserve each multiplayer car');
   console.log('PASS '+size+' car garage, solo persistence, 3 individual car skins, handoff, reset and track change');
 }
+
+async function verifyForceVectorLabels(send){
+  // Drive known legal QA routes via actual UI buttons, then read the NEW
+  // column vectors from the active-zone overlay (not from physics internals).
+  const courses=[
+    {id:'crosswind-ridge',name:'CROSSWIND RIDGE',
+      actions:CROSSWIND_RIDGE_CLEAR_LAP,
+      expected:[['WIND','0','-1','↓']]},
+    {id:'icebound-rapids',name:'ICEBOUND RAPIDS',
+      actions:ICEBOUND_RAPIDS_CLEAR_LAP,
+      expected:[['BOOST','2','0','→'],['BOOST','-2','0','←']]},
+    {id:'frozen-gauntlet',name:'FROZEN GAUNTLET',
+      actions:FROZEN_GAUNTLET_CLEAR_LAP,
+      expected:[['WIND','0','-1','↓'],['BOOST','-2','0','←']]},
+    {id:'arctic-grand-prix',name:'ARCTIC GRAND PRIX',
+      actions:ARCTIC_GRAND_PRIX_CLEAR_RACE,
+      expected:[['WIND','0','-1','↓'],['BOOST','-2','0','←']]}
+  ];
+  const snapshot='(()=>{const panel=document.getElementById("appliedForces");'+
+    'if(!panel||panel.hidden)return [];'+
+    'return [...panel.querySelectorAll(".applied-force")].map(node=>({'+
+    'kind:node.dataset.kind,label:node.querySelector(".force-name")?.textContent,'+
+    'values:[...node.querySelectorAll("[data-component]")].map(e=>e.textContent),'+
+    'aria:node.querySelector("[role=img]")?.getAttribute("aria-label")}));})()';
+  for(const course of courses){
+    await navigate(send,'/race.html?track='+course.id+'&mode=single',
+      'document.getElementById("mapName")?.textContent==='+JSON.stringify(course.name));
+    const found=new Set();
+    for(let turn=0;turn<=course.actions.length;turn++){
+      const rows=await evaluate(send,snapshot);
+      for(const row of rows){
+        for(const [kind,x,y,arrow] of course.expected){
+          if(row.kind===kind && row.values.join(',')===x+','+y &&
+              row.label.includes(arrow) && row.aria.includes('top x-component ' + x) &&
+              row.aria.includes('bottom y-component ' + y)){
+            found.add(kind+':'+x+','+y);
+            if(course.id==='icebound-rapids'&&x==='2'){
+              await shot(send,'v20-boost-east-'+course.id);
+            }
+          }
+        }
+      }
+      if(found.size===course.expected.length)break;
+      if(turn>=course.actions.length)break;
+      const a=course.actions[turn];
+      const selector='#accelerationPad [data-x="'+a.x+'"][data-y="'+a.y+'"]';
+      const click='(()=>{const button=document.querySelector('+JSON.stringify(selector)+');'+
+        'if(!button||button.disabled)return false;button.click();'+
+        'const commit=document.getElementById("commit");'+
+        'if(commit.disabled)return false;commit.click();return true})()';
+      check(await evaluate(send,click),'QA route command disabled on '+course.id+' turn '+(turn+1));
+    }
+    for(const [kind,x,y] of course.expected)
+      check(found.has(kind+':'+x+','+y),
+        course.id+' missing true '+kind+' column vector ('+x+','+y+')');
+    console.log('PASS '+course.id+' actual force column vectors '+[...found].join(', '));
+  }
+}
+
 async function main(){
   if(typeof WebSocket!=='function')throw new Error('Node 22 WebSocket required');
   let port=null;
@@ -198,6 +262,7 @@ async function main(){
         features:[{name:'prefers-reduced-motion',value:'reduce'}]
       });
       await verify(send,width+'x'+height);
+      if(width===1440)await verifyForceVectorLabels(send);
     }finally{
       socket.close();
       await fetch('http://127.0.0.1:'+port+'/json/close/'+target.id).catch(()=>{});

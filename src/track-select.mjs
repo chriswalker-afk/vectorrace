@@ -1,4 +1,6 @@
 import { CIRCUITS } from './circuit.mjs';
+import { renderColumnVector } from './vector-notation.mjs';
+import { forceDirection } from './force-notation.mjs';
 import { biomeForCircuit, tierFromLevel } from './biomes.mjs';
 import { parseGameSettings, raceUrl } from './pass-play.mjs';
 import { CAR_STYLES, BODY_COLORS, TRIM_COLORS, normalizeCar,
@@ -59,10 +61,30 @@ for (const tier of tiers) {
     name.textContent=circuit.name.toUpperCase();
     const hint=document.createElement('p');
     hint.textContent=circuit.tagline||circuit.menuHint||'Vector racing challenge';
+    const effects=document.createElement('div');
+    effects.className='card-effects';
+    const seen=new Set();
+    for(const [kind,zones] of [['WIND',circuit.windZones??[]],['BOOST',circuit.boostZones??[]]]){
+      for(const zone of zones){
+        const key=kind+':'+zone.vector.x+','+zone.vector.y;
+        if(seen.has(key))continue;
+        seen.add(key);
+        const badge=document.createElement('span');
+        badge.className='card-force';
+        const title=document.createElement('span');
+        title.textContent=kind+' '+forceDirection(zone.vector);
+        const vector=document.createElement('strong');
+        renderColumnVector(vector,zone.vector,{name:kind+' added to velocity'});
+        badge.append(title,vector);
+        effects.appendChild(badge);
+      }
+    }
     const start=document.createElement('span');
     start.className='start';
     start.textContent='RACE THIS TRACK ↗';
-    card.append(number,level,name,hint,start);
+    card.append(number,level,name,hint);
+    if(seen.size)card.appendChild(effects);
+    card.appendChild(start);
     cards.appendChild(card);
     anchors.push({card,circuit});
   });

@@ -1,0 +1,44 @@
+/* Mathematical force labels without changing the size of the race HUD.
+   Both force values use the existing vertical x/y vector renderer. */
+.applied-forces {
+  position:absolute;
+  z-index:3;
+  top:clamp(58px,6.5vw,78px);
+  right:clamp(6px,1vw,16px);
+  max-width:56%;
+  pointer-events:none;
+}
+.applied-forces:not([hidden]){display:flex;align-items:flex-start;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+.applied-force{
+  display:flex;align-items:center;gap:6px;
+  padding:2px 5px 2px 7px;
+  border:1px solid #f9df9aa6;border-radius:5px;
+  background:#0a2434ed;color:#fff2c8;
+  box-shadow:0 3px 10px #04162577;
+}
+.applied-force[data-kind="WIND"]{border-color:#c3b2f0;color:#f0e7ff}
+.applied-force .force-name{white-space:nowrap;font-size:10px;font-weight:900;letter-spacing:.02em}
+.applied-force .column-vector{height:29px;min-width:23px;padding:1px 7px;font-size:12px}
+.applied-force .column-vector::before,
+.applied-force .column-vector::after{width:5px;border-width:1.4px}
+@media (max-width:600px){
+  .applied-forces{top:47px;right:5px;max-width:56%}
+  .applied-force{padding:1px 4px;gap:3px}
+  .applied-force .force-name{font-size:8px}
+  .applied-force .column-vector{height:25px;min-width:20px;padding:1px 6px;font-size:10px}
+}
+@media (max-height:450px) and (orientation:landscape){
+  .applied-forces{top:43px;right:5px}
+  .applied-force{padding:0 4px;gap:3px}
+  .applied-force .column-vector{height:22px;min-width:20px;font-size:9px;padding:1px 6px}
+  .applied-force .force-name{font-size:8px}
+}
+/* Map selection: real column-vector force badges derived from zone data. */
+.card-effects{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.card-force{display:inline-flex;align-items:center;gap:4px;
+  color:#fff2ce;background:#0519259c;border:1px solid #c7e3eb82;
+  border-radius:4px;padding:2px 5px;font-size:10px;font-weight:800}
+.card-force .column-vector{height:26px;min-width:22px;padding:1px 6px;font-size:11px}
+.card-force .column-vector::before,
+.card-force .column-vector::after{width:5px;border-width:1.3px}
+@media(max-width:680px){.card-force{font-size:9px;padding:1px 4px}}

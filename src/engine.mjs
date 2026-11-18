@@ -1,4 +1,5 @@
 import { NORTHERN_LOOP } from './circuit.mjs';
+import { inlineForce } from './force-notation.mjs';
 
 export const EPSILON = 1e-9;
 export const ACCELERATIONS = Object.freeze(
@@ -350,7 +351,7 @@ export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
     laps: progress.laps,
     finished: progress.finished,
     lastEvent: progress.message || (move.boostZone
-      ? (move.boost.x > 0 ? 'Boost engaged: +2 east' : 'Boost engaged: -2 west')
+      ? 'Boost engaged: '+inlineForce('BOOST',move.boost)
       : 'Clean glide'),
     trail: [...state.trail, { from: move.from, to: move.to, velocity: move.velocity }]
   };
