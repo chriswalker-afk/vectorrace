@@ -538,7 +538,7 @@ function renderTutorial() {
                     : tutorialStep === 3 && circuit.id === 'frozen-gauntlet'
                       ? 'UPPER: GLASS and WIND work together. Use just one acceleration axis, then add the known wind (0,−1). LOWER: a BOOST (−2,0) adds speed while the two rocks follow their six-step clock. Filled rock = NOW; dashed ring = NEXT. Brake before the boost, and time the crossing.'
                     : tutorialStep === 3 && circuit.id === 'arctic-grand-prix'
-                      ? 'THE ECLIPSE CUP FINALE: Race TWO complete laps. THREE numbered sentinels follow visible six-step rock clocks. UPPER Glass Ice and southward wind act together; LOWER a −2 west boost meets a moving sentinel, then return Glass Ice restricts diagonals. Your speed and the rock phase NEVER reset after lap one. Clear EAST, RETURN and WEST in order on EACH lap. Filled sentinel = NOW; dashed ring = NEXT.'
+                      ? 'THE ECLIPSE CUP: Race TWO laps without a restart. THREE moving sentinels advance each GLIDE (filled = now; dashed = next). Glass + Wind restricts acceleration to one axis and adds (0,−1); a westward BOOST adds (−2,0). Your speed and rock phase carry into lap two. Clear all gates on BOTH laps.'
                     : step.text;
   $('tourNext').textContent = step.next + ' ↗';
   document.querySelector('.acceleration-pad').classList.toggle('tour-focus', tutorialStep === 1);
