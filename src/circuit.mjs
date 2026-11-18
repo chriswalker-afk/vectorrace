@@ -514,7 +514,7 @@ export const CROSSWIND_RIDGE = {
   subtitle: 'Arctic Series / Circuit 08',
   level: 'INTERMEDIATE 4',
   tagline: 'Southward wind · Counter the drift',
-  menuHint: 'A marked wind field adds the vector (0, -1) to velocity each turn',
+  menuHint: 'The southward wind vector (0, −1) is added to velocity each turn',
   outer: [
     { x: 3, y: 8 }, { x: 6.8, y: 3.6 },
     { x: 12, y: 5.2 }, { x: 15.4, y: 9.8 },
@@ -600,7 +600,7 @@ export const ICEBOUND_RAPIDS = {
   subtitle: 'Arctic Series / Circuit 09',
   level: 'ADVANCED 1',
   tagline: 'Twin boost strips · Brake before the surge',
-  menuHint: 'Copper strips force +2 east or -2 west: plan your velocity early',
+  menuHint: 'Copper strips add boost vectors (2, 0) east and (−2, 0) west',
   outer: [
     { x: 3, y: 8 }, { x: 6.5, y: 3.2 },
     { x: 11.5, y: 4.1 }, { x: 15.3, y: 8.2 },
@@ -625,7 +625,7 @@ export const ICEBOUND_RAPIDS = {
   boostZones: [
     {
       id: 'east-rapids',
-      label: 'Eastbound Boost +2',
+      label: 'Eastbound boost vector (2, 0)',
       vector: { x: 2, y: 0 },
       polygon: [
         { x: 15.5, y: 18.8 }, { x: 19.5, y: 18.8 },
@@ -634,7 +634,7 @@ export const ICEBOUND_RAPIDS = {
     },
     {
       id: 'west-rapids',
-      label: 'Westbound Boost -2',
+      label: 'Westbound boost vector (−2, 0)',
       vector: { x: -2, y: 0 },
       polygon: [
         { x: 13.5, y: 8.8 }, { x: 17.5, y: 8.8 },
@@ -1153,7 +1153,7 @@ export const FROZEN_GAUNTLET = {
   "boostZones": [
     {
       "id": "gauntlet-west-boost",
-      "label": "West Return Boost −2",
+      "label": "West return boost vector (−2, 0)",
       "vector": {
         "x": -2,
         "y": 0
@@ -1612,7 +1612,7 @@ export const ARCTIC_GRAND_PRIX = {
   "boostZones": [
     {
       "id": "eclipse-west-boost",
-      "label": "Eclipse West Boost −2",
+      "label": "Eclipse west boost vector (−2, 0)",
       "vector": {
         "x": -2,
         "y": 0

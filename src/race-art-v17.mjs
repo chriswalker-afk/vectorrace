@@ -1,5 +1,6 @@
 import { biomeForCircuit, biomeForLevel } from './biomes.mjs';
 import { paintBiomeAtmosphere, paintBiomeLand, paintBiomeBeacon } from './biome-scenery.mjs';
+import { drawMapForceLabel } from './force-notation.mjs';
 
 /**
  * Snowshift's original art layer (PR #3).
@@ -339,13 +340,9 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.stroke();
     ctx.setLineDash([]);
     const label=world({x:21.5,y:23.15});
-    ctx.textAlign='center';
-    ctx.font='900 16px system-ui, sans-serif';
-    ctx.lineWidth=3.6;
-    ctx.strokeStyle='#241d54';
-    ctx.fillStyle='#fff0c9';
-    ctx.strokeText('WIND ↓ (0,−1)',label.x,label.y);
-    ctx.fillText('WIND ↓ (0,−1)',label.x,label.y);
+    drawMapForceLabel(ctx,'WIND',zone.vector,label,{
+      fontSize:14,componentSize:13,color:'#fff0c9',outline:'#241d54'
+    });
     ctx.restore();
   }
 
@@ -386,11 +383,10 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.save();ctx.lineWidth=2.4;ctx.strokeStyle='#fff3d5';
     ctx.setLineDash([8,5]);polygonPath(ctx,zone.polygon,world);ctx.stroke();ctx.setLineDash([]);
     const centre=world({x:(zone.polygon[0].x+zone.polygon[1].x)/2,
-      y:Math.max(...zone.polygon.map(p=>p.y))-.45});
-    ctx.font='900 13px system-ui,sans-serif';ctx.textAlign='center';
-    ctx.lineWidth=3.4;ctx.strokeStyle='#492021ed';ctx.fillStyle='#fff4d1';
-    const label=east?'BOOST → +2':'BOOST ← −2';
-    ctx.strokeText(label,centre.x,centre.y);ctx.fillText(label,centre.x,centre.y);
+      y:Math.max(...zone.polygon.map(p=>p.y))-.85});
+    drawMapForceLabel(ctx,'BOOST',zone.vector,centre,{
+      fontSize:12,componentSize:12,color:'#fff4d1',outline:'#492021'
+    });
     ctx.restore();
   }
 
@@ -519,13 +515,10 @@ export function createSnowshiftArtwork(requestRender = () => {}) {
     ctx.strokeStyle=activeBiome.id==='expert'?'#fff0bc':'#ffefb7';
     polygonPath(ctx,glass.polygon,world);ctx.stroke();ctx.setLineDash([]);
     const title=world({x:(glass.polygon[0].x+glass.polygon[1].x)/2,
-      y:Math.max(...glass.polygon.map(p=>p.y))-.55});
-    ctx.font='900 13px system-ui,sans-serif';ctx.textAlign='center';
-    ctx.lineWidth=3.3;ctx.strokeStyle='#253a68';
-    ctx.fillStyle='#fff8db';
-    const name='GLASS + WIND ↓ (0,−1)';
-    ctx.strokeText(name,title.x,title.y);
-    ctx.fillText(name,title.x,title.y);
+      y:Math.max(...glass.polygon.map(p=>p.y))-.85});
+    drawMapForceLabel(ctx,'GLASS + WIND',wind.vector,title,{
+      fontSize:12,componentSize:12,color:'#fff8db',outline:'#253a68'
+    });
     ctx.restore();
   }
 
