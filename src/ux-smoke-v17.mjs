@@ -9,7 +9,7 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
       const errors=[];
       const width=window.innerWidth,height=window.innerHeight;
       const required=[
-        '#course','#commit','#help','#reset','#showGrid',
+        '#course','#commit','#homeLink','#help','#reset','#showGrid',
         '#modeOptions','#accelerationPad','#nextMoveLabel',
         '#currentVelocity','#selectedAcceleration','#nextVelocity',
         '.checkpoint-list','.board-scores','.game-board','.race-panel',
