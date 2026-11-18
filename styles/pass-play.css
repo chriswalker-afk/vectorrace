@@ -1,0 +1,22 @@
+/* Public V18: one-screen racing with per-player turn state. */
+.players-strip{display:flex;flex:1;min-width:0;gap:3px;justify-content:flex-end;align-items:center}
+.player-chip{flex:0 1 auto;min-width:0;border:1px solid var(--player-color);border-radius:4px;padding:4px 5px;font:900 10px ui-monospace,monospace;color:var(--player-color);background:#082031}
+.player-chip.is-active{background:var(--player-color);color:#071c2e;box-shadow:0 0 7px var(--player-color)}
+.player-chip.is-finished{opacity:.65}
+html[data-game-type="pass-play"] #recordBadge{color:#ffc49e}
+html[data-game-type="pass-play"] #mapPicker{min-height:47px}
+html[data-game-type="pass-play"] .panel-footer:has(.players-strip:not([hidden])) .micro-hint{display:none}
+.handoff-panel:not([hidden]){position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:12px;background:#061626ec}
+.handoff-card{width:min(470px,96vw);max-height:calc(100dvh - 24px);overflow:auto;background:linear-gradient(160deg,#1d4a5c,#0d2034);border:2px solid #d4fc77;border-radius:10px;padding:clamp(15px,3vw,30px);text-align:center}
+.handoff-card small{font-size:12px;color:#b9eaf0;font-weight:900;letter-spacing:.08em}
+.handoff-card h2{font-size:clamp(26px,6vw,44px);font-weight:1000;font-style:italic;letter-spacing:-.04em;margin:9px 0}
+.handoff-card p{color:#c5dce4;font-size:13px;line-height:1.5}
+.handoff-card #handoffName{display:block;font-size:clamp(26px,6vw,44px);line-height:1.2}
+.handoff-card .primary{margin-top:12px;padding:11px 25px}
+.match-results:not([hidden]){display:grid;gap:4px;margin:9px 0}
+.result-row{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:6px 7px;background:#0b2538b8;border:1px solid #b2d5da45;font-size:11px}
+.result-row strong{white-space:nowrap}
+.result-row span{font:800 10px ui-monospace,monospace;color:#eaf8f7}
+@media(max-width:500px){.player-chip{font-size:9px;padding:3px 4px}.handoff-card .primary{min-height:40px}}
+@media(max-height:450px) and (orientation:landscape){.result-row{padding:3px 7px}.match-results:not([hidden]){gap:2px;margin:4px 0}.handoff-card p{margin:5px 0}.handoff-card h2{font-size:24px;margin:3px 0}}
+@media(max-width:920px){.finish-card{max-height:calc(100dvh - 18px)}}

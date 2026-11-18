@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a192b">
+<title>SNOWSHIFT · Choose a circuit</title>
+<link rel="stylesheet" href="./styles/track-select.css">
+<script type="module" src="./src/track-select.mjs"></script>
+</head>
+<body>
+<main>
+  <header class="page-head">
+    <a class="back-link" href="./index.html">← GAME MODE</a>
+    <div class="wordmark">SNOW<span>SHIFT</span></div>
+    <span class="stage">01 GAME MODE <span>→</span> <b>02 CIRCUIT</b> <span>→</span> 03 RACE</span>
+  </header>
+  <section class="intro">
+    <div>
+      <p class="eyebrow" id="modeKicker">SINGLE PLAYER / CHOOSE A CIRCUIT</p>
+      <h1>Choose your circuit.</h1>
+      <p id="modeDescription">Choose a course, then race for a personal best. Tracks increase in difficulty from Beginner to Expert.</p>
+    </div>
+    <aside class="setup" id="playerSetup" hidden>
+      <label for="playerCount">RACERS ON THIS DEVICE</label>
+      <div class="counter">
+        <button type="button" id="lessPlayers" aria-label="Remove one player">−</button>
+        <strong id="playerCountDisplay" aria-live="polite">2</strong>
+        <button type="button" id="morePlayers" aria-label="Add one player">+</button>
+      </div>
+      <input id="playerCount" type="hidden" value="2">
+      <small>2–4 players · One glide each, then pass the device.</small>
+    </aside>
+  </section>
+  <p class="instructions" id="selectionHint">SELECT A TRACK TO START RACING <span>↓</span></p>
+  <div id="trackList" class="regions" aria-label="Choose one of twelve circuits"></div>
+  <noscript><p>Enable JavaScript to view all twelve selectable Snowshift circuits.</p></noscript>
+  <footer><a href="./index.html">← CHANGE GAME MODE</a><span>12 CIRCUITS · 4 REGIONS · SAME MATHEMATICS</span></footer>
+</main>
+</body>
+</html>
