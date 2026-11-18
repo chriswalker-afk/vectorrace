@@ -62,3 +62,10 @@
   }
   .map-option[data-circuit="arctic-grand-prix"]{border-width:1.5px}
 }
+
+/* Stable navigation: Home and replay are distinct actions, including at the finish. */
+.home-link { display:inline-flex;align-items:center;justify-content:center;text-decoration:none; }
+.finish-actions { display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center;margin-top:12px; }
+.finish-actions .primary,.finish-actions .top-button { min-height:36px;padding:7px 11px;text-decoration:none; }
+.finish-home { display:inline-flex;align-items:center;justify-content:center; }
+@media(max-width:760px) { .home-link { min-width:30px;padding:4px 7px; } }
