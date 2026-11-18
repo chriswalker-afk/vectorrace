@@ -664,13 +664,13 @@ function setMode(nextMode) {
   drawAccelerationPad($('accelerationPad'), mode);
   $('accelNotationHint').textContent = policy.accelerationNotation === 'columns'
     ? 'TOP x · BOTTOM y' : '−1, 0 or +1 each axis';
-  $('ghostToggle').hidden = !bestRecord || !policy.selectedDestination;
+  $('ghostToggle').hidden = multiplayer || !bestRecord || !policy.selectedDestination;
   if (tutorialStep >= 0) renderTutorial();
   renderHUD();
   scheduleDraw();
 }
 function setAcceleration(x, y) {
-  if (animation || state.finished) return;
+  if (animation || state.finished || handoffPending || awaitingNextPlayer) return;
   if (!accelerationAllowed(state,{x,y},circuit)) return;
   selection = { x, y };
   if (tutorialStep === 1) setTutorialStep(2);
@@ -761,7 +761,7 @@ function renderHUD() {
     $('nextMoveLabel').dataset.tone = selected.movingObstacle && mode==='standard'
       ? 'danger' : explanation.tone;
   }
-  $('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB —';
+  $('recordBadge').textContent = multiplayer ? '· '+gameSettings.players+' RACERS' : bestRecord ? '· PB ' + bestRecord.score : '· PB —';
   $('message').textContent=isGauntlet && !state.finished
     ? (state.lastEvent.endsWith('cleared') ? state.lastEvent.toUpperCase()
       : isGrandPrix&&state.lastEvent==='Lap 1'
@@ -793,7 +793,11 @@ function renderHUD() {
           : circuit.id==='twin-routes' && state.moves===0
             ? 'INNER SHORTCUT · OUTER WIDE'
             : state.lastEvent.toUpperCase();
-  $('commit').disabled=!!animation || state.finished || selected.zoneBlocked;
+  if(multiplayer){
+    renderPlayers();
+    $('message').textContent='P'+match.players[match.activeIndex].id+' · '+$('message').textContent;
+  }
+  $('commit').disabled=!!animation || state.finished || handoffPending || awaitingNextPlayer || selected.zoneBlocked;
 
   for (const button of $('accelerationPad').querySelectorAll('button')) {
     const pressed = Number(button.dataset.x) === selection.x &&
@@ -808,7 +812,7 @@ function renderHUD() {
     button.setAttribute('aria-label',blocked
       ? 'Unavailable on glass ice. '+vectorDescription(acceleration,'Acceleration')
       : vectorDescription(acceleration,'Acceleration'));
-    button.disabled=!!animation || state.finished || blocked;
+    button.disabled=!!animation || state.finished || handoffPending || awaitingNextPlayer || blocked;
   }
   for (const [i, li] of [...document.querySelectorAll('[data-checkpoint]')].entries()) {
     li.classList.toggle('cleared', state.finished || i < state.checkpoint);
@@ -817,13 +821,20 @@ function renderHUD() {
 }
 
 function commit() {
-  if (animation || state.finished || !accelerationAllowed(state,selection,circuit)) return;
+  if (animation || state.finished || handoffPending || awaitingNextPlayer ||
+      !accelerationAllowed(state,selection,circuit)) return;
   const before = state;
   const beforePreview=previewMove(before,selection,circuit);
   const boostAtStart=boostZoneAt(before.position,circuit);
   const now = performance.now();
-  state = takeTurn(state, selection, circuit);
-  turnFrames.push({ ...state.position });
+  if(multiplayer){
+    match=playHotseatMove(match,selection,circuit);
+    state=match.players[match.activeIndex].state;
+    turnFrames=match.players[match.activeIndex].frames;
+  } else {
+    state=takeTurn(state,selection,circuit);
+    turnFrames.push({...state.position});
+  }
   if (tutorialStep === 2) setTutorialStep(3);
   if (state.crashes > before.crashes) {
     flashUntil = now + (useReducedMotion.matches ? 0 : 340);
@@ -846,7 +857,7 @@ function commit() {
     }
     if (state.finished) {
       if (!useReducedMotion.matches) spawnBurst(state.position, 'gate', now);
-      recordFinishedRace();
+      if(!multiplayer)recordFinishedRace();
     } else if (state.laps>before.laps) {
       if (!useReducedMotion.matches) spawnBurst(state.position, 'gate', now);
       showToast('LAP '+state.laps+' COMPLETE · FINAL LAP!', 'gate', 1650);
@@ -863,12 +874,21 @@ function commit() {
     hazardMotion={fromTurn:before.moves,start:now,
       duration:animation?.duration??360};
   }
+  if(multiplayer){
+    match.players[match.activeIndex].heading=heading;
+    handoffPending=true;
+  }
   renderHUD();
   scheduleDraw();
 }
 
 function reset() {
-  state = createRace(circuit);
+  if(multiplayer)match=createHotseat(circuit,gameSettings.players);
+  state=multiplayer?match.players[0].state:createRace(circuit);
+  handoffPending=false;
+  awaitingNextPlayer=false;
+  $('handoffPanel').hidden=true;
+  $('matchResults').hidden=true;
   selection = { x: 1, y: 0 };
   animation = null;
   hazardMotion = null;
@@ -901,23 +921,12 @@ for (const button of $('modeOptions').querySelectorAll('button')) {
   button.addEventListener('click', () => setMode(button.dataset.mode));
 }
 $('commit').addEventListener('click', commit);
-$('reset').addEventListener('click', reset);
-$('raceAgain').addEventListener('click', reset);
-$('finishChooseTrack').addEventListener('click', () => {
-  $('finishPanel').hidden = true;
+$('reset').addEventListener('click', () => {
+  if(multiplayer && !window.confirm('Restart the match for all racers?'))return;
   reset();
-  toggleMapMenu();
-  $('mapPicker').focus();
 });
-$('mapPicker').addEventListener('click', toggleMapMenu);
-for (const option of document.querySelectorAll('[data-circuit]')) {
-  option.addEventListener('click', () => switchCircuit(option.dataset.circuit));
-}
-document.addEventListener('pointerdown', event => {
-  if ($('mapMenu').hidden) return;
-  if (event.target instanceof Node && !$('mapMenu').contains(event.target)
-      && !$('mapPicker').contains(event.target)) closeMapMenu();
-});
+$('raceAgain').addEventListener('click', reset);
+$('beginTurn').addEventListener('click', startNextTurn);
 $('ghostToggle').addEventListener('click', () => {
   ghostEnabled = !ghostEnabled;
   $('ghostToggle').setAttribute('aria-pressed', String(ghostEnabled));
@@ -935,7 +944,7 @@ $('tourSkip').addEventListener('click', closeTutorial);
 $('tourNext').addEventListener('click', () => setTutorialStep(tutorialStep + 1));
 
 canvas.addEventListener('click', event => {
-  if (animation || state.finished || !modePolicy(mode).selectedDestination) return;
+  if (animation || state.finished || handoffPending || awaitingNextPlayer || !modePolicy(mode).selectedDestination) return;
   const rect = canvas.getBoundingClientRect();
   const sceneX = ((event.clientX - rect.left) - canvasFit.offsetX) / canvasFit.scale;
   const sceneY = ((event.clientY - rect.top) - canvasFit.offsetY) / canvasFit.scale;
@@ -956,9 +965,7 @@ canvas.addEventListener('click', event => {
 window.addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey) return;
   if (event.target instanceof HTMLElement && event.target.matches('input')) return;
-  if (event.code === 'Escape' && !$('mapMenu').hidden) {
-    event.preventDefault(); closeMapMenu(); $('mapPicker').focus(); return;
-  }
+  if(multiplayer && (handoffPending || awaitingNextPlayer))return;
   if (event.code === 'Escape' && tutorialStep >= 0) {
     event.preventDefault(); closeTutorial(); return;
   }
@@ -1011,10 +1018,8 @@ if (typeof ResizeObserver !== 'undefined') {
 }
 setMode('guided');
 renderCircuitUI();
-$('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB —';
-$('ghostToggle').hidden = !bestRecord;
+$('recordBadge').textContent = multiplayer ? '· '+gameSettings.players+' RACERS' : bestRecord ? '· PB ' + bestRecord.score : '· PB —';
+$('ghostToggle').hidden = multiplayer || !bestRecord;
 renderHUD();
 resize();
-if (showTrackPickerOnEntry) {
-  toggleMapMenu();
-}
+
