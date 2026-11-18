@@ -1,0 +1,22 @@
+/* Eclipse Summit: final 2-lap race retains all old physics,
+   but the cockpit emphasizes the real running lap and public rock clock. */
+html[data-finale="grand-prix"] #lap{
+  color:#ffe29c;font-weight:1000;letter-spacing:.07em;
+  text-shadow:0 0 7px #d2a66c99;
+}
+html[data-finale="grand-prix"] #message{
+  color:#fff3d6;font-weight:900;
+  text-shadow:0 1px 8px #030818;
+}
+html[data-finale="grand-prix"] #accelNotationHint{
+  color:#e0f1ff;font-weight:900;
+}
+html[data-finale="grand-prix"] .map-picker{
+  border-color:#ffe29c;
+}
+html[data-finale="grand-prix"] .checkpoint-list .active{
+  border-color:#ffe29c;
+}
+html[data-finale="grand-prix"] .map-option[data-circuit="arctic-grand-prix"][aria-current="true"]{
+  border-color:#fff3be;
+}
