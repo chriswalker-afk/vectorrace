@@ -773,7 +773,428 @@ export const BROKEN_PASSAGE = {
   }
 };
 
-export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE, CROSSWIND_RIDGE, ICEBOUND_RAPIDS, BROKEN_PASSAGE]);
+/**
+ * Advanced 3 / Ember Rift: combine existing wind, Glass Ice, boost and
+ * moving basalt rules without adding new force or collision physics.
+ * A northern field applies wind (0,-1) AND one-axis glass restriction from
+ * the same polygon on turn start. A westward (-2,0) return boost intersects
+ * the public six-phase moving slab corridor; separate glass ice follows.
+ * Exact original geometry and records of circuits 01–10 are untouched.
+ */
+export const FROZEN_GAUNTLET = {
+  "id": "frozen-gauntlet",
+  "name": "Frozen Gauntlet",
+  "subtitle": "Arctic Series / Circuit 11",
+  "level": "ADVANCED 3",
+  "tagline": "Coupled Glass + Wind · Boost + Moving Basalt",
+  "menuHint": "Coupled glass and wind, then a timed westbound boost and moving basalt",
+  "outer": [
+    {
+      "x": 3,
+      "y": 8
+    },
+    {
+      "x": 6.3,
+      "y": 3.5
+    },
+    {
+      "x": 11.6,
+      "y": 4
+    },
+    {
+      "x": 15,
+      "y": 7.7
+    },
+    {
+      "x": 23,
+      "y": 7.9
+    },
+    {
+      "x": 26.2,
+      "y": 9.6
+    },
+    {
+      "x": 29.6,
+      "y": 12.2
+    },
+    {
+      "x": 31,
+      "y": 15.4
+    },
+    {
+      "x": 31.3,
+      "y": 19
+    },
+    {
+      "x": 27.8,
+      "y": 22.9
+    },
+    {
+      "x": 25.4,
+      "y": 25.1
+    },
+    {
+      "x": 22.8,
+      "y": 25.25
+    },
+    {
+      "x": 20.3,
+      "y": 24.4
+    },
+    {
+      "x": 17.7,
+      "y": 25.2
+    },
+    {
+      "x": 14.6,
+      "y": 24.6
+    },
+    {
+      "x": 11,
+      "y": 24.65
+    },
+    {
+      "x": 6.2,
+      "y": 22.9
+    },
+    {
+      "x": 3.1,
+      "y": 20.2
+    },
+    {
+      "x": 1.5,
+      "y": 16.8
+    },
+    {
+      "x": 1.9,
+      "y": 12
+    }
+  ],
+  "inner": [
+    {
+      "x": 7.1,
+      "y": 12
+    },
+    {
+      "x": 9.2,
+      "y": 10.2
+    },
+    {
+      "x": 12.4,
+      "y": 11.8
+    },
+    {
+      "x": 15.5,
+      "y": 14.6
+    },
+    {
+      "x": 24.3,
+      "y": 14.9
+    },
+    {
+      "x": 25.9,
+      "y": 15.9
+    },
+    {
+      "x": 26.3,
+      "y": 17.2
+    },
+    {
+      "x": 25.5,
+      "y": 18.1
+    },
+    {
+      "x": 23.5,
+      "y": 18.3
+    },
+    {
+      "x": 21.1,
+      "y": 17.8
+    },
+    {
+      "x": 18.6,
+      "y": 17.5
+    },
+    {
+      "x": 17,
+      "y": 18.2
+    },
+    {
+      "x": 12.2,
+      "y": 18.7
+    },
+    {
+      "x": 9,
+      "y": 18.3
+    },
+    {
+      "x": 7.1,
+      "y": 17
+    }
+  ],
+  "movingObstacles": [
+    {
+      "id": "north-gauntlet-slab",
+      "label": "Upper Gauntlet Slab",
+      "radius": 0.55,
+      "positions": [
+        {
+          "x": 20.5,
+          "y": 19.7
+        },
+        {
+          "x": 20.5,
+          "y": 20.7
+        },
+        {
+          "x": 20.5,
+          "y": 21.8
+        },
+        {
+          "x": 20.5,
+          "y": 22.8
+        },
+        {
+          "x": 20.5,
+          "y": 21.8
+        },
+        {
+          "x": 20.5,
+          "y": 20.7
+        }
+      ]
+    },
+    {
+      "id": "return-gauntlet-slab",
+      "label": "Return Gauntlet Slab",
+      "radius": 0.55,
+      "positions": [
+        {
+          "x": 18,
+          "y": 9.7
+        },
+        {
+          "x": 18,
+          "y": 10.8
+        },
+        {
+          "x": 18,
+          "y": 12
+        },
+        {
+          "x": 18,
+          "y": 12.8
+        },
+        {
+          "x": 18,
+          "y": 12
+        },
+        {
+          "x": 18,
+          "y": 10.8
+        }
+      ]
+    }
+  ],
+  "start": {
+    "x": 9,
+    "y": 21
+  },
+  "targetLaps": 1,
+  "crashPenalty": 3,
+  "finish": {
+    "id": "finish",
+    "label": "Start / finish",
+    "a": {
+      "x": 13,
+      "y": 18.7
+    },
+    "b": {
+      "x": 13,
+      "y": 24.8
+    },
+    "direction": {
+      "x": 1,
+      "y": 0
+    }
+  },
+  "checkpoints": [
+    {
+      "id": "east",
+      "label": "East Gauntlet Gate",
+      "a": {
+        "x": 26.3,
+        "y": 15.7
+      },
+      "b": {
+        "x": 31,
+        "y": 15.7
+      },
+      "direction": {
+        "x": 0,
+        "y": -1
+      }
+    },
+    {
+      "id": "south",
+      "label": "Return Gauntlet Gate",
+      "a": {
+        "x": 19,
+        "y": 8
+      },
+      "b": {
+        "x": 19,
+        "y": 14.6
+      },
+      "direction": {
+        "x": -1,
+        "y": 0
+      }
+    },
+    {
+      "id": "west",
+      "label": "West Gauntlet Gate",
+      "a": {
+        "x": 2,
+        "y": 16
+      },
+      "b": {
+        "x": 7.1,
+        "y": 16
+      },
+      "direction": {
+        "x": 0,
+        "y": 1
+      }
+    }
+  ],
+  "featuredMotion": {
+    "period": 6,
+    "rule": "One step per attempted GLIDE, including crashes",
+    "collision": "Simultaneous linear sweep, 0.8 car half-width",
+    "minBankClearance": 1
+  },
+  "glassZones": [
+    {
+      "id": "gauntlet-glass-and-wind",
+      "label": "Glass + Crosswind",
+      "rule": "axis-only",
+      "polygon": [
+        {
+          "x": 12.6,
+          "y": 18.9
+        },
+        {
+          "x": 21.6,
+          "y": 18.9
+        },
+        {
+          "x": 21.6,
+          "y": 23.8
+        },
+        {
+          "x": 12.6,
+          "y": 23.8
+        }
+      ]
+    },
+    {
+      "id": "return-glass",
+      "label": "Return Glass Ice",
+      "rule": "axis-only",
+      "polygon": [
+        {
+          "x": 12.8,
+          "y": 7.95
+        },
+        {
+          "x": 18.6,
+          "y": 7.95
+        },
+        {
+          "x": 18.6,
+          "y": 12
+        },
+        {
+          "x": 12.8,
+          "y": 12
+        }
+      ]
+    }
+  ],
+  "windZones": [
+    {
+      "id": "gauntlet-southwind",
+      "label": "Coupled Southwind",
+      "vector": {
+        "x": 0,
+        "y": -1
+      },
+      "polygon": [
+        {
+          "x": 12.6,
+          "y": 18.9
+        },
+        {
+          "x": 21.6,
+          "y": 18.9
+        },
+        {
+          "x": 21.6,
+          "y": 23.8
+        },
+        {
+          "x": 12.6,
+          "y": 23.8
+        }
+      ]
+    }
+  ],
+  "boostZones": [
+    {
+      "id": "gauntlet-west-boost",
+      "label": "West Return Boost −2",
+      "vector": {
+        "x": -2,
+        "y": 0
+      },
+      "polygon": [
+        {
+          "x": 20.9,
+          "y": 8.8
+        },
+        {
+          "x": 24.2,
+          "y": 8.8
+        },
+        {
+          "x": 24.2,
+          "y": 12.4
+        },
+        {
+          "x": 20.9,
+          "y": 12.4
+        }
+      ]
+    }
+  ],
+  "featuredGauntlet": {
+    "pairedGlassId": "gauntlet-glass-and-wind",
+    "pairedWindId": "gauntlet-southwind",
+    "boostId": "gauntlet-west-boost",
+    "returnGlassId": "return-glass",
+    "hazardPeriod": 6,
+    "stageOrder": [
+      "Glass + Crosswind",
+      "Upper moving slab",
+      "Boost + Return moving slab",
+      "Return Glass Ice"
+    ],
+    "minVisibleBankClearance": 1
+  }
+};
+
+export const CIRCUITS = Object.freeze([NORTHERN_LOOP, AURORA_SPLIT, FROST_CHICANE, NARROW_PASSAGE, HAIRPIN_HOLLOW, TWIN_ROUTES, GLASS_ICE, CROSSWIND_RIDGE, ICEBOUND_RAPIDS, BROKEN_PASSAGE, FROZEN_GAUNTLET]);
 
 export function getCircuit(id) {
   return CIRCUITS.find(circuit => circuit.id === id) ?? NORTHERN_LOOP;
