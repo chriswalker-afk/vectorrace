@@ -2,6 +2,7 @@ import { CIRCUITS, getCircuit } from './circuit.mjs';
 import { renderColumnVector, vectorDescription } from './vector-notation.mjs';
 import { ACCELERATION_GRID, drawAccelerationPad } from './acceleration-pad.mjs';
 import { createSnowshiftArtwork } from './race-art-v17.mjs';
+import { drawCar, paintCarPreview, decodeCars, loadSoloCar, styleName } from './car-customization.mjs';
 import { parseGameSettings, createHotseat, playHotseatMove, nextHotseatPlayer,
   activateHotseatPlayer, hotseatFinished, hotseatStandings, selectUrl } from './pass-play.mjs';
 import { biomeForCircuit, tierFromLevel } from './biomes.mjs';
@@ -25,15 +26,20 @@ const useReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const urlParams = new URLSearchParams(location.search);
 const gameSettings = parseGameSettings(urlParams);
 const multiplayer = gameSettings.gameType === 'pass-play';
+const carDesigns = decodeCars(urlParams.get('cars'), multiplayer ? gameSettings.players : 1);
+if (!multiplayer && !urlParams.has('cars')) {
+  try { carDesigns[0] = loadSoloCar(window.localStorage); } catch { /* Private mode is fine. */ }
+}
 const requestedTrack = urlParams.get('track');
 // Never silently begin Track 1 on missing or outdated navigation.
 if (!CIRCUITS.some(c => c.id === requestedTrack))
-  location.replace(selectUrl(gameSettings.gameType, gameSettings.players));
+  location.replace(selectUrl(gameSettings.gameType, gameSettings.players, carDesigns));
 let circuit = getCircuit(requestedTrack);
-let match = multiplayer ? createHotseat(circuit, gameSettings.players) : null;
+let match = multiplayer ? createHotseat(circuit, gameSettings.players, carDesigns) : null;
 let state = multiplayer ? match.players[0].state : createRace(circuit);
 let handoffPending = false;
 let awaitingNextPlayer = false;
+const currentCar = () => multiplayer ? match.players[match.activeIndex].car : carDesigns[0];
 let selection = { x: 1, y: 0 };
 let heading = 0;
 let animation = null;
@@ -274,20 +280,22 @@ function paintGhost(now) {
 }
 
 function paintOtherPlayers() {
-  if(!multiplayer) return;
-  match.players.forEach((player,index)=>{
-    if(index===match.activeIndex)return;
-    const p=world(player.state.position);
+  if (!multiplayer) return;
+  match.players.forEach((player,index) => {
+    if (index === match.activeIndex) return;
+    const point=world(player.state.position);
+    const velocity=player.state.velocity;
     ctx.save();
-    ctx.globalAlpha=player.state.finished?.55:.95;
-    ctx.fillStyle=player.color;
-    ctx.strokeStyle='#082538';
-    ctx.lineWidth=2;
-    ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();ctx.stroke();
-    ctx.font='900 10px system-ui,sans-serif';
-    ctx.textAlign='center';
-    ctx.fillStyle='#071e30';
-    ctx.fillText(String(player.id),p.x,p.y+3.5);
+    ctx.globalAlpha=player.state.finished ? .48 : .85;
+    drawCar(ctx,point,player.heading,Math.hypot(velocity.x,velocity.y),player.car,.72);
+    // Coloured number badge identifies the racer even when skimmers overlap.
+    ctx.globalAlpha=1;
+    ctx.beginPath();ctx.arc(point.x-18,point.y-16,8,0,Math.PI*2);
+    ctx.fillStyle=player.car.body;ctx.fill();
+    ctx.strokeStyle='#071a29';ctx.lineWidth=1.4;ctx.stroke();
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#071a29';ctx.font='900 10px system-ui,sans-serif';
+    ctx.fillText(String(player.id),point.x-18,point.y-16);
     ctx.restore();
   });
 }
@@ -433,7 +441,7 @@ function draw(now = performance.now()) {
     // The visual position is linear in t, never a smoothed curved shortcut.
     skimmerPosition = interpolate(animation.from, animation.to, t);
   }
-  artwork.drawSkimmer(ctx, world(skimmerPosition), heading, Math.hypot(state.velocity.x, state.velocity.y));
+  drawCar(ctx, world(skimmerPosition), heading, Math.hypot(state.velocity.x, state.velocity.y), currentCar());
   if (!useReducedMotion.matches) paintBurst(now);
   if (now < flashUntil) {
     ctx.fillStyle = '#ff755733';
@@ -484,10 +492,10 @@ function renderCircuitUI() {
   $('mapName').textContent=circuit.name.toUpperCase();
   $('mapLevel').childNodes[0].textContent=circuit.level+' ';
   $('circuitHeading').textContent=number+' / '+circuit.name.toUpperCase();
-  $('mapPicker').setAttribute('aria-label','Change track. Current: '+circuit.name+', '+circuit.level);
-  $('mapPicker').title='Change track · '+biome.name;
+  $('mapPicker').setAttribute('aria-label','Change track or customise car. Current: '+circuit.name+', '+circuit.level);
+  $('mapPicker').title='Change track or car · '+biome.name;
   $('mapName').closest('.game-board').setAttribute('aria-label',circuit.name+' race circuit');
-  const chooser=selectUrl(gameSettings.gameType,gameSettings.players);
+  const chooser=selectUrl(gameSettings.gameType,gameSettings.players,carDesigns);
   $('mapPicker').href=chooser;
   $('finishChooseTrack').href=chooser;
   document.title='SNOWSHIFT · '+(multiplayer?'Pass & Play · ':'')+circuit.name;
@@ -508,7 +516,7 @@ function renderPlayers() {
       (player.state.finished?' is-finished':'');
     chip.style.setProperty('--player-color',player.color);
     chip.textContent='P'+player.id+' '+(player.state.finished?'✓':score(player.state,circuit));
-    chip.title=player.name+' · '+(player.state.finished?'finished':score(player.state,circuit)+' points');
+    chip.title=player.name+' · '+styleName(player.car)+' · '+(player.state.finished?'finished':score(player.state,circuit)+' points');
     strip.appendChild(chip);
   });
 }
@@ -528,6 +536,7 @@ function showHandoff() {
     ' points after '+current.state.moves+' glides.';
   $('handoffName').textContent=next.name.toUpperCase();
   $('handoffName').style.color=next.color;
+  paintCarPreview($('handoffCarPreview'),next.car);
   $('beginTurn').textContent='START '+next.name.toUpperCase()+' ↗';
   $('handoffPanel').hidden=false;
   $('beginTurn').focus();
@@ -679,6 +688,10 @@ function setAcceleration(x, y) {
 }
 
 function renderHUD() {
+  // Screen-reader and automated QA identity follows the currently active racer.
+  document.documentElement.dataset.carStyle=currentCar().style;
+  document.documentElement.dataset.carBody=currentCar().body;
+  document.documentElement.dataset.carTrim=currentCar().trim;
   const glassZone=glassIceZoneAt(state.position,circuit);
   const windZone=windZoneAt(state.position,circuit);
   const boostZone=boostZoneAt(state.position,circuit);
@@ -883,7 +896,7 @@ function commit() {
 }
 
 function reset() {
-  if(multiplayer)match=createHotseat(circuit,gameSettings.players);
+  if(multiplayer)match=createHotseat(circuit,gameSettings.players,carDesigns);
   state=multiplayer?match.players[0].state:createRace(circuit);
   handoffPending=false;
   awaitingNextPlayer=false;

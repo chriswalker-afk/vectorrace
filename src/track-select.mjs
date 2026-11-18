@@ -1,18 +1,26 @@
 import { CIRCUITS } from './circuit.mjs';
 import { biomeForCircuit, tierFromLevel } from './biomes.mjs';
 import { parseGameSettings, raceUrl } from './pass-play.mjs';
+import { CAR_STYLES, BODY_COLORS, TRIM_COLORS, normalizeCar,
+  decodeCars, encodeCars, loadSoloCar, saveSoloCar, paintCarPreview, styleName
+} from './car-customization.mjs';
 
 const params = new URLSearchParams(location.search);
 const settings = parseGameSettings(params);
 const multiplayer = settings.gameType === 'pass-play';
 let playerCount = settings.players;
 const $ = id => document.getElementById(id);
+let selectedPlayer=0;
+let cars=decodeCars(params.get('cars'),4);
+// A solo player's design is remembered on this device, not uploaded anywhere.
+const storage=(()=>{try{return window.localStorage}catch{return null}})();
+if(!params.has('cars')&&!multiplayer)cars[0]=loadSoloCar(storage);
 
 $('playerSetup').hidden = !multiplayer;
 $('modeKicker').textContent = multiplayer ? 'PASS & PLAY / CHOOSE A CIRCUIT' : 'SINGLE PLAYER / CHOOSE A CIRCUIT';
 $('modeDescription').textContent = multiplayer
-  ? 'Race together on one device. Each player takes one vector glide and passes it on. Finish with the lowest score to win.'
-  : 'Choose a course, then race for a personal best. Tracks increase in difficulty from Beginner to Expert.';
+  ? 'Customise each player’s car, then choose one of the twelve circuits. Take turns on the same device — lowest score wins.'
+  : 'Customise your car, then choose a circuit to race for a personal best. The design changes appearance, never the physics.';
 
 const tiers = [
   { id:'beginner', title:'BEGINNER', summary:'Learn velocity, turns and careful braking' },
@@ -62,16 +70,101 @@ for (const tier of tiers) {
   $('trackList').appendChild(section);
 }
 
+
+function changeCar(patch){
+  cars[selectedPlayer]=normalizeCar({...cars[selectedPlayer],...patch},selectedPlayer);
+  if(!multiplayer)saveSoloCar(storage,cars[0]);
+  renderGarage();
+}
+
+for(const style of CAR_STYLES){
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='style-option';
+  button.dataset.style=style.id;
+  const title=document.createElement('strong');title.textContent=style.name;
+  const small=document.createElement('small');small.textContent=style.description;
+  button.append(title,small);
+  button.addEventListener('click',()=>changeCar({style:style.id}));
+  $('styleChoices').appendChild(button);
+}
+function fillSwatches(id,colours,part){
+  const container=$(id);
+  for(const colour of colours){
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='paint-choice';
+    button.dataset.part=part;
+    button.dataset.colour=colour;
+    button.style.setProperty('--colour',colour);
+    button.setAttribute('aria-label',colour+' '+part+' colour');
+    button.title=colour+' '+part+' colour';
+    button.addEventListener('click',()=>changeCar({[part]:colour}));
+    container.appendChild(button);
+  }
+}
+fillSwatches('bodyColours',BODY_COLORS,'body');
+fillSwatches('trimColours',TRIM_COLORS,'trim');
+$('customBody').addEventListener('input',value=>changeCar({body:value.target.value}));
+$('customTrim').addEventListener('input',value=>changeCar({trim:value.target.value}));
+
 function renderLinks(){
+  const count=multiplayer?playerCount:1;
   $('playerCountDisplay').textContent=String(playerCount);
   $('playerCount').value=String(playerCount);
   $('lessPlayers').disabled=playerCount===2;
   $('morePlayers').disabled=playerCount===4;
-  for(const {card,circuit} of anchors)card.href=raceUrl(circuit.id, settings.gameType, playerCount);
+  for(const {card,circuit} of anchors)
+    card.href=raceUrl(circuit.id,settings.gameType,playerCount,cars);
   const url=new URL(location.href);
   if(multiplayer)url.searchParams.set('players',String(playerCount));
+  url.searchParams.set('cars',encodeCars(cars,count));
   history.replaceState(null,'',url);
 }
-$('lessPlayers').addEventListener('click',()=>{playerCount=Math.max(2,playerCount-1);renderLinks()});
-$('morePlayers').addEventListener('click',()=>{playerCount=Math.min(4,playerCount+1);renderLinks()});
-renderLinks();
+function renderGarage(){
+  const count=multiplayer?playerCount:1;
+  if(selectedPlayer>=count)selectedPlayer=count-1;
+  const roster=$('carRoster');
+  roster.replaceChildren();
+  roster.hidden=!multiplayer;
+  if(multiplayer){
+    for(let i=0;i<count;i++){
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='racer-option';
+      button.setAttribute('aria-pressed',String(selectedPlayer===i));
+      button.setAttribute('aria-label','Customise Player '+(i+1));
+      button.dataset.player=String(i+1);
+      const label=document.createElement('span');
+      label.textContent='P'+(i+1);
+      const thumb=document.createElement('canvas');
+      thumb.width=100;thumb.height=48;
+      thumb.setAttribute('aria-hidden','true');
+      button.append(label,thumb);
+      paintCarPreview(thumb,cars[i]);
+      button.addEventListener('click',()=>{selectedPlayer=i;renderGarage()});
+      roster.appendChild(button);
+    }
+  }
+  const selected=cars[selectedPlayer];
+  paintCarPreview($('carPreview'),selected);
+  $('carPreviewName').textContent=(multiplayer?'PLAYER '+(selectedPlayer+1):'YOUR CAR')+
+    ' · '+styleName(selected);
+  $('carPreviewCaption').textContent=CAR_STYLES.find(s=>s.id===selected.style).description;
+  for(const button of $('styleChoices').querySelectorAll('button'))
+    button.setAttribute('aria-pressed',String(button.dataset.style===selected.style));
+  for(const button of document.querySelectorAll('.paint-choice')){
+    const part=button.dataset.part;
+    button.setAttribute('aria-pressed',String(button.dataset.colour===selected[part]));
+  }
+  $('customBody').value=selected.body;
+  $('customTrim').value=selected.trim;
+  renderLinks();
+}
+$('lessPlayers').addEventListener('click',()=>{
+  playerCount=Math.max(2,playerCount-1);renderGarage();
+});
+$('morePlayers').addEventListener('click',()=>{
+  playerCount=Math.min(4,playerCount+1);renderGarage();
+});
+renderGarage();

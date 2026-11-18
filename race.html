@@ -35,10 +35,10 @@
   <header class="topbar">
     <div class="brand" aria-label="Snowshift vector racing">
       <strong>SNOW<span>SHIFT</span></strong>
-      <small>VECTOR RACING <span class="build-tag">18</span></small>
+      <small>VECTOR RACING <span class="build-tag">19</span></small>
     </div>
     <div class="top-controls">
-      <a id="homeLink" class="top-button home-link" href="./index.html" title="Return to Snowshift home (not Track 1)" aria-label="Home">⌂ <span>HOME</span></a>
+      <a id="homeLink" class="top-button home-link" href="./index.html" title="Return to game-mode home" aria-label="Home">⌂ <span>HOME</span></a>
       <span class="circuit-heading" id="circuitHeading">01 <span aria-hidden="true">/</span> NORTHERN LOOP</span>
       <button id="help" class="top-button" title="Start the interactive tutorial" aria-label="How to play">? <span>HOW TO PLAY</span></button>
       <button id="reset" class="top-button" title="Restart race" aria-label="Reset race">↻ <span>RESET</span></button>
@@ -48,7 +48,7 @@
     <section class="game-board" aria-label="Northern Loop race circuit">
       <canvas id="course" width="960" height="700" aria-label="Race track with position, skimmer, track boundaries, checkpoint gates and preview destinations"></canvas>
       <div class="board-label">
-        <a id="mapPicker" class="map-picker" href="./select-track.html?mode=single" aria-label="Change race circuit">
+        <a id="mapPicker" class="map-picker" href="./select-track.html?mode=single" aria-label="Change track or customise car">
           <span class="map-picker-kicker"><span id="biomeShort">SNOWBOUND</span> · <span id="mapNumber">01</span> <span aria-hidden="true">↗</span></span>
           <strong id="mapName">NORTHERN LOOP</strong>
           <span class="map-picker-level" id="mapLevel">BEGINNER 1 <b id="recordBadge" class="record-badge">· PB —</b></span>
@@ -80,7 +80,7 @@
           <div id="matchResults" class="match-results" hidden></div>
           <div class="finish-actions">
             <button id="raceAgain" class="primary" type="button">RACE AGAIN ↗</button>
-            <a id="finishChooseTrack" class="top-button finish-home" href="./select-track.html?mode=single">CHANGE TRACK</a>
+            <a id="finishChooseTrack" class="top-button finish-home" href="./select-track.html?mode=single">TRACK / GARAGE</a>
             <a class="top-button finish-home" href="./index.html">HOME</a>
           </div>
         </div>
@@ -91,6 +91,7 @@
           <h2 id="handoffTitle">PASS THE DEVICE</h2>
           <p id="handoffSummary">Time for the next racer.</p>
           <strong id="handoffName">PLAYER 2</strong>
+          <canvas id="handoffCarPreview" class="handoff-car-preview" width="280" height="92" aria-label="Next player's customised car"></canvas>
           <p class="handoff-instructions">Give the device to the next player, then start their turn.</p>
           <button type="button" id="beginTurn" class="primary">START TURN ↗</button>
         </div>

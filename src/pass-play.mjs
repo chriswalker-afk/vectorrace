@@ -1,4 +1,5 @@
 import { createRace, takeTurn, score } from './engine.mjs';
+import { normalizeCar, encodeCars } from './car-customization.mjs';
 
 export const PLAYER_COLORS = Object.freeze(['#ff7557','#75dfff','#d4fc77','#e5abfa']);
 
@@ -10,25 +11,30 @@ export function parseGameSettings(search) {
   return { gameType, players };
 }
 
-export function raceUrl(trackId, gameType = 'single', count = 2) {
+export function raceUrl(trackId, gameType = 'single', count = 2, cars = null) {
   const validId = typeof trackId==='string' && /^[a-z0-9-]{1,48}$/.test(trackId);
   if(!validId)throw new TypeError('Invalid track identifier');
   const params = new URLSearchParams({track:trackId,mode:gameType==='pass-play'?'pass-play':'single'});
   if(gameType==='pass-play')params.set('players',String(Math.max(2,Math.min(4,count))));
+  if(Array.isArray(cars))params.set('cars',encodeCars(cars,gameType==='pass-play'?count:1));
   return './race.html?'+params.toString();
 }
 
-export function selectUrl(gameType = 'single', count = 2) {
-  return './select-track.html?mode=' + (gameType==='pass-play'?'pass-play&players='+Math.max(2,Math.min(4,count)):'single');
+export function selectUrl(gameType = 'single', count = 2, cars = null) {
+  const params=new URLSearchParams({mode:gameType==='pass-play'?'pass-play':'single'});
+  if(gameType==='pass-play')params.set('players',String(Math.max(2,Math.min(4,count))));
+  if(Array.isArray(cars))params.set('cars',encodeCars(cars,gameType==='pass-play'?count:1));
+  return './select-track.html?'+params.toString();
 }
 
-export function createHotseat(circuit, count = 2) {
+export function createHotseat(circuit, count = 2, cars = null) {
   if(!Number.isInteger(count)||count<2||count>4)throw new RangeError('Pass & Play requires 2–4 players');
   return {
     activeIndex:0,
     players:Array.from({length:count},(_,i)=>{
       const state=createRace(circuit);
-      return {id:i+1,name:'Player '+(i+1),color:PLAYER_COLORS[i],state,
+      const car=normalizeCar(Array.isArray(cars)?cars[i]:null,i);
+      return {id:i+1,name:'Player '+(i+1),color:car.body,car,state,
         heading:0,frames:[{...state.position}]};
     })
   };

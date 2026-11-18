@@ -1,4 +1,4 @@
-name: Snowshift V18 menus and Pass & Play
+name: Snowshift public menus, cars and Pass & Play
 
 on:
   pull_request:
@@ -9,11 +9,14 @@ on:
       - 'theme-gallery.html'
       - 'src/track-select.mjs'
       - 'src/pass-play.mjs'
+      - 'src/car-customization.mjs'
       - 'src/race-v18.mjs'
       - 'src/ux-smoke-v18.mjs'
       - 'styles/track-select.css'
+      - 'styles/car-garage.css'
       - 'styles/pass-play.css'
       - 'tests/pass-play.test.mjs'
+      - 'tests/car-customization.test.mjs'
       - 'tests/navigation.test.mjs'
       - 'scripts/menu-pass-play-smoke.mjs'
       - 'package.json'
@@ -38,7 +41,7 @@ jobs:
         run: npm test
       - name: Syntax-check current game and archived versions
         run: npm run check
-      - name: Browser test mode -> map -> race and 3-player handoffs
+      - name: Browser test custom cars, mode -> map -> race and 3-player handoffs
         run: |
           set -e
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/snowshift-v18-http.log 2>&1 &
@@ -48,6 +51,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: snowshift-v18-menu-and-handoff-screens
+          name: snowshift-v19-custom-cars-and-multiplayer-previews
           path: screenshots/snowshift-v18-*.png
           if-no-files-found: warn

@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0a192b">
 <title>SNOWSHIFT · Choose a circuit</title>
 <link rel="stylesheet" href="./styles/track-select.css">
+<link rel="stylesheet" href="./styles/car-garage.css">
 <script type="module" src="./src/track-select.mjs"></script>
 </head>
 <body>
@@ -32,7 +33,39 @@
       <small>2–4 players · One glide each, then pass the device.</small>
     </aside>
   </section>
-  <p class="instructions" id="selectionHint">SELECT A TRACK TO START RACING <span>↓</span></p>
+  <section class="garage" aria-labelledby="garageTitle">
+    <div class="garage-heading">
+      <div><p class="eyebrow">YOUR RACING MACHINE</p><h2 id="garageTitle">Customise your car</h2></div>
+      <p>Choose a body shape and colours. Each player's car is cosmetic only — every racer follows the same vector physics.</p>
+    </div>
+    <div class="garage-layout">
+      <div class="garage-display">
+        <div class="garage-roster" id="carRoster" role="group" aria-label="Choose which player's car to customise"></div>
+        <canvas id="carPreview" width="320" height="125" aria-label="Live preview of your customised car"></canvas>
+        <strong id="carPreviewName">PLAYER 1 · SKIMMER</strong>
+        <span id="carPreviewCaption">Classic ice racer</span>
+      </div>
+      <div class="garage-settings">
+        <fieldset class="garage-field">
+          <legend>BODY STYLE</legend>
+          <div id="styleChoices" class="style-choices" role="group" aria-label="Choose car shape"></div>
+        </fieldset>
+        <div class="paint-fields">
+          <fieldset class="garage-field">
+            <legend>BODY COLOUR</legend>
+            <div id="bodyColours" class="paint-choices" role="group" aria-label="Choose body colour"></div>
+            <label class="custom-paint" for="customBody"><span>Custom body colour</span><input id="customBody" type="color" value="#ff7557" aria-label="Custom body colour"></label>
+          </fieldset>
+          <fieldset class="garage-field">
+            <legend>TRIM COLOUR</legend>
+            <div id="trimColours" class="paint-choices" role="group" aria-label="Choose trim colour"></div>
+            <label class="custom-paint" for="customTrim"><span>Custom trim colour</span><input id="customTrim" type="color" value="#f5fbff" aria-label="Custom trim colour"></label>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </section>
+  <p class="instructions" id="selectionHint">CAR READY? SELECT A TRACK TO START RACING <span>↓</span></p>
   <div id="trackList" class="regions" aria-label="Choose one of twelve circuits"></div>
   <noscript><p>Enable JavaScript to view all twelve selectable Snowshift circuits.</p></noscript>
   <footer><a href="./index.html">← CHANGE GAME MODE</a><span>12 CIRCUITS · 4 REGIONS · SAME MATHEMATICS</span></footer>
