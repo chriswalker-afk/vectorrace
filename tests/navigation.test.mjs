@@ -62,3 +62,20 @@ test('public race controller uses the V18 hotseat flow, never a retired map menu
   assert.match(controller,/match=activateHotseatPlayer\(match,next\)/);
   assert.doesNotMatch(controller,/toggleMapMenu|closeMapMenu|showTrackPickerOnEntry|mapMenu/);
 });
+
+test('single and multiplayer share one garage on the track screen, not another menu',()=>{
+  const selector=read('select-track.html');
+  for(const id of ['carRoster','carPreview','styleChoices','bodyColours','trimColours','customBody','customTrim'])
+    assert.match(selector,new RegExp('id="'+id+'"'));
+  const js=read('src/track-select.mjs');
+  assert.match(js,/paintCarPreview/);
+  assert.match(js,/saveSoloCar/);
+  assert.match(js,/raceUrl\(circuit.id,settings.gameType,playerCount,cars\)/);
+  const race=read('src/race-v18.mjs');
+  assert.match(race,/decodeCars\(urlParams.get\('cars'\)/);
+  assert.match(race,/selectUrl\(gameSettings.gameType,gameSettings.players,carDesigns\)/);
+  assert.match(race,/drawCar\(ctx, world\(skimmerPosition\)/);
+  assert.match(race,/drawCar\(ctx,point,player.heading/);
+  assert.match(race,/paintCarPreview\(\$\('handoffCarPreview'\),next.car\)/);
+  assert.doesNotMatch(race,/artwork\.drawSkimmer\(ctx/);
+});

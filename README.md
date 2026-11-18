@@ -75,3 +75,9 @@ PR #3 introduces original reusable SVG vehicles, scenery and surface materials. 
 - Pass & Play: choose **2, 3 or 4** players on the track selector, then take **one vector glide per player**. Hand the device to the next racer and tap **Start Turn** to continue. Each player has an independent race state, checkpoints, lap progress and obstacle phase clock. Players do not collide with one another. The game skips completed racers and compares final scores (**turns + 3 × crashes**, lowest wins; equal scores tie).
 - **Home** always returns to the title page; **Change Track** always returns to the track selector for the same game mode and number of players. **Reset** restarts the current race or entire Pass & Play match; **Race Again** restarts on the current circuit.
 - Local personal bests and ghosts belong to Single Player only. Pass & Play never saves over solo personal bests.
+
+## Build 19: racer customisation
+
+The **Choose a Circuit** screen includes a built-in **Garage**. A single player can choose one of four visible car silhouettes (**Skimmer, Arrow, Rally or Glider**), a body colour and a separate trim colour using preset swatches or the colour picker. The solo car is saved locally on the device. In Pass & Play, each of the 2–4 players customises their own car by selecting their racer tab in the same garage.
+
+Custom cars use the same Canvas renderer in garage previews, on the course and at the player handoff. The appearances travel with the race link (cars=...) and stay intact through race reset, turn changes and **Track / Garage** navigation. Changes are purely visual and do not modify the track, engine, hitbox, scores, lap records or solo physics. Invalid appearance data safely falls back to default skins. No account or additional image asset is required.
