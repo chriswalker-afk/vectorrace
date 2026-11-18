@@ -20,7 +20,11 @@ const COLORS = {
   white: '#eff8fb', flare: '#ff7557', lime: '#d4fc77'
 };
 const useReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-let circuit = getCircuit(new URLSearchParams(location.search).get('track'));
+// A missing or obsolete track parameter opens the current full track selector;
+// never silently interpret Home as the legacy first track.
+const requestedTrack = new URLSearchParams(location.search).get('track');
+const showTrackPickerOnEntry = !requestedTrack || !CIRCUITS.some(c => c.id === requestedTrack);
+let circuit = getCircuit(requestedTrack);
 let state = createRace(circuit);
 let selection = { x: 1, y: 0 };
 let heading = 0;
@@ -470,8 +474,10 @@ function toggleMapMenu() {
 }
 function switchCircuit(nextId) {
   const next = getCircuit(nextId);
+  if (!CIRCUITS.some(c => c.id === nextId)) return;
   closeMapMenu();
   if (next.id === circuit.id) return;
+
   circuit = next;
   records = createRecordStore(storage, circuit.id);
   bestRecord = records.load();
@@ -809,6 +815,12 @@ for (const button of $('modeOptions').querySelectorAll('button')) {
 $('commit').addEventListener('click', commit);
 $('reset').addEventListener('click', reset);
 $('raceAgain').addEventListener('click', reset);
+$('finishChooseTrack').addEventListener('click', () => {
+  $('finishPanel').hidden = true;
+  reset();
+  toggleMapMenu();
+  $('mapPicker').focus();
+});
 $('mapPicker').addEventListener('click', toggleMapMenu);
 for (const option of document.querySelectorAll('[data-circuit]')) {
   option.addEventListener('click', () => switchCircuit(option.dataset.circuit));
@@ -915,3 +927,6 @@ $('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB
 $('ghostToggle').hidden = !bestRecord;
 renderHUD();
 resize();
+if (showTrackPickerOnEntry) {
+  toggleMapMenu();
+}

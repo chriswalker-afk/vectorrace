@@ -13,7 +13,7 @@ const assets = [
   'lantern.svg'
 ];
 
-test('the art library contains the eight declared original SVG assets', () => {
+test('the game retains all eight original SVG artwork assets', () => {
   for (const name of assets) {
     const path = 'assets/art/' + name;
     assert.equal(existsSync(path), true, 'Missing ' + path);
@@ -34,7 +34,12 @@ test('PR3 scene is separate from and compatible with PR2 physics', () => {
   assert.match(controller, /takeTurn\(state, selection, circuit\)/);
   assert.match(controller, /createSnowshiftArtwork/);
   assert.match(controller, /artwork\.paintScene/);
-  for (const file of ['race-v3.html', 'styles/race-v3.css', 'artwork-lab.html']) {
+  for (const file of ['race-v3.html', 'styles/race-v3.css']) {
     assert.equal(existsSync(file), true, 'Missing ' + file);
   }
+});
+
+test('retired art library is absent and not linked from the public home page', () => {
+  assert.equal(existsSync('artwork-lab.html'), false);
+  assert.doesNotMatch(readFileSync('index.html', 'utf8'), /artwork-lab\.html|VIEW ART LIBRARY/i);
 });

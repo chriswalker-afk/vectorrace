@@ -37,6 +37,7 @@
       <small>VECTOR RACING <span class="build-tag">17</span></small>
     </div>
     <div class="top-controls">
+      <a id="homeLink" class="top-button home-link" href="./index.html" title="Return to Snowshift home (not Track 1)" aria-label="Home">⌂ <span>HOME</span></a>
       <span class="circuit-heading" id="circuitHeading">01 <span aria-hidden="true">/</span> NORTHERN LOOP</span>
       <button id="help" class="top-button" title="Start the interactive tutorial" aria-label="How to play">? <span>HOW TO PLAY</span></button>
       <button id="reset" class="top-button" title="Restart race" aria-label="Reset race">↻ <span>RESET</span></button>
@@ -115,7 +116,11 @@
           <p>Beautiful racing. Every vector counted.</p>
           <div class="finish-score"><span>FINAL SCORE</span><strong id="finalScore">0</strong></div>
           <small id="bestResult" class="record-result">Local records on this device</small>
-          <button id="raceAgain" class="primary" type="button">RACE AGAIN ↗</button>
+          <div class="finish-actions">
+            <button id="raceAgain" class="primary" type="button">RACE AGAIN ↗</button>
+            <button id="finishChooseTrack" class="top-button" type="button">CHOOSE TRACK</button>
+            <a class="top-button finish-home" href="./index.html">HOME</a>
+          </div>
         </div>
       </div>
     </section>

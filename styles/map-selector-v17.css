@@ -62,3 +62,29 @@
   }
   .map-option[data-circuit="arctic-grand-prix"]{border-width:1.5px}
 }
+
+/* Stable navigation: Home and replay are distinct actions, including at the finish. */
+.home-link { display:inline-flex;align-items:center;justify-content:center;text-decoration:none; }
+.finish-actions { display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center;margin-top:12px; }
+.finish-actions .primary,.finish-actions .top-button { min-height:36px;padding:7px 11px;text-decoration:none; }
+.finish-home { display:inline-flex;align-items:center;justify-content:center; }
+@media(max-width:760px) { .home-link { min-width:30px;padding:4px 7px; } }
+
+/* The three finish actions must never turn the podium into a scrolling card.
+   On phones, show the finish as a full-screen modal rather than cramming
+   it into the short race-board viewport. */
+@media (max-width:920px) {
+  .game-board:has(#finishPanel:not([hidden])) { z-index:30; overflow:visible; }
+  .finish-panel:not([hidden]) { position:fixed; inset:0; z-index:40; }
+  .finish-card { max-height:calc(100dvh - 20px); }
+  .finish-actions { margin-top:7px; gap:5px; }
+  .finish-actions .primary,
+  .finish-actions .top-button { min-height:32px; padding:5px 8px; font-size:10px; }
+}
+@media (max-height:450px) and (orientation:landscape) {
+  .finish-card { padding:8px 13px; max-height:calc(100dvh - 16px); overflow:hidden; }
+  .finish-card h2 { font-size:clamp(27px,8dvh,36px); line-height:1; margin:3px 0; }
+  .finish-card p { display:none; }
+  .finish-score { margin:5px 0; padding:5px 8px; }
+  .finish-actions { margin-top:5px; }
+}

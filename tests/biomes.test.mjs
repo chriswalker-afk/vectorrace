@@ -79,12 +79,13 @@ test('earlier circuits are untouched; visual renderer is isolated in V10',()=>{
   assert.match(v10,/document\.documentElement\.dataset\.biome/);
 });
 
-test('region preview shows all four tiers without inventing playable tracks',()=>{
+test('region preview shows all four tiers with accurate playable status',()=>{
   const html=readFileSync(new URL('../theme-gallery.html',import.meta.url),'utf8');
   const gallery=readFileSync(new URL('../src/biome-gallery.mjs',import.meta.url),'utf8');
   const art=readFileSync(new URL('../src/race-art-v10.mjs',import.meta.url),'utf8');
   for(const tier of TIERS)assert.match(html,new RegExp('preview-'+tier));
-  assert.match(html,/Visual concepts/);
+  assert.match(html,/All 12 circuits are playable/);
+  assert.equal((html.match(/class="state">PLAYABLE/g)||[]).length,4);
   assert.match(gallery,/NORTHERN_LOOP/);
   assert.match(art,/ctx\.clip\('evenodd'\)/);
   assert.match(art,/biomeForCircuit\(circuit\)/);
