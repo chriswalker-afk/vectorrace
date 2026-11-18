@@ -31,16 +31,33 @@ h1 span{color:#ff7557}
 footer{margin-top:45px;color:#8cb1bd;font-size:11px;letter-spacing:.08em}
 @media(max-width:850px){.hero{grid-template-columns:1fr;gap:12px;min-height:auto;padding-top:32px}.scene{min-height:340px}.features{grid-template-columns:1fr;gap:0}h1{font-size:clamp(56px,12vw,95px)}}
 @media(max-width:480px){main{padding:14px 10px 25px}.scene{min-height:280px}.vehicle{width:96%}.tag{right:8px;bottom:8px}}
+.mode-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:28px;max-width:620px}
+.mode-card{display:flex;flex-direction:column;gap:9px;min-height:166px;padding:19px 15px;border:2px solid #d4fc77;border-radius:8px;text-decoration:none;color:#eff8fb;background:linear-gradient(155deg,#164b65,#0b293b)}
+.mode-card.friends{border-color:#ffac83;background:linear-gradient(155deg,#58374b,#17283c)}
+.mode-card small{font-size:10px;letter-spacing:.1em;color:#d4fc77;font-weight:950}
+.mode-card.friends small{color:#ffbd97}
+.mode-card strong{font-size:clamp(17px,2vw,23px);line-height:1.1}
+.mode-card strong span{color:#d4fc77}
+.mode-card.friends strong span{color:#ffbd97}
+.mode-card>span{font-size:12px;line-height:1.45;color:#c9e2e7}
+.mode-card:hover,.mode-card:focus-visible{outline:2px solid #fff;outline-offset:3px;transform:translateY(-2px)}
+.explore-link{margin:15px 0 0;font-size:11px;letter-spacing:.08em;font-weight:800}
+.explore-link a{color:#b9eaf0}
+@media(max-width:470px){.mode-choices{grid-template-columns:1fr}.mode-card{min-height:120px;padding:13px 16px}}
 </style></head>
 <body><main>
 <header class="top"><div class="kicker">ARCTIC SERIES / VECTOR RACING</div></header>
 <section class="hero">
 <div>
-<div class="kicker">EARLY ACCESS / SINGLE-PLAYER PROTOTYPE</div>
+<div class="kicker">ARCTIC SERIES / ONE DEVICE · TWO WAYS TO RACE</div>
 <h1>SNOW<br><span>SHIFT</span></h1>
 <div class="strap">Think ahead.<br>Slide faster.</div>
-<p class="copy">Race all twelve vector-racing circuits across four increasingly dramatic Arctic worlds. Beyond the Beginner tracks, discover Aurora Vale's Glass Ice and Crosswind Ridge. Beyond Ember Rift's three Advanced circuits, the Expert finale takes you to Eclipse Summit for a two-lap Arctic Grand Prix. Combine Glass Ice, crosswinds and forced boosts while navigating three timed sentinels. Preserve speed, plan ahead and race for the Eclipse Cup.</p>
-<div class="actions"><a class="action" href="race.html">CHOOSE A CIRCUIT ↗</a><a class="action secondary" href="theme-gallery.html">EXPLORE FOUR WORLDS ↗</a></div>
+<p class="copy">Twelve vector-racing circuits. Four Arctic worlds. Play alone or challenge friends on the same device: choose your mode, choose your circuit, then race with mathematical precision.</p>
+<div class="mode-choices" aria-label="Choose a game mode">
+  <a class="mode-card" href="./select-track.html?mode=single"><small>01 / SOLO RUN</small><strong>SINGLE PLAYER <span aria-hidden="true">↗</span></strong><span>Choose a track, master your vectors and set a personal best.</span></a>
+  <a class="mode-card friends" href="./select-track.html?mode=pass-play"><small>02 / SAME DEVICE</small><strong>PASS &amp; PLAY <span aria-hidden="true">↗</span></strong><span>2–4 racers take one glide each, pass the device and compete for the lowest score.</span></a>
+</div>
+<p class="explore-link"><a href="./theme-gallery.html">EXPLORE THE FOUR WORLDS ↗</a></p>
 </div>
 <div class="scene" aria-label="Original Snowshift artwork: a skimmer racing over a frozen grid">
 <img class="tree t1" src="assets/art/pine-canopy.svg" alt="">
@@ -55,5 +72,5 @@ footer{margin-top:45px;color:#8cb1bd;font-size:11px;letter-spacing:.08em}
 <div class="feature"><strong>02 / LEARN TO CORNER</strong><p>Use mathematical planning rather than conventional steering.</p></div>
 <div class="feature"><strong>03 / FINISH THE CIRCUIT</strong><p>Cross the gates in order, avoid the snowbanks and minimise your score.</p></div>
 </section>
-<footer>SNOWSHIFT · WORKING TITLE · ORIGINAL ARCTIC RACING ART · PROTOTYPE BUILD 17 · FOUR BEGINNER + FOUR INTERMEDIATE + THREE ADVANCED + ONE EXPERT</footer>
+<footer>SNOWSHIFT · SINGLE PLAYER / PASS & PLAY · ORIGINAL ARCTIC RACING ART · BUILD 18 · FOUR BEGINNER + FOUR INTERMEDIATE + THREE ADVANCED + ONE EXPERT</footer>
 </main></body></html>

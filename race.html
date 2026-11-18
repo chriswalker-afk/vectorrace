@@ -26,15 +26,16 @@
 <link rel="stylesheet" href="./styles/gauntlet-ui.css">
 <link rel="stylesheet" href="./styles/map-selector-v17.css">
 <link rel="stylesheet" href="./styles/grand-prix-ui.css">
-<script type="module" src="./src/race-v17.mjs"></script>
-<script type="module" src="./src/ux-smoke-v17.mjs"></script>
+<link rel="stylesheet" href="./styles/pass-play.css">
+<script type="module" src="./src/race-v18.mjs"></script>
+<script type="module" src="./src/ux-smoke-v18.mjs"></script>
 </head>
 <body>
 <div class="app-shell" id="app">
   <header class="topbar">
     <div class="brand" aria-label="Snowshift vector racing">
       <strong>SNOW<span>SHIFT</span></strong>
-      <small>VECTOR RACING <span class="build-tag">17</span></small>
+      <small>VECTOR RACING <span class="build-tag">18</span></small>
     </div>
     <div class="top-controls">
       <a id="homeLink" class="top-button home-link" href="./index.html" title="Return to Snowshift home (not Track 1)" aria-label="Home">⌂ <span>HOME</span></a>
@@ -47,51 +48,11 @@
     <section class="game-board" aria-label="Northern Loop race circuit">
       <canvas id="course" width="960" height="700" aria-label="Race track with position, skimmer, track boundaries, checkpoint gates and preview destinations"></canvas>
       <div class="board-label">
-        <button id="mapPicker" type="button" class="map-picker" aria-expanded="false" aria-controls="mapMenu" aria-haspopup="true" aria-label="Choose race circuit">
-          <span class="map-picker-kicker"><span id="biomeShort">SNOWBOUND</span> · <span id="mapNumber">01</span> <span aria-hidden="true">▾</span></span>
+        <a id="mapPicker" class="map-picker" href="./select-track.html?mode=single" aria-label="Change race circuit">
+          <span class="map-picker-kicker"><span id="biomeShort">SNOWBOUND</span> · <span id="mapNumber">01</span> <span aria-hidden="true">↗</span></span>
           <strong id="mapName">NORTHERN LOOP</strong>
           <span class="map-picker-level" id="mapLevel">BEGINNER 1 <b id="recordBadge" class="record-badge">· PB —</b></span>
-        </button>
-      </div>
-      <div id="mapMenu" class="map-menu" role="group" aria-label="Choose race circuit" hidden>
-        <div class="map-menu-title">CHOOSE A CIRCUIT <span>4 BEGINNER · 4 INTERMEDIATE · 3 ADVANCED · 1 EXPERT</span></div>
-        <button type="button" class="map-option" data-circuit="northern-loop" aria-current="true">
-          <span class="map-option-no">01</span><span class="map-option-body"><strong>NORTHERN LOOP</strong><small>BEGINNER 1 · WIDE BENDS</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="aurora-split" aria-current="false">
-          <span class="map-option-no">02</span><span class="map-option-body"><strong>AURORA SPLIT</strong><small>BEGINNER 2 · SMALL ROCK · TWO ROUTES</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="frost-chicane" aria-current="false">
-          <span class="map-option-no">03</span><span class="map-option-body"><strong>FROST CHICANE</strong><small>BEGINNER 3 · TWO QUICK BENDS</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="narrow-passage" aria-current="false">
-          <span class="map-option-no">04</span><span class="map-option-body"><strong>NARROW PASSAGE</strong><small>BEGINNER 4 · SHORT BOTTLENECK</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="hairpin-hollow" aria-current="false">
-          <span class="map-option-no">05</span><span class="map-option-body"><strong>HAIRPIN HOLLOW</strong><small>INTERMEDIATE 1 · 180° TURN</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="twin-routes" aria-current="false">
-          <span class="map-option-no">06</span><span class="map-option-body"><strong>TWIN ROUTES</strong><small>INTERMEDIATE 2 · SHORT / WIDE</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="glass-ice" aria-current="false">
-          <span class="map-option-no">07</span><span class="map-option-body"><strong>GLASS ICE</strong><small>INTERMEDIATE 3 · ONE AXIS</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="crosswind-ridge" aria-current="false">
-          <span class="map-option-no">08</span><span class="map-option-body"><strong>CROSSWIND RIDGE</strong><small>INTERMEDIATE 4 · WIND ↓</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="icebound-rapids" aria-current="false">
-          <span class="map-option-no">09</span><span class="map-option-body"><strong>ICEBOUND RAPIDS</strong><small>ADVANCED 1 · BOOST ±2</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="broken-passage" aria-current="false">
-          <span class="map-option-no">10</span><span class="map-option-body"><strong>BROKEN PASSAGE</strong><small>ADVANCED 2 · MOVING ROCKS</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="frozen-gauntlet" aria-current="false">
-          <span class="map-option-no">11</span><span class="map-option-body"><strong>FROZEN GAUNTLET</strong><small>ADVANCED 3 · GLASS+WIND</small></span>
-        </button>
-        <button type="button" class="map-option" data-circuit="arctic-grand-prix" aria-current="false"
-          aria-label="12 Arctic Grand Prix, Expert Final, two laps, three moving sentinels">
-          <span class="map-option-no">12</span><span class="map-option-body"><strong>ARCTIC GRAND PRIX</strong><small>EXPERT FINAL · 2 LAPS</small></span>
-        </button>
+        </a>
       </div>
       <div class="board-scores" aria-label="Race scoreboard">
         <div><small>TURNS</small><strong id="moves">00</strong></div>
@@ -112,21 +73,32 @@
       <div id="finishPanel" class="finish-panel" hidden>
         <div class="finish-card">
           <small>THE ARCTIC SERIES</small>
-          <h2>FINISH!</h2>
-          <p>Beautiful racing. Every vector counted.</p>
-          <div class="finish-score"><span>FINAL SCORE</span><strong id="finalScore">0</strong></div>
+          <h2 id="finishTitle">FINISH!</h2>
+          <p id="finishIntro">Beautiful racing. Every vector counted.</p>
+          <div class="finish-score"><span id="finishScoreLabel">FINAL SCORE</span><strong id="finalScore">0</strong></div>
           <small id="bestResult" class="record-result">Local records on this device</small>
+          <div id="matchResults" class="match-results" hidden></div>
           <div class="finish-actions">
             <button id="raceAgain" class="primary" type="button">RACE AGAIN ↗</button>
-            <button id="finishChooseTrack" class="top-button" type="button">CHOOSE TRACK</button>
+            <a id="finishChooseTrack" class="top-button finish-home" href="./select-track.html?mode=single">CHANGE TRACK</a>
             <a class="top-button finish-home" href="./index.html">HOME</a>
           </div>
         </div>
       </div>
+      <div id="handoffPanel" class="handoff-panel" hidden role="dialog" aria-modal="true" aria-labelledby="handoffTitle">
+        <div class="handoff-card">
+          <small id="handoffPrevious">PLAYER 1 FINISHED THE TURN</small>
+          <h2 id="handoffTitle">PASS THE DEVICE</h2>
+          <p id="handoffSummary">Time for the next racer.</p>
+          <strong id="handoffName">PLAYER 2</strong>
+          <p class="handoff-instructions">Give the device to the next player, then start their turn.</p>
+          <button type="button" id="beginTurn" class="primary">START TURN ↗</button>
+        </div>
+      </div>
     </section>
-    <aside class="race-panel" aria-label="Single-screen race controls">
+    <aside class="race-panel" aria-label="Vector racing controls">
       <div class="mode-strip">
-        <span class="section-label">MODE</span>
+        <span class="section-label">ASSISTANCE</span>
         <div id="modeOptions" class="mode-options" role="group" aria-label="Mathematical assistance">
           <button type="button" data-mode="guided" aria-pressed="true">GUIDED</button>
           <button type="button" data-mode="standard" aria-pressed="false">STANDARD</button>
@@ -161,6 +133,7 @@
       <div class="panel-footer">
         <button id="showGrid" class="grid-toggle" type="button" aria-pressed="true" title="Toggle coordinate grid">▦ <span>GRID ON</span></button>
         <button id="ghostToggle" class="grid-toggle ghost-toggle" type="button" aria-pressed="true" title="Show or hide the local best lap ghost" hidden>◌ <span>GHOST</span></button>
+        <div id="playerStrip" class="players-strip" aria-live="polite" aria-label="Pass and Play standings" hidden></div>
         <p id="microHint" class="micro-hint">NUMBERS 1–9 · ENTER TO GLIDE · ARROWS TO ADJUST</p>
       </div>
     </aside>
