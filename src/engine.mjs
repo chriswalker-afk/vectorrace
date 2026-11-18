@@ -89,6 +89,51 @@ export function boostVectorAt(point, circuit = NORTHERN_LOOP) {
   return zone ? {...zone.vector} : {x:0,y:0};
 }
 
+
+/** A circular basalt slab is painted at its exact 0.55-unit physics radius. */
+export const SKIMMER_HAZARD_HALF_WIDTH = 0.8;
+
+/** Motion only advances on an attempted turn, never with wall-clock time. */
+export function movingObstaclePeriod(circuit = NORTHERN_LOOP) {
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+  return (circuit.movingObstacles??[]).reduce((period,obstacle)=>{
+    const count=obstacle.positions.length;
+    return period/gcd(period,count)*count;
+  },1);
+}
+
+export function movingObstaclePosition(obstacle, turn) {
+  if (!Number.isInteger(turn)||turn<0) throw new RangeError('Obstacle turn index must be a nonnegative integer');
+  const position=obstacle.positions[turn%obstacle.positions.length];
+  return {...position};
+}
+
+/** Minimum centre separation of simultaneous linear car-and-obstacle sweeps. */
+export function movingObstacleApproach(from, to, obstacle, turn) {
+  const before=movingObstaclePosition(obstacle,turn);
+  const after=movingObstaclePosition(obstacle,turn+1);
+  const initial=sub(from,before);
+  const relative=sub(sub(to,from),sub(after,before));
+  const magnitude=dot(relative,relative);
+  const t=magnitude>EPSILON
+    ?Math.max(0,Math.min(1,-dot(initial,relative)/magnitude)):0;
+  return Math.hypot(initial.x+relative.x*t,initial.y+relative.y*t);
+}
+
+/** Remaining car-width clearance around all hazards; Infinity on old tracks. */
+export function movingObstaclePathClearance(from,to,circuit=NORTHERN_LOOP,turn=0) {
+  return Math.min(Infinity,...(circuit.movingObstacles??[]).map(obstacle=>
+    movingObstacleApproach(from,to,obstacle,turn)-obstacle.radius-SKIMMER_HAZARD_HALF_WIDTH
+  ));
+}
+
+export function movingObstacleImpact(from,to,circuit=NORTHERN_LOOP,turn=0) {
+  return (circuit.movingObstacles??[]).find(obstacle=>
+    movingObstacleApproach(from,to,obstacle,turn)
+      < obstacle.radius+SKIMMER_HAZARD_HALF_WIDTH-EPSILON
+  )??null;
+}
+
 export function accelerationAllowed(state, acceleration, circuit = NORTHERN_LOOP) {
   if (!validAcceleration(acceleration)) return false;
   const zone=glassIceZoneAt(state.position,circuit);
@@ -222,15 +267,18 @@ export function previewMove(state, acceleration, circuit = NORTHERN_LOOP) {
   const zone=glassIceZoneAt(state.position,circuit);
   const zoneBlocked=!accelerationAllowed(state,acceleration,circuit);
   const roadClear=!zoneBlocked && segmentOnTrack(state.position,destination,circuit);
+  const movingImpact=roadClear
+    ?movingObstacleImpact(state.position,destination,circuit,state.moves??0):null;
   return {
     from: { ...state.position },
     to: destination,
     velocity: nextVelocity,
     acceleration: { ...acceleration },
-    valid: !zoneBlocked && roadClear,
-    // Rejected glass-ice controls are NOT collisions and incur no penalty.
+    valid: !zoneBlocked && roadClear && !movingImpact,
+    // A moving obstacle is physically solid throughout BOTH motion segments.
     zoneBlocked,
-    reason: zoneBlocked?'glass-axis-only':roadClear?null:'snowbank',
+    movingObstacle: movingImpact?.id ?? null,
+    reason: zoneBlocked?'glass-axis-only':!roadClear?'snowbank':movingImpact?'moving-obstacle':null,
     surface: zone?.id ?? null,
     wind,
     windZone:windZoneAt(state.position,circuit)?.id ?? null,
@@ -247,6 +295,25 @@ export function score(state, circuit = NORTHERN_LOOP) {
   return state.moves + state.crashes * circuit.crashPenalty;
 }
 
+
+/**
+ * A player cannot safely remain inside an obstacle's NEXT sweep after a crash.
+ * Recover to the most recent previously visited, driveable and safe gridpoint
+ * (or the initial starting pad as a last resort). Only moving-slab collisions
+ * use this rescue rule; prior snowbank crash behaviour is unchanged.
+ */
+function safeMovingRecovery(state,circuit){
+  const nextTurn=state.moves+1;
+  const safe=p=>onTrack(p,circuit) &&
+    movingObstaclePathClearance(p,p,circuit,nextTurn)>=0.05;
+  if(safe(state.position))return {position:{...state.position},trail:state.trail};
+  for(let i=(state.trail?.length??0)-1;i>=0;i--){
+    const candidate=state.trail[i].from;
+    if(safe(candidate))return {position:{...candidate},trail:state.trail.slice(0,i)};
+  }
+  return {position:{...circuit.start},trail:[]};
+}
+
 export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
   if (state.finished) return state;
   const move = previewMove(state, acceleration, circuit);
@@ -256,14 +323,21 @@ export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
     return { ...state, lastEvent:'Glass Ice: one axis per turn' };
   }
   if (!move.valid) {
-    // A crash keeps the player at the last legal grid point, kills velocity,
-    // and costs one attempted turn plus an additional score penalty.
+    // Static collisions preserve the classic behaviour. Dynamic collisions
+    // rescue only when the next timed obstacle sweep would trap the player.
+    const recovery=move.movingObstacle
+      ? safeMovingRecovery(state,circuit)
+      : {position:state.position,trail:state.trail};
     return {
       ...state,
+      position: recovery.position,
+      trail: recovery.trail,
       velocity: { x: 0, y: 0 },
       moves: state.moves + 1,
       crashes: state.crashes + 1,
-      lastEvent: 'Crash: reset velocity to zero'
+      lastEvent: move.movingObstacle
+        ? 'Crash: struck moving basalt slab'
+        : 'Crash: reset velocity to zero'
     };
   }
   const progress = gateProgress(move.from, move.to, state.checkpoint, state.laps, circuit);

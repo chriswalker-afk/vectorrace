@@ -1,0 +1,17 @@
+/* Moving-rock public schedule uses the existing HUD, not an extra row. */
+html[data-surface="moving"] #accelNotationHint{
+  color:#ffdfae;font-weight:900;letter-spacing:.015em;
+  font-size:clamp(8px,.87vw,11px);
+}
+html[data-surface="moving"] #message{
+  color:#ffe5ba;font-weight:900;text-shadow:0 2px 5px #392026;
+}
+html[data-surface="moving"] .readout-grid{
+  border-color:#ffbb81;box-shadow:0 0 12px #ffbb813b;
+}
+html[data-surface="moving"] #accelerationPad{
+  outline:1px solid #ffcb9783;border-radius:5px;
+}
+html[data-surface="moving"] .acceleration-pad button:not([disabled]){
+  border-color:#fbc69e9c;
+}

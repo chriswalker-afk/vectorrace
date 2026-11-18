@@ -1,0 +1,64 @@
+/*
+ * Ten-circuit overlay: 3 columns x 4 rows, with a wide final Advanced card.
+ * The 320px portrait board can fit four 34px rows without scrolling.
+ */
+.map-menu:not([hidden]){
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:auto repeat(4,44px);
+  width:min(555px,calc(100% - 10px));
+  max-height:calc(100% - 47px);
+  overflow:hidden;
+}
+.map-option,
+.map-option[data-circuit="glass-ice"],
+.map-option[data-circuit="crosswind-ridge"]{
+  grid-column:auto;
+  min-height:44px;height:44px;
+  padding:3px 4px;
+}
+.map-option[data-circuit="broken-passage"]{
+  grid-column:1/-1;
+  border-color:#ffc78fa0;
+  justify-content:flex-start;
+}
+.map-option[data-circuit="broken-passage"] .map-option-body{
+  flex-direction:row;
+  align-items:center;
+  flex-wrap:wrap;
+  column-gap:9px;
+}
+.map-option[data-circuit="broken-passage"] .map-option-body strong{font-size:11px}
+.map-option[data-circuit="broken-passage"] .map-option-body small{font-size:8px}
+@media(max-width:440px) and (orientation:portrait),
+       (max-width:760px) and (orientation:landscape),
+       (max-height:450px) and (orientation:landscape){
+  .map-menu:not([hidden]){
+    grid-template-rows:auto repeat(4,34px);
+    top:39px;max-height:none;overflow:visible;
+    row-gap:1px;column-gap:2px;
+    padding:2px 3px;
+  }
+  .map-menu-title{margin:0 1px}
+  .map-option,
+  .map-option[data-circuit="glass-ice"],
+  .map-option[data-circuit="crosswind-ridge"],
+  .map-option[data-circuit="broken-passage"]{
+    min-height:34px;height:34px;
+    padding:1px 2px;gap:3px;overflow:hidden;
+  }
+  .map-option-body strong,
+  .map-option[data-circuit="glass-ice"] .map-option-body strong,
+  .map-option[data-circuit="crosswind-ridge"] .map-option-body strong{
+    font-size:8px;line-height:1.02;
+  }
+  .map-option-body small,
+  .map-option[data-circuit="glass-ice"] .map-option-body small,
+  .map-option[data-circuit="crosswind-ridge"] .map-option-body small{
+    font-size:7px;line-height:1.02;
+  }
+  .map-option[data-circuit="broken-passage"] .map-option-body{
+    flex-direction:row;align-items:center;column-gap:7px;gap:3px;
+  }
+  .map-option[data-circuit="broken-passage"] .map-option-body strong{font-size:9px}
+  .map-option[data-circuit="broken-passage"] .map-option-body small{font-size:7px}
+}
