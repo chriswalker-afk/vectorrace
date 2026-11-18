@@ -35,6 +35,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `race-v14.html` — nine circuits, with Icebound Rapids (Advanced 1): two copper boost strips push +2 east and -2 west in Ember Rift.
 - `race-v15.html` — **ten playable tracks**, now including Broken Passage (Advanced 2): two moving basalt slabs with a published six-turn clock, synchronized swept collision checks and safety recovery.
 - `race-v16.html` — **eleven playable tracks**, now including Frozen Gauntlet (Advanced 3): one shared Glass+Wind polygon, a westward boost through a timed moving-rock crossing and a second Glass Ice strip.
+- `race-v17.html` — **the full twelve-track Arctic Series**, ending with **Arctic Grand Prix (Expert 1 / Eclipse Summit)**: a distinct black-glass and gilded mountain circuit, two continuous laps, three timed sentinels, coupled Glass+Wind, boosted basalt and return Glass Ice.
 - `theme-gallery.html` — all four region palettes shown using the same reference course (Expert remains a visual concept; Advanced is now playable).
   - PR #7 adds **Master** after Expert: nine column-vector acceleration keys instead of arrows, with no predictions or racing hints.
 - `artwork-lab.html` — inspect individual SVG vehicle, terrain and track materials.
@@ -55,6 +56,7 @@ Inspired by the educational vector-racing tradition in NRICH, CIMT Vectorace and
 - `docs/PR17_ICEBOUND_RAPIDS.md` — Track 09 fixed boost-vector mathematics, Ember Rift geometry, safety route and QA.
 - `docs/PR18_BROKEN_PASSAGE.md` — Track 10 obstacle phase physics, complete moving-hazard clearance QA and one-screen browser release checks.
 - `docs/PR19_FROZEN_GAUNTLET.md` — Track 11 coupled mechanics, mathematical timing rules, 24-turn full-lap proof and classroom difficulty checklist.
+- `docs/PR20_ARCTIC_GRAND_PRIX.md` — Track 12 Expert two-lap mathematical specification, three moving sentinels, 50-turn full race and all-device release QA.
 
 The browser prototype uses native JavaScript ES modules. Serve the project through HTTP(S), not by double-clicking an HTML file:
 
@@ -64,6 +66,6 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race-v16.html` for all eleven tracks. Add `?track=frozen-gauntlet` to see both coupled-field and boosted-rock challenges. The V15 ten-track build remains available for comparison.
+Open `http://localhost:8000/race-v17.html` to choose from all twelve tracks. Add `?track=arctic-grand-prix` for the final two-lap Eclipse Cup. The V16 eleven-track build remains available for comparison.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
