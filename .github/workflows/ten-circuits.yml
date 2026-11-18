@@ -1,0 +1,56 @@
+name: Ten-circuit Broken Passage moving-rock physics and browser QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v15.html'
+      - 'index.html'
+      - 'src/circuit.mjs'
+      - 'src/engine.mjs'
+      - 'src/race-coach.mjs'
+      - 'src/race-art-v15.mjs'
+      - 'src/race-v15.mjs'
+      - 'src/ux-smoke-v15.mjs'
+      - 'scripts/solve-lap.mjs'
+      - 'scripts/broken-passage-qa-route.mjs'
+      - 'scripts/viewport-smoke-v15.mjs'
+      - 'styles/map-selector-v15.css'
+      - 'styles/moving-obstacles-ui.css'
+      - 'tests/broken-passage.test.mjs'
+      - 'tests/biomes.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - 'docs/PR18_BROKEN_PASSAGE.md'
+      - '.github/workflows/ten-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  moving-rocks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact moving-slab collision, full-lap geometry and all ten circuit tests
+        run: npm test
+      - name: Syntax-check V15 renderer, controller, browser QA and earlier builds
+        run: npm run check
+      - name: All nine CSS viewports, Master lap, actual moving-rock crash and preserved old mechanics
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-broken-passage.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v15.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr18-broken-passage-reviewed-previews
+          path: screenshots/snowshift-v15-*.png
+          if-no-files-found: warn

@@ -42,8 +42,8 @@ The table is a roadmap, not a claim that future tracks exist.
 | 06 | Twin Routes | Intermediate 2 | Choose between a tight inner shortcut and a wider outer detour | Base physics — **this PR** |
 | 07 | Glass Ice | Intermediate 3 | Marked ice permits changing at most one velocity component per turn | **New deterministic zone rule — this PR** |
 | 08 | Crosswind Ridge | Intermediate 4 | Counter a known southward wind vector (0,−1) in one marked field | **Deterministic external force — this PR** |
-| 09 | Icebound Rapids | Advanced 1 | Twin fixed boost strips and advance braking | **New +2 boost rule** — implemented in PR #17 (pending merge) |
-| 10 | Broken Passage | Advanced 2 | Moving obstacles on deterministic turn cycles | **Turn-indexed hazard rule** — planned |
+| 09 | Icebound Rapids | Advanced 1 | Twin fixed boost strips and advance braking | **New +2 boost rule** — merged PR #17 |
+| 10 | Broken Passage | Advanced 2 | Two moving slabs on a published six-step cycle | **Turn-indexed swept-hazard rule** — implemented in PR #18 (pending merge) |
 | 11 | Frozen Gauntlet | Advanced 3 | Combination of previously taught mechanics | Existing extended rules — planned |
 | 12 | Arctic Grand Prix | Expert Track | Longer multistage final challenge | Existing extended rules — planned |
 
@@ -57,7 +57,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
 | Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes, Glass Ice and Crosswind Ridge playable; Advanced tracks planned |
-| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | First playable Advanced circuit Icebound Rapids implemented in PR #17 (pending merge) |
+| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Icebound Rapids playable; Broken Passage (Advanced 2) in PR #18 pending merge |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
 Every future track must match the region's look, retain the exact physics-to-art shoreline, and preserve readable skimmer, gates and vectors. The region name and difficulty tier must appear in text, not colour alone. The V9 build remains an unmodified visual baseline; `theme-gallery.html` shows all four regions using identical sample geometry. See [Difficulty Region Art Standards](PR13_DIFFICULTY_REGIONS.md).
@@ -94,6 +94,12 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 10 design note — Broken Passage
+
+Advanced 2 introduces exactly one new mechanic: **two deterministically oscillating basalt slabs**. They move along clearly marked copper rails and follow the same public **six-turn cycle**. A hazard changes its location only when the player attempts a GLIDE, whether successful or a crash; it moves linearly and simultaneously with the skimmer during that turn. The engine tests the closest distance over the **entire relative movement segment**, not merely from-position and landing-point collisions. The visible slab radius is 0.55 world units, and the skimmer clearance radius is 0.8; both the current solid slab and a dashed outline of its next position appear on the board. The HUD explicitly labels current → next phase in Guided, Standard, Expert and Master; Expert/Master still conceal next-velocity projections. On a moving obstacle crash, the player is returned to the nearest previously visited safe grid point only if remaining in place would cause an unavoidable following-turn strike. The existing static crash behaviour is unchanged.
+
+A **24-turn, crash-free complete lap** navigates both actively moving passages and maintains at least **1.19 world units** of complete-segment clearance from banks and at least **0.5 world units of spare clearance** beyond the combined skimmer/slab hitbox. An independent BFS must find a real lap using the six-phase state key. Track 10 deliberately has **no boosts, wind or Glass Ice**: combined mechanics are reserved for Frozen Gauntlet. See [Track 10 mathematical design and release QA](PR18_BROKEN_PASSAGE.md). Student playtesting remains necessary.
 
 ## Track 09 design note — Icebound Rapids
 
