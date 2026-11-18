@@ -291,6 +291,34 @@ function compareBoostMovementBrowser(actions,west=false) {
   const braking=inspect(west?{x:1,y:-1}:{x:-1,y:0});
   return {coast,braking};
 }
+function crashIntoEasternSentinelBrowser(actions){
+  document.getElementById('reset').click();
+  document.querySelector('[data-mode="master"]').click();
+  for(const a of actions){
+    const button=document.querySelector('#accelerationPad [data-x="'+a.x+'"][data-y="'+a.y+'"]');
+    if(!button)throw new Error('Grand Prix route control missing');
+    button.click();document.getElementById('commit').click();
+  }
+  const before={
+    turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    lap:document.getElementById('lap').textContent,
+    phase:document.getElementById('accelNotationHint').textContent
+  };
+  const hit=document.querySelector('#accelerationPad [data-x="1"][data-y="0"]');
+  hit.click();document.getElementById('commit').click();
+  return {
+    before,turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    score:document.getElementById('score').textContent,
+    lap:document.getElementById('lap').textContent,
+    velocity:[...document.querySelectorAll('#currentVelocity [data-component]')].map(e=>Number(e.textContent)),
+    phase:document.getElementById('accelNotationHint').textContent,
+    toast:document.getElementById('eventToast').textContent,
+    master:document.getElementById('accelerationPad').dataset.notation==='columns',
+    nextHidden:document.getElementById('nextVelocity').dataset.hidden==='true'
+  };
+}
 function crashIntoMovingBasaltBrowser(){
   document.getElementById('reset').click();
   document.querySelector('[data-mode="master"]').click();
@@ -653,6 +681,45 @@ async function main(){
        !returnIce.master||!returnIce.hidden){
       console.error('FAIL return Glass Ice after boost',returnIce);failed++;
     }else console.log('PASS boost to Glass Ice transition without extra hidden rules');
+
+    // Preserve visual proof of the lap 1→2 handoff. The skimmer does NOT
+    // respawn or lose velocity and the public six-step clock continues.
+    const startFinal=await evaluation(send,'('+inspectActiveWindBrowser.toString()+')('+
+      JSON.stringify(GRAND_PRIX_LAP_ONE)+')');
+    const lapLabel=await evaluation(send,'document.getElementById("lap").textContent');
+    if(startFinal.turns!=='28'||startFinal.crashes!=='00'||
+       startFinal.current.join(',')!=='1,0'||lapLabel!=='LAP 2 / 2'||
+       !startFinal.hidden||startFinal.region!=='ECLIPSE'){
+      console.error('FAIL two-lap transition visual HUD',startFinal,lapLabel);failed++;
+    }else console.log('PASS lap 2/2 starts with preserved velocity and clock');
+    await delay(180);
+    const lapShot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    writeFileSync('screenshots/snowshift-v17-lap-two-master.png',Buffer.from(lapShot.data,'base64'));
+
+    // Track 12 adds an east-approach third rock. It is genuinely dangerous:
+    // the proven clean line succeeds but (1,0) from the same state hits its
+    // moving full-segment hitbox, not a bank or imaginary decorative object.
+    const sentinel=await evaluation(send,'('+inspectActiveWindBrowser.toString()+')('+
+      JSON.stringify(ARCTIC_GRAND_PRIX_CLEAR_RACE.slice(0,37))+')');
+    if(sentinel.turns!=='37'||sentinel.crashes!=='00'||
+       sentinel.current.join(',')!=='-1,-2'||
+       !sentinel.notation.includes('ROCKS 2→3')||
+       sentinel.enabled!==9||!sentinel.master||!sentinel.hidden||
+       sentinel.region!=='ECLIPSE'){
+      console.error('FAIL eastern sentinel live Master HUD',sentinel);failed++;
+    }else console.log('PASS third numbered moving sentinel visible before timed east descent');
+    await delay(180);
+    const rockShot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    writeFileSync('screenshots/snowshift-v17-east-sentinel-master.png',Buffer.from(rockShot.data,'base64'));
+    const hit=await evaluation(send,'('+crashIntoEasternSentinelBrowser.toString()+')('+
+      JSON.stringify(ARCTIC_GRAND_PRIX_CLEAR_RACE.slice(0,37))+')');
+    if(hit.before.turns!=='37'||hit.before.crashes!=='00'||
+       hit.before.lap!=='LAP 2 / 2'||hit.turns!=='38'||
+       hit.crashes!=='01'||hit.score!=='41'||hit.lap!=='LAP 2 / 2'||
+       hit.velocity.join(',')!=='0,0'||!hit.toast.includes('MOVING BASALT')||
+       !hit.phase.includes('ROCKS 3→4')||!hit.nextHidden||!hit.master){
+      console.error('FAIL actual third Eclipse sentinel impact and recovery',hit);failed++;
+    }else console.log('PASS real third sentinel interception: +3 penalty, final lap intact, phase advances');
 
     // Track 10 remains playable after introducing the Expert finale.
     await evaluation(send,
