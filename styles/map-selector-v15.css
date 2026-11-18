@@ -34,7 +34,7 @@
        (max-height:450px) and (orientation:landscape){
   .map-menu:not([hidden]){
     grid-template-rows:auto repeat(4,34px);
-    top:39px;max-height:calc(100% - 40px);
+    top:39px;max-height:none;overflow:visible;
     row-gap:1px;column-gap:2px;
     padding:2px 3px;
   }

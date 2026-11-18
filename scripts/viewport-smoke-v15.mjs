@@ -516,7 +516,7 @@ async function main(){
     if(records.moving.name!=='BROKEN PASSAGE' || records.moving.ghostHidden ||
        /PB —/.test(records.moving.badge) ||
        records.boost.score!=='00' || !records.boost.ghostHidden ||
-       /PB —/.test(records.boost.badge) ||
+       !/PB —/.test(records.boost.badge) ||
        records.wind.score!=='00' || !records.wind.ghostHidden ||
        !/PB —/.test(records.wind.badge) ||
        records.northern.score!=='00' || !records.northern.ghostHidden ||

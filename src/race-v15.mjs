@@ -635,7 +635,9 @@ function renderHUD() {
   }
   $('recordBadge').textContent = bestRecord ? '· PB ' + bestRecord.score : '· PB —';
   $('message').textContent=hasHazards && !state.finished
-    ? 'ROCK PHASE '+(hazardPhase+1)+'→'+(nextHazardPhase+1)+' / '+obstaclePeriod+' · GLIDE ADVANCES BOTH'
+    ? (state.lastEvent.endsWith('cleared')
+      ? state.lastEvent.toUpperCase()
+      : 'ROCK PHASE '+(hazardPhase+1)+'→'+(nextHazardPhase+1)+' / '+obstaclePeriod+' · GLIDE ADVANCES BOTH')
     : boostZone && !state.finished
     ? (boostZone.vector.x>0?'BOOST → (+2,0) · BRAKE BEFORE THE BEND':'BOOST ← (−2,0) · BRAKE BEFORE THE SWEEP')
     : circuit.id==='icebound-rapids' && state.moves===0
