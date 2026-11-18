@@ -83,8 +83,8 @@ async function verify(send,size){
   check(cards.join(',')==='4,4,3,1'&&ids===12,'Bad / duplicate track list');
   if(size==='1440x900'||size==='390x844')await shot(send,'select-'+size);
   await evaluate(send,'document.querySelector("[data-circuit=frozen-gauntlet]").click()');
-  await until(send,'document.querySelectorAll("#accelerationPad button").length===9');
-  check(await evaluate(send,'document.getElementById("mapName").textContent')==='FROZEN GAUNTLET','Solo track incorrect');
+  await until(send,'document.getElementById("mapName")?.textContent==="FROZEN GAUNTLET" && document.querySelectorAll("#accelerationPad button").length===9');
+  check(await evaluate(send,'document.documentElement.dataset.biome==="advanced" && location.search.includes("frozen-gauntlet")'),'Solo track incorrect');
   check(await evaluate(send,'!document.getElementById("mapMenu") && document.getElementById("playerStrip").hidden'),
     'In-game duplicate menu or solo multiplayer strip');
   check(!(await evaluate(send,'document.documentElement.scrollHeight>innerHeight+1 || document.documentElement.scrollWidth>innerWidth+1')),
@@ -99,7 +99,7 @@ async function verify(send,size){
   await evaluate(send,'document.getElementById("morePlayers").click()');
   check(await evaluate(send,'document.getElementById("playerCountDisplay").textContent')==='3','Player count not updated');
   await evaluate(send,'document.querySelector("[data-circuit=northern-loop]").click()');
-  await until(send,'document.querySelectorAll("#accelerationPad button").length===9');
+  await until(send,'document.documentElement.dataset.gameType==="pass-play" && document.querySelectorAll(".player-chip").length===3');
   check(await evaluate(send,'document.querySelectorAll(".player-chip").length')===3,'Not three racers');
   check(await evaluate(send,'document.documentElement.dataset.gameType==="pass-play"'),'Wrong game mode');
   check(await evaluate(send,'document.getElementById("message").textContent.startsWith("P1 · ")'),'Player 1 not active');
@@ -108,7 +108,7 @@ async function verify(send,size){
   await evaluate(send,'document.getElementById("commit").click()');
   await until(send,'!document.getElementById("handoffPanel").hidden',7000);
   check(await evaluate(send,'document.getElementById("handoffName").textContent')==='PLAYER 2','P1 -> P2 handoff failed');
-  check(await evaluate(send,'!document.querySelector(".handoff-card").scrollHeight>document.querySelector(".handoff-card").clientHeight')===false || true,'');
+  check(await evaluate(send,'(()=>{ const e=document.querySelector(".handoff-card"); const r=e.getBoundingClientRect(); return r.top>=0 && r.bottom<=innerHeight+1 && e.scrollHeight<=e.clientHeight+1; })()'),'Handoff overlay clipped');
   if(size==='390x844'||size==='667x375')await shot(send,'handoff-'+size);
   await evaluate(send,'document.getElementById("beginTurn").click()');
   check(await evaluate(send,'document.getElementById("moves").textContent')==='00','P2 inherited P1 turns');
