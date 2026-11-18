@@ -71,8 +71,8 @@ test('both obstacle positions are published, symmetric and six-turn periodic',()
 test('simultaneous full-segment sweep catches a crossing missed by endpoint checks',()=>{
   const north=c.movingObstacles[0];
   const from=p(18,22),to=p(22,22),turn=4;
-  assert.ok(Math.hypot(from.x-20,from.y-21.8)>north.radius+SKIMMER_HAZARD_HALF_WIDTH);
-  assert.ok(Math.hypot(to.x-20,to.y-20.7)>north.radius+SKIMMER_HAZARD_HALF_WIDTH);
+  assert.ok(Math.hypot(from.x-20.5,from.y-21.8)>north.radius+SKIMMER_HAZARD_HALF_WIDTH);
+  assert.ok(Math.hypot(to.x-20.5,to.y-20.7)>north.radius+SKIMMER_HAZARD_HALF_WIDTH);
   assert.ok(movingObstacleApproach(from,to,north,turn)<1.35,
     'Both endpoints clear, but two moving paths intersect at an intermediate fraction');
   assert.equal(movingObstacleImpact(from,to,c,turn).id,'north-shuttle');
@@ -127,7 +127,9 @@ test('a stationary car still risks a collision when a basalt slab moves onto it'
   const crash=takeTurn(state,p(0,0),c);
   assert.equal(crash.moves,1);
   assert.equal(crash.crashes,1);
-  assert.deepEqual(crash.position,state.position);
+  assert.deepEqual(crash.position,c.start,
+    'After a rock strikes a stationary car, reset to safe ice rather than repeat unavoidable impacts');
+  assert.ok(movingObstaclePathClearance(crash.position,crash.position,c,crash.moves)>=0.05);
 });
 
 test('old nine courses have unchanged movement and no turn-indexed hazard hitboxes',()=>{

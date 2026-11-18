@@ -295,6 +295,25 @@ export function score(state, circuit = NORTHERN_LOOP) {
   return state.moves + state.crashes * circuit.crashPenalty;
 }
 
+
+/**
+ * A player cannot safely remain inside an obstacle's NEXT sweep after a crash.
+ * Recover to the most recent previously visited, driveable and safe gridpoint
+ * (or the initial starting pad as a last resort). Only moving-slab collisions
+ * use this rescue rule; prior snowbank crash behaviour is unchanged.
+ */
+function safeMovingRecovery(state,circuit){
+  const nextTurn=state.moves+1;
+  const safe=p=>onTrack(p,circuit) &&
+    movingObstaclePathClearance(p,p,circuit,nextTurn)>=0.05;
+  if(safe(state.position))return {position:{...state.position},trail:state.trail};
+  for(let i=(state.trail?.length??0)-1;i>=0;i--){
+    const candidate=state.trail[i].from;
+    if(safe(candidate))return {position:{...candidate},trail:state.trail.slice(0,i)};
+  }
+  return {position:{...circuit.start},trail:[]};
+}
+
 export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
   if (state.finished) return state;
   const move = previewMove(state, acceleration, circuit);
@@ -304,10 +323,15 @@ export function takeTurn(state, acceleration, circuit = NORTHERN_LOOP) {
     return { ...state, lastEvent:'Glass Ice: one axis per turn' };
   }
   if (!move.valid) {
-    // A crash keeps the player at the last legal grid point, kills velocity,
-    // and costs one attempted turn plus an additional score penalty.
+    // Static collisions preserve the classic behaviour. Dynamic collisions
+    // rescue only when the next timed obstacle sweep would trap the player.
+    const recovery=move.movingObstacle
+      ? safeMovingRecovery(state,circuit)
+      : {position:state.position,trail:state.trail};
     return {
       ...state,
+      position: recovery.position,
+      trail: recovery.trail,
       velocity: { x: 0, y: 0 },
       moves: state.moves + 1,
       crashes: state.crashes + 1,
