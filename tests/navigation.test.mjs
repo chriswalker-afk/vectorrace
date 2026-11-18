@@ -52,3 +52,13 @@ test('world gallery leads to Home and current selector, never an obsolete build'
   assert.doesNotMatch(gallery,/href="[^"]*race-v\d+\.html"/);
   assert.doesNotMatch(gallery,/Advanced and Expert courses are not yet implemented/);
 });
+
+test('public race controller uses the V18 hotseat flow, never a retired map menu',()=>{
+  const controller=read('src/race-v18.mjs');
+  assert.match(controller,/match=playHotseatMove\(match,selection,circuit\)/);
+  assert.match(controller,/handoffPending=true/);
+  assert.match(controller,/hotseatFinished\(match\)/);
+  assert.match(controller,/beginTurn'\)\.addEventListener\('click', startNextTurn\)/);
+  assert.match(controller,/match=activateHotseatPlayer\(match,next\)/);
+  assert.doesNotMatch(controller,/toggleMapMenu|closeMapMenu|showTrackPickerOnEntry|mapMenu/);
+});
