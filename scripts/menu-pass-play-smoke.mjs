@@ -124,7 +124,7 @@ async function verify(send,size){
     document.querySelector('#styleChoices [data-style="glider"]').click();
     document.querySelector('#bodyColours [data-colour="#8098ff"]').click();
   })()`);
-  check(await evaluate(send,'document.querySelector("#carRoster [data-player=\"2\"]").getAttribute("aria-pressed")==="true" && location.search.includes("rally-f7518a") && location.search.includes("glider-8098ff")'),
+  check(await evaluate(send,'document.querySelector("#carRoster .racer-option:nth-child(2)").getAttribute("aria-pressed")==="true" && location.search.includes("rally-f7518a") && location.search.includes("glider-8098ff")'),
     'Pass & Play cars did not maintain independent designs');
   if(size==='390x844'||size==='1440x900')await shot(send,'multiplayer-garage-'+size);
   await evaluate(send,'document.querySelector("[data-circuit=northern-loop]").click()');
@@ -168,7 +168,7 @@ async function verify(send,size){
   await until(send,'document.querySelectorAll(".track-card").length===12');
   check(await evaluate(send,'location.search.includes("mode=pass-play") && location.search.includes("players=3")'),
     'Change Track did not preserve multiplayer setup');
-  check(await evaluate(send,'location.search.includes("rally-f7518a") && location.search.includes("glider-8098ff") && document.querySelector("#carRoster [data-player=\"2\"]")'),
+  check(await evaluate(send,'location.search.includes("rally-f7518a") && location.search.includes("glider-8098ff") && document.querySelector("#carRoster .racer-option:nth-child(2)")'),
     'Change Track did not preserve each multiplayer car');
   console.log('PASS '+size+' car garage, solo persistence, 3 individual car skins, handoff, reset and track change');
 }
