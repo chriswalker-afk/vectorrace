@@ -43,8 +43,8 @@ The table is a roadmap, not a claim that future tracks exist.
 | 07 | Glass Ice | Intermediate 3 | Marked ice permits changing at most one velocity component per turn | **New deterministic zone rule — this PR** |
 | 08 | Crosswind Ridge | Intermediate 4 | Counter a known southward wind vector (0,−1) in one marked field | **Deterministic external force — this PR** |
 | 09 | Icebound Rapids | Advanced 1 | Twin fixed boost strips and advance braking | **New +2 boost rule** — merged PR #17 |
-| 10 | Broken Passage | Advanced 2 | Two moving slabs on a published six-step cycle | **Turn-indexed swept-hazard rule** — implemented in PR #18 (pending merge) |
-| 11 | Frozen Gauntlet | Advanced 3 | Combination of previously taught mechanics | Existing extended rules — planned |
+| 10 | Broken Passage | Advanced 2 | Two moving slabs on a published six-step cycle | **Turn-indexed swept-hazard rule** — merged PR #18 |
+| 11 | Frozen Gauntlet | Advanced 3 | Glass + crosswind, then timed boost + moving slab, return Glass Ice | **Four existing mechanics combined** — implemented in PR #19 (pending merge) |
 | 12 | Arctic Grand Prix | Expert Track | Longer multistage final challenge | Existing extended rules — planned |
 
 For upcoming Track 04 onward, build from this checklist and commit a concise track-design note alongside the new geometry.
@@ -57,7 +57,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 |---|---|---|---|
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
 | Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes, Glass Ice and Crosswind Ridge playable; Advanced tracks planned |
-| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Icebound Rapids playable; Broken Passage (Advanced 2) in PR #18 pending merge |
+| Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Icebound Rapids and Broken Passage playable; Frozen Gauntlet (Advanced 3) implemented in PR #19 |
 | Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
 
 Every future track must match the region's look, retain the exact physics-to-art shoreline, and preserve readable skimmer, gates and vectors. The region name and difficulty tier must appear in text, not colour alone. The V9 build remains an unmodified visual baseline; `theme-gallery.html` shows all four regions using identical sample geometry. See [Difficulty Region Art Standards](PR13_DIFFICULTY_REGIONS.md).
@@ -94,6 +94,12 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 11 design note — Frozen Gauntlet
+
+The first true **combined-rule track** uses only previously taught operations, with no new physics. A broad translucent upper **paired field** shares one exact polygon for both Glass Ice (one-axis selected acceleration) and Crosswind Ridge's southward wind (0,−1); the wind still acts when Glass Ice disables diagonals. A first moving basalt slab crosses the exit of that zone on its public six-turn rhythm. On the lower return a painted (−2,0) westward boost fires when a turn starts on the strip while a second moving basalt slab crosses the same path. A separate lower Glass Ice zone reinforces one-axis braking following the return boost. In every help mode, both rocks' present and next positions, their phase clock and all known surface forces remain visible. Expert and Master still hide next velocity/destination predictions.
+
+The route has its own silhouette (widened Ember Rift basalt shelf and deep island notch). A 24-turn crash-free proof crosses the upper combined zone on turns 5–6, deliberately counteracts (0,−1) with allowed single-axis vectors, times the upper rock, activates the west boost on turn 14 while crossing lower moving basalt, and obeys return Glass Ice on turns 15–16. Whole-segment margin is **>=1.19 world units** to banks and **>=0.51 world units clear of the slab+skimmer combined hitbox**. Independent BFS finds a different completed 22-turn lap that also activates coupled rules, boost and return Glass Ice. See [Track 11 maths and QA](PR19_FROZEN_GAUNTLET.md). The last planned circuit is Arctic Grand Prix (Expert / Eclipse Summit).
 
 ## Track 10 design note — Broken Passage
 

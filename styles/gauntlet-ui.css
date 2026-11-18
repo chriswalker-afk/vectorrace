@@ -1,0 +1,21 @@
+/* Public simultaneous Glass + Wind physics in all four assistance modes;
+   Expert/Master retain hidden predicted next velocity. */
+html[data-surface="coupled"] #accelNotationHint{
+  color:#d6faff;font-weight:900;letter-spacing:0;
+  font-size:clamp(8px,.8vw,11px);
+}
+html[data-surface="coupled"] .readout-grid{
+  border-color:#d6e7ff;box-shadow:0 0 12px #b5acff66;
+}
+html[data-surface="coupled"] #message{
+  color:#fff2d2;font-weight:900;text-shadow:0 2px 5px #211c40;
+}
+html[data-surface="coupled"] #accelerationPad{
+  outline:1px solid #c7faff9c;border-radius:5px;
+}
+html[data-surface="coupled"] .acceleration-pad button:not([disabled]){
+  border-color:#c0deffac;
+}
+html[data-coupled="true"] #nextMoveLabel[data-tone="glass"]{
+  color:#dcffff;font-weight:900;
+}
