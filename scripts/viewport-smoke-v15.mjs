@@ -254,6 +254,29 @@ function compareBoostMovementBrowser(actions,west=false) {
   const braking=inspect(west?{x:1,y:-1}:{x:-1,y:0});
   return {coast,braking};
 }
+function crashIntoMovingBasaltBrowser(){
+  document.getElementById('reset').click();
+  document.querySelector('[data-mode="master"]').click();
+  const glide=(x,y)=>{
+    const control=document.querySelector('#accelerationPad [data-x="'+x+'"][data-y="'+y+'"]');
+    if(!control)throw new Error('Missing Master matrix for rock collision');
+    control.click();document.getElementById('commit').click();
+  };
+  glide(1,-1);glide(1,1);glide(1,0);glide(1,0);
+  const before=document.getElementById('message').textContent;
+  glide(-1,0); // Driveable bank path, but slab intersects the fifth glide.
+  return {
+    before,
+    turns:document.getElementById('moves').textContent,
+    crashes:document.getElementById('crashes').textContent,
+    score:document.getElementById('score').textContent,
+    velocity:[...document.querySelectorAll('#currentVelocity [data-component]')]
+      .map(x=>Number(x.textContent)),
+    phase:document.getElementById('accelNotationHint').textContent,
+    toast:document.getElementById('eventToast').textContent,
+    nextHidden:document.getElementById('nextVelocity').dataset.hidden==='true'
+  };
+}
 function crashIntoGlacierBrowser() {
   document.getElementById('reset').click();
   document.getElementById('mapPicker').click();
@@ -517,6 +540,34 @@ async function main(){
     }else{
       console.log('PASS ten independent personal bests: moving hazard record preserved');
     }
+
+    // The two six-step shuttles are real, not decorative barriers.
+    const phaseInfo=await evaluation(send,'('+inspectActiveWindBrowser.toString()+')('+
+      JSON.stringify(BROKEN_PASSAGE_CLEAR_LAP.slice(0,5))+')');
+    if(phaseInfo.turns!=='05'||phaseInfo.crashes!=='00'||
+       phaseInfo.surface!=='moving'||phaseInfo.enabled!==9||
+       !phaseInfo.notation.includes('ROCKS 6→1')||
+       !phaseInfo.banner.includes('ROCK PHASE 6→1')||
+       !phaseInfo.master||!phaseInfo.hidden||
+       phaseInfo.region!=='EMBER RIFT'){
+      console.error('FAIL timed rocks Master HUD',phaseInfo);failed++;
+    }else console.log('PASS active moving rocks: six-step phase, all controls and hidden next velocity');
+    await delay(180);
+    const movingShot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false,fromSurface:true});
+    writeFileSync('screenshots/snowshift-v15-active-moving-rocks-master.png',
+      Buffer.from(movingShot.data,'base64'));
+    const rock=await evaluation(send,'('+crashIntoMovingBasaltBrowser.toString()+')()');
+    if(rock.turns!=='05'||rock.crashes!=='01'||rock.score!=='08'||
+       rock.velocity.join(',')!=='0,0'||!rock.toast.includes('MOVING BASALT')||
+       !rock.before.includes('ROCK PHASE 5→6')||
+       !rock.phase.includes('ROCKS 6→1')||!rock.nextHidden){
+      console.error('FAIL moving basalt intercept/crash/clock advance',rock);
+      failed++;
+    }else console.log('PASS real moving-rock crash: bank-legal glide intercepted, +3, clock progresses');
+
+    // Preserve all Track 09 boost QA in the V15 runtime.
+    await evaluation(send,
+      'document.getElementById("mapPicker").click();document.querySelector("[data-circuit=icebound-rapids]").click()');
 
     // Test BOTH signed strips through the actual Master-mode buttons, with
     // public pad information and hidden future velocities.
