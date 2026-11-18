@@ -479,7 +479,7 @@ function renderCircuitUI() {
   document.documentElement.dataset.hazards=circuit.movingObstacles?.length?'moving':'none';
   document.documentElement.dataset.gameType=gameSettings.gameType;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',biome.uiBg);
-  $('biomeShort').textContent=(multiplayer?'PASS & PLAY · ':'')+biome.shortName;
+  $('biomeShort').textContent=(multiplayer?'P&P · ':'')+biome.shortName;
   $('mapNumber').textContent=number;
   $('mapName').textContent=circuit.name.toUpperCase();
   $('mapLevel').childNodes[0].textContent=circuit.level+' ';
@@ -517,6 +517,9 @@ function showHandoff() {
   const current=match.players[match.activeIndex];
   const nextIndex=nextHotseatPlayer(match);
   if(nextIndex<0)return showMatchResults();
+  if(nextIndex===match.activeIndex){
+    selection={x:1,y:0};renderHUD();scheduleDraw();return;
+  }
   const next=match.players[nextIndex];
   awaitingNextPlayer=true;
   $('handoffPrevious').textContent=current.name.toUpperCase()+

@@ -1,0 +1,53 @@
+name: Snowshift V18 menus and Pass & Play
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'select-track.html'
+      - 'race.html'
+      - 'theme-gallery.html'
+      - 'src/track-select.mjs'
+      - 'src/pass-play.mjs'
+      - 'src/race-v18.mjs'
+      - 'src/ux-smoke-v18.mjs'
+      - 'styles/track-select.css'
+      - 'styles/pass-play.css'
+      - 'tests/pass-play.test.mjs'
+      - 'tests/navigation.test.mjs'
+      - 'scripts/menu-pass-play-smoke.mjs'
+      - 'package.json'
+      - '.github/workflows/menu-pass-play.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  v18-play:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit tests across physics, navigation and per-player states
+        run: npm test
+      - name: Syntax-check current game and archived versions
+        run: npm run check
+      - name: Browser test mode -> map -> race and 3-player handoffs
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/snowshift-v18-http.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/menu-pass-play-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-v18-menu-and-handoff-screens
+          path: screenshots/snowshift-v18-*.png
+          if-no-files-found: warn

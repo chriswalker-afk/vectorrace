@@ -65,6 +65,13 @@ npm run check
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/race.html` to choose from all twelve tracks. Add `?track=arctic-grand-prix` for the final two-lap Eclipse Cup. The V16 eleven-track build remains available for comparison.
+Open `http://localhost:8000/` to choose Single Player or Pass & Play, then choose from all twelve tracks on `select-track.html`. Direct course links such as `race.html?track=arctic-grand-prix&mode=single` remain available. Add `?track=arctic-grand-prix` for the final two-lap Eclipse Cup. The V16 eleven-track build remains available for comparison.
 
 PR #3 introduces original reusable SVG vehicles, scenery and surface materials. The assets still require visual review before they are final production artwork.
+
+## Build 18: public menu and local Pass & Play
+
+- The public homepage offers **Single Player** and **Pass & Play**, each leading to a dedicated, shared twelve-circuit selection page. The public race page is `race.html`; versioned pages remain as historical QA snapshots.
+- Pass & Play: choose **2, 3 or 4** players on the track selector, then take **one vector glide per player**. Hand the device to the next racer and tap **Start Turn** to continue. Each player has an independent race state, checkpoints, lap progress and obstacle phase clock. Players do not collide with one another. The game skips completed racers and compares final scores (**turns + 3 × crashes**, lowest wins; equal scores tie).
+- **Home** always returns to the title page; **Change Track** always returns to the track selector for the same game mode and number of players. **Reset** restarts the current race or entire Pass & Play match; **Race Again** restarts on the current circuit.
+- Local personal bests and ghosts belong to Single Player only. Pass & Play never saves over solo personal bests.
