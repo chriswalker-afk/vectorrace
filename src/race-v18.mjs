@@ -473,56 +473,108 @@ function frame(now) {
 
 
 function renderCircuitUI() {
-  const number = String(CIRCUITS.indexOf(circuit) + 1).padStart(2, '0');
+  const number=String(CIRCUITS.indexOf(circuit)+1).padStart(2,'0');
   const biome=biomeForCircuit(circuit);
   document.documentElement.dataset.biome=biome.id;
   document.documentElement.dataset.hazards=circuit.movingObstacles?.length?'moving':'none';
-  document.querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content',biome.uiBg);
-  $('biomeShort').textContent=biome.shortName;
-  $('mapNumber').textContent = number;
-  $('mapName').textContent = circuit.name.toUpperCase();
-  $('mapLevel').childNodes[0].textContent = circuit.level + ' ';
-  $('circuitHeading').textContent = number + ' / ' + circuit.name.toUpperCase();
-  $('mapPicker').setAttribute('aria-label',
-    'Choose race circuit. Current: ' + circuit.name + ', ' + circuit.level +
-    '. Region: ' + biome.name);
-  $('mapPicker').title=biome.name+' · '+biome.tagline;
+  document.documentElement.dataset.gameType=gameSettings.gameType;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',biome.uiBg);
+  $('biomeShort').textContent=(multiplayer?'PASS & PLAY · ':'')+biome.shortName;
+  $('mapNumber').textContent=number;
+  $('mapName').textContent=circuit.name.toUpperCase();
+  $('mapLevel').childNodes[0].textContent=circuit.level+' ';
+  $('circuitHeading').textContent=number+' / '+circuit.name.toUpperCase();
+  $('mapPicker').setAttribute('aria-label','Change track. Current: '+circuit.name+', '+circuit.level);
+  $('mapPicker').title='Change track · '+biome.name;
   $('mapName').closest('.game-board').setAttribute('aria-label',circuit.name+' race circuit');
-  document.title = 'SNOWSHIFT · ' + biome.name + ' · ' + circuit.name + ' · Race V17';
-  for(const option of document.querySelectorAll('[data-circuit]')) {
-    option.setAttribute('aria-current',String(option.dataset.circuit === circuit.id));
-    const optionCircuit=CIRCUITS.find(c=>c.id===option.dataset.circuit);
-    if(optionCircuit)option.dataset.tier=tierFromLevel(optionCircuit.level);
-  }
+  const chooser=selectUrl(gameSettings.gameType,gameSettings.players);
+  $('mapPicker').href=chooser;
+  $('finishChooseTrack').href=chooser;
+  document.title='SNOWSHIFT · '+(multiplayer?'Pass & Play · ':'')+circuit.name;
+  $('reset').title=multiplayer?'Restart this entire Pass & Play match':'Restart race';
+  $('reset').setAttribute('aria-label',multiplayer?'Restart match':'Reset race');
+  $('playerStrip').hidden=!multiplayer;
+  $('microHint').hidden=multiplayer;
+  if(multiplayer)renderPlayers();
 }
-function closeMapMenu() {
-  $('mapMenu').hidden = true;
-  $('mapPicker').setAttribute('aria-expanded','false');
-}
-function toggleMapMenu() {
-  const open=$('mapMenu').hidden;
-  $('mapMenu').hidden = !open;
-  $('mapPicker').setAttribute('aria-expanded',String(open));
-}
-function switchCircuit(nextId) {
-  const next = getCircuit(nextId);
-  if (!CIRCUITS.some(c => c.id === nextId)) return;
-  closeMapMenu();
-  if (next.id === circuit.id) return;
 
-  circuit = next;
-  records = createRecordStore(storage, circuit.id);
-  bestRecord = records.load();
+function renderPlayers() {
+  if(!multiplayer)return;
+  const strip=$('playerStrip');
+  strip.replaceChildren();
+  match.players.forEach((player,i)=>{
+    const chip=document.createElement('span');
+    chip.className='player-chip'+(i===match.activeIndex?' is-active':'')+
+      (player.state.finished?' is-finished':'');
+    chip.style.setProperty('--player-color',player.color);
+    chip.textContent='P'+player.id+' '+(player.state.finished?'✓':score(player.state,circuit));
+    chip.title=player.name+' · '+(player.state.finished?'finished':score(player.state,circuit)+' points');
+    strip.appendChild(chip);
+  });
+}
+
+function showHandoff() {
+  const current=match.players[match.activeIndex];
+  const nextIndex=nextHotseatPlayer(match);
+  if(nextIndex<0)return showMatchResults();
+  const next=match.players[nextIndex];
+  awaitingNextPlayer=true;
+  $('handoffPrevious').textContent=current.name.toUpperCase()+
+    (current.state.finished?' FINISHED · SCORE '+score(current.state,circuit):' · TURN COMPLETE');
+  $('handoffSummary').textContent=current.name+' has '+score(current.state,circuit)+
+    ' points after '+current.state.moves+' glides.';
+  $('handoffName').textContent=next.name.toUpperCase();
+  $('handoffName').style.color=next.color;
+  $('beginTurn').textContent='START '+next.name.toUpperCase()+' ↗';
+  $('handoffPanel').hidden=false;
+  $('beginTurn').focus();
+}
+
+function startNextTurn() {
+  if(!multiplayer||!awaitingNextPlayer)return;
+  const next=nextHotseatPlayer(match);
+  if(next<0)return showMatchResults();
+  match=activateHotseatPlayer(match,next);
+  state=match.players[next].state;
+  heading=match.players[next].heading;
+  turnFrames=match.players[next].frames;
+  selection={x:1,y:0};
+  animation=null;hazardMotion=null;burst=null;flashUntil=0;toastUntil=0;
+  $('eventToast').hidden=true;
+  $('handoffPanel').hidden=true;
+  awaitingNextPlayer=false;
   closeTutorial();
-  reset();
-  renderCircuitUI();
-  $('ghostToggle').hidden = !bestRecord || !modePolicy(mode).selectedDestination;
-  // Deep-linkable track selection while preserving ?qa=1 if active.
-  const url = new URL(window.location.href);
-  url.searchParams.set('track',circuit.id);
-  history.replaceState(null,'',url);
-  showToast(biomeForCircuit(circuit).name.toUpperCase()+' · '+circuit.level, 'gate', 1100);
+  renderHUD();
+  scheduleDraw();
+}
+
+function showMatchResults() {
+  awaitingNextPlayer=false;
+  $('handoffPanel').hidden=true;
+  const standings=hotseatStandings(match,circuit);
+  const winner=standings[0];
+  const tied=standings.filter(p=>p.points===winner.points);
+  $('finishTitle').textContent=tied.length>1?'TIE AT THE TOP!':'RACE RESULTS';
+  $('finishIntro').textContent=tied.length>1
+    ? tied.map(p=>p.name).join(' & ')+' share the win!'
+    : winner.name+' wins the '+circuit.name+' race!';
+  $('finishScoreLabel').textContent='LOWEST SCORE WINS';
+  $('finalScore').textContent=String(winner.points);
+  $('bestResult').textContent='TURNS + 3 POINTS PER CRASH';
+  const rows=$('matchResults');
+  rows.replaceChildren();
+  rows.hidden=false;
+  standings.forEach(player=>{
+    const item=document.createElement('div');item.className='result-row';
+    const label=document.createElement('strong');
+    label.style.color=player.color;
+    label.textContent=player.place+'. '+player.name;
+    const points=document.createElement('span');
+    points.textContent=player.points+' pts · '+player.state.moves+' turns · '+player.state.crashes+' crashes';
+    item.append(label,points);rows.appendChild(item);
+  });
+  $('finishPanel').hidden=false;
+  $('raceAgain').focus();
 }
 
 const tour = [
