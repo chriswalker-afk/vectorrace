@@ -5,13 +5,15 @@
 import { ACCELERATIONS, createRace, previewMove, gateProgress, movingObstaclePeriod } from '../src/engine.mjs';
 import { NORTHERN_LOOP } from '../src/circuit.mjs';
 
-export function findLegalLap(circuit = NORTHERN_LOOP) {
-  const start = createRace(circuit);
+export function findLegalLap(circuit = NORTHERN_LOOP, initialState = null) {
+  // Optional real in-progress race lets multi-lap QA independently solve the
+  // FINAL lap without resetting the skimmer's speed, gates or rock phase.
+  const start = initialState ?? createRace(circuit);
   const period=movingObstaclePeriod(circuit);
   // Waiting can be strategically crucial: revisit the SAME cell at a
   // DIFFERENT hazard phase. Old static circuits still use a single phase.
   const key = s => [s.position.x,s.position.y,s.velocity.x,s.velocity.y,
-    s.checkpoint,(s.moves??0)%period].join(',');
+    s.checkpoint,s.laps,(s.moves??0)%period].join(',');
   const nodes = [{ state: start, parent: -1, acceleration: null, depth: 0 }];
   const visited = new Set([key(start)]);
   const maxStates = 220000;

@@ -1,0 +1,55 @@
+name: Twelve-circuit Arctic Grand Prix two-lap Expert finale and browser QA
+
+on:
+  pull_request:
+    paths:
+      - 'race-v17.html'
+      - 'index.html'
+      - 'src/circuit.mjs'
+      - 'src/engine.mjs'
+      - 'src/race-v17.mjs'
+      - 'src/race-art-v17.mjs'
+      - 'src/ux-smoke-v17.mjs'
+      - 'scripts/solve-lap.mjs'
+      - 'scripts/arctic-grand-prix-qa-route.mjs'
+      - 'scripts/viewport-smoke-v17.mjs'
+      - 'styles/map-selector-v17.css'
+      - 'styles/grand-prix-ui.css'
+      - 'tests/arctic-grand-prix.test.mjs'
+      - 'tests/biomes.test.mjs'
+      - 'docs/TRACK_DIFFICULTY_ROADMAP.md'
+      - 'docs/PR20_ARCTIC_GRAND_PRIX.md'
+      - '.github/workflows/twelve-circuits.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  grand-prix-finale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: All twelve courses and 50-turn two-lap Expert mathematics regressions
+        run: npm test
+      - name: Check v17 and all earlier build scripts
+        run: npm run check
+      - name: Nine exact viewports, 12-map picker, two-lap Master race and real third-sentinel crash
+        run: |
+          set -e
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/snowshift-arctic-grand-prix.log 2>&1 &
+          sleep 2
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          node scripts/viewport-smoke-v17.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snowshift-pr20-eclipse-cup-reviewed-previews
+          path: screenshots/snowshift-v17-*.png
+          if-no-files-found: warn

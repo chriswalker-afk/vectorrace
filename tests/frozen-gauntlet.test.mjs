@@ -17,7 +17,7 @@ import {MIN_RECOMMENDED_CLEARANCE,visualSkimmerPathClearance} from '../scripts/t
 const c=FROZEN_GAUNTLET,p=(x,y)=>({x,y});
 
 test('Frozen Gauntlet is the 11th Advanced circuit, no new core physics',()=>{
-  assert.equal(CIRCUITS.length,11);
+  assert.ok(CIRCUITS.length>=11);
   assert.strictEqual(CIRCUITS[10],c);
   assert.strictEqual(getCircuit('frozen-gauntlet'),c);
   assert.equal(c.level,'ADVANCED 3');

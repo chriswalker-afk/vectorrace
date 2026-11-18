@@ -44,8 +44,8 @@ The table is a roadmap, not a claim that future tracks exist.
 | 08 | Crosswind Ridge | Intermediate 4 | Counter a known southward wind vector (0,−1) in one marked field | **Deterministic external force — this PR** |
 | 09 | Icebound Rapids | Advanced 1 | Twin fixed boost strips and advance braking | **New +2 boost rule** — merged PR #17 |
 | 10 | Broken Passage | Advanced 2 | Two moving slabs on a published six-step cycle | **Turn-indexed swept-hazard rule** — merged PR #18 |
-| 11 | Frozen Gauntlet | Advanced 3 | Glass + crosswind, then timed boost + moving slab, return Glass Ice | **Four existing mechanics combined** — implemented in PR #19 (pending merge) |
-| 12 | Arctic Grand Prix | Expert Track | Longer multistage final challenge | Existing extended rules — planned |
+| 11 | Frozen Gauntlet | Advanced 3 | Glass + crosswind, then timed boost + moving slab, return Glass Ice | **Four existing mechanics combined** — merged PR #19 |
+| 12 | Arctic Grand Prix | Expert 1 | **Two continuous laps**, three timed sentinels, compound fields and forced boost | **Expert finale** — implemented in PR #20 (pending merge) |
 
 For upcoming Track 04 onward, build from this checklist and commit a concise track-design note alongside the new geometry.
 
@@ -58,7 +58,7 @@ Each difficulty tier takes the player into a new cosmetic environment. Visual th
 | Beginner | **Snowbound Valley** | Blue ice, fresh snow, pines and cabins | Four playable circuits |
 | Intermediate | **Aurora Vale** | Violet sky, cyan ice, glowing crystals and northern lights | Hairpin Hollow, Twin Routes, Glass Ice and Crosswind Ridge playable; Advanced tracks planned |
 | Advanced | **Ember Rift** | Basalt cliffs, charcoal ice, amber banks and land fissures | Icebound Rapids and Broken Passage playable; Frozen Gauntlet (Advanced 3) implemented in PR #19 |
-| Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | Visual style ready; no playable Expert track yet |
+| Expert | **Eclipse Summit** | Black glass ice, gold markers, dark monoliths and eclipse halo | First Expert circuit Arctic Grand Prix, two-lap finale in PR #20 |
 
 Every future track must match the region's look, retain the exact physics-to-art shoreline, and preserve readable skimmer, gates and vectors. The region name and difficulty tier must appear in text, not colour alone. The V9 build remains an unmodified visual baseline; `theme-gallery.html` shows all four regions using identical sample geometry. See [Difficulty Region Art Standards](PR13_DIFFICULTY_REGIONS.md).
 
@@ -94,6 +94,12 @@ Every future track must match the region's look, retain the exact physics-to-art
 
 ## Empirical difficulty evidence
 Track each map's minimum crash-free moves; average or median player score (turns + crash penalties); completion rate; number of crashes and where; and whether the key challenge is actually encountered. A one-move theoretical difference is **not** proof of good progression. Prefer multiple forgiving solutions before exact shortest route optimization.
+
+## Track 12 design note — Arctic Grand Prix
+
+**Eclipse Summit / EXPERT 1** concludes the original twelve-track progression with a real two-lap championship. Unlike Track 11, the challenge now tests **sustained precision and adaptation** rather than one combination of familiar effects. There is no teleportation, no random weather and no newly invented movement rule: the northern coupled Glass+Wind field, west (-2,0) boost and return Glass Ice all use their established start-of-turn definitions; three moving sentinels share a published deterministic six-phase clock. The extra, smaller **eastern sentinel** uses full simultaneous swept collision, including the whole segment between safe-looking endpoints. Each lap must clear East, Return and West in order before crossing Finish. Finishing the first lap does **not** stop the skimmer or reset momentum, position, hazards, phase, score or crash count; the checkpoint sequence alone restarts.
+
+The grand prix has a new serrated mountain outer bank, inward-set faceted island, and a westward-shifted finish line giving safe braking room before lap two. The custom Eclipse Summit region includes black-glass ice, gold lights, a gilded island emblem, gold-trimmed numbered moving sentinels and a dedicated Expert selection card. A **50-turn collision-free complete race** (28-turn first lap + 22-turn second lap) is verified from the actual start, covers all three genuinely moving hazard lanes, passes **six ordered checkpoint gates**, and engages Glass+Wind, boost and return glass on **both laps**. Exact whole-path bank margin **>=1.42** world units and moving obstacle hitbox clearance **>=0.45** world units. The exact solver independently completes another final lap **from the real lap-one state**, preserving velocity, phase and lap count. In-app Guided/Standard/Expert/Master help all disclose rock timing and known force vectors; Expert/Master still conceal future velocity predictions. The final one-screen menu contains **4 Beginner + 4 Intermediate + 3 Advanced + 1 Expert** entries. See [Track 12 maths and QA](PR20_ARCTIC_GRAND_PRIX.md). Classroom challenge playtesting remains recommended before release.
 
 ## Track 11 design note — Frozen Gauntlet
 
